@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/add_product_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ListingsView extends StatelessWidget {
   @override
@@ -41,6 +42,17 @@ class ListingsView extends StatelessWidget {
               final productPrice = product['price'] ?? 0.0;
 
               return ListTile(
+                leading: CachedNetworkImage(
+                  // Use CachedNetworkImage
+                  imageUrl: product['image_url'] ??
+                      '', // Provide default empty string
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) =>
+                      Icon(Icons.error, size: 50),
+                ),
                 title: Text(productName),
                 subtitle: Text('₱ ${productPrice.toStringAsFixed(2)}'),
                 trailing: Row(
@@ -56,6 +68,7 @@ class ListingsView extends StatelessWidget {
                               productId: productId,
                               productName: productName,
                               productPrice: productPrice,
+                              productImageUrl: product['image_url'],
                             ),
                           ),
                         );
