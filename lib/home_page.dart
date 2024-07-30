@@ -1,40 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/dashboard_view.dart';
+import 'package:unshelf_seller/orders_view.dart';
+import 'package:unshelf_seller/listings_view.dart';
+import 'package:unshelf_seller/store_view.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  // List of screens to display
+  final List<Widget> _screens = [
+    DashboardView(),
+    OrdersView(),
+    ListingsView(),
+    StoreView(),
+  ];
+
+  final List<String> _titles = [
+    'Dashboard',
+    'Orders',
+    'Listings',
+    'Store',
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get the current user from FirebaseAuth
-    User? user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: Text(_titles[_selectedIndex]),
+        automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance
-              .collection('users')
-              .doc(user?.uid)
-              .get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            }
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Text('User data not found');
-            }
-
-            var userData = snapshot.data!.data() as Map<String, dynamic>;
-            String displayName = userData['name'] ?? 'User';
-
-            return Text('Welcome, $displayName!');
-          },
-        ),
+      body: _screens[_selectedIndex], // Display the selected screen
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt),
+            label: 'Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Listings',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Store',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.green,
+        onTap: _onItemTapped,
       ),
     );
   }
