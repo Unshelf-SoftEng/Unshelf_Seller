@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
-class EditStoreDetailsScreen extends StatefulWidget {
+class EditStoreSchedScreen extends StatefulWidget {
   final StoreModel userProfile;
 
-  EditStoreDetailsScreen({required this.userProfile});
+  EditStoreSchedScreen({required this.userProfile});
 
   @override
-  _EditStoreDetailsScreenState createState() => _EditStoreDetailsScreenState();
+  _EditStoreSchedScreenState createState() => _EditStoreSchedScreenState();
 }
 
-class _EditStoreDetailsScreenState extends State<EditStoreDetailsScreen> {
+class _EditStoreSchedScreenState extends State<EditStoreSchedScreen> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, Map<String, String>> _storeSchedule;
   final DateFormat _timeFormatter = DateFormat('HH:mm');

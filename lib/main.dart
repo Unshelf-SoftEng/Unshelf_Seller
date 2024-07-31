@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:unshelf_seller/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyCmzJYL0RqnGHP7OCu-8TyNVqWsSdATGf0",
+    options: FirebaseOptions(
+      apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
       appId: "1:733152787617:android:3c3e7b87d0cb7c59f544e0",
       messagingSenderId: "733152787617",
       projectId: "unshelf-d4567",

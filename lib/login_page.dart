@@ -77,6 +77,7 @@ class _SignInPageState extends State<SignInPage> {
                   }
                   return null;
                 },
+                onFieldSubmitted: (value) => _signIn(),
               ),
               const SizedBox(height: 20),
               ElevatedButton(

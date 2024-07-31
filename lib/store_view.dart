@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/models/store_model.dart';
-import 'package:unshelf_seller/edit_profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/models/store_model.dart';
+import 'package:unshelf_seller/edit_store_schedule_view.dart';
+import 'package:unshelf_seller/edit_store_location_view.dart';
 
 class StoreView extends StatelessWidget {
   final User? user = FirebaseAuth.instance.currentUser;
@@ -21,13 +22,27 @@ class StoreView extends StatelessWidget {
   }
 
   String formatStoreSchedule(Map<String, Map<String, String>> schedule) {
-    return schedule.entries.map((entry) {
-      String day = entry.key;
-      Map<String, String> times = entry.value;
+    const List<String> daysOfWeek = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+
+    return daysOfWeek.map((day) {
+      Map<String, String> times =
+          schedule[day] ?? {'open': 'Closed', 'close': 'Closed'};
       String open = times['open'] ?? 'Closed';
       String close = times['close'] ?? 'Closed';
-      return '$day: $open - $close';
-    }).join(', ');
+      if (open == 'Closed' && close == 'Closed') {
+        return '$day: Closed';
+      } else {
+        return '$day: $open - $close';
+      }
+    }).join('\n');
   }
 
   @override
@@ -91,20 +106,6 @@ class StoreView extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(userProfile.storeName),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditStoreDetailsScreen(userProfile: userProfile),
-                    ),
-                  );
-                },
-              ),
-            ],
           ),
           body: Padding(
             padding: EdgeInsets.all(16.0),
@@ -136,27 +137,59 @@ class StoreView extends StatelessWidget {
                 ),
                 Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
-                  child: ExpansionTile(
-                    title: Text('Store Hours'),
-                    leading: Icon(Icons.access_time),
+                  child: Row(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          userProfile.storeSchedule != null
-                              ? formatStoreSchedule(userProfile.storeSchedule!)
-                              : 'No schedule available',
+                      Expanded(
+                        child: ListTile(
+                          title: Text('Store Hours'),
+                          subtitle: Text(
+                            userProfile.storeSchedule != null
+                                ? formatStoreSchedule(
+                                    userProfile.storeSchedule!)
+                                : 'No schedule available',
+                          ),
+                          leading: Icon(Icons.access_time),
                         ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditStoreSchedScreen(
+                                  userProfile: userProfile),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
                 Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    title: Text('Store Location'),
-                    subtitle: Text(userProfile.storeLocation ?? 'N/A'),
-                    leading: Icon(Icons.location_on),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ListTile(
+                          title: Text('Store Location'),
+                          subtitle: Text(userProfile.storeLocation ?? 'N/A'),
+                          leading: Icon(Icons.location_on),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditStoreLocationScreen(
+                                  userProfile: userProfile),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
