@@ -9,47 +9,47 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
-class AddProductScreen extends StatefulWidget {
+class AddProductView extends StatefulWidget {
   final String? productId;
-  final String? productName;
-  final double? productPrice;
-  final String? productImageUrl;
 
-  AddProductScreen({
-    this.productId,
-    this.productName,
-    this.productPrice,
-    this.productImageUrl,
-  });
+  AddProductView({this.productId});
 
   @override
-  _AddProductScreenState createState() => _AddProductScreenState();
+  _AddProductViewState createState() => _AddProductViewState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _AddProductViewState extends State<AddProductView> {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productPriceController = TextEditingController();
+  final TextEditingController _productQuantityController =
+      TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  final _formKey = GlobalKey<FormState>();
+
+  bool _isLoading = false;
   Uint8List? _imageData;
   bool _isImageNew = false;
-  final ImagePicker _picker = ImagePicker();
-
-  final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.productId != null) _fetchProductData();
+  }
 
-    if (widget.productName != null) {
-      _productNameController.text = widget.productName!;
-    }
+  Future<void> _fetchProductData() async {
+    final productDoc = await FirebaseFirestore.instance
+        .collection('products')
+        .doc(widget.productId)
+        .get();
 
-    if (widget.productPrice != null) {
-      _productPriceController.text = widget.productPrice!.toString();
-    }
-
-    if (widget.productImageUrl != null) {
-      _loadImageFromUrl(widget.productImageUrl!);
+    if (productDoc.exists) {
+      final productData = productDoc.data() as Map<String, dynamic>;
+      _productNameController.text = productData['name'];
+      _productPriceController.text = productData['price'].toString();
+      _productQuantityController.text = productData['quantity'].toString();
+      _expiryDateController.text = productData['expiry_date'];
+      _loadImageFromUrl(productData['image_url']);
     }
   }
 
@@ -111,6 +111,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return '';
   }
 
+  Future<void> _selectExpiryDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _expiryDateController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
+  }
+
   Future<void> addOrUpdateProduct() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -137,6 +151,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
               'price': price,
               'seller_id': user.uid,
               'image_url': imageUrl,
+              'quantity': int.tryParse(_productQuantityController.text) ?? 0,
+              'expiry_date': _expiryDateController.text,
             });
           } else {
             // Update existing product
@@ -147,6 +163,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
               'name': _productNameController.text,
               'price': price,
               'image_url': imageUrl,
+              'quantity': int.tryParse(_productQuantityController.text) ?? 0,
+              'expiry_date': _expiryDateController.text,
             });
           }
           Navigator.pop(context);
@@ -171,6 +189,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void dispose() {
     _productNameController.dispose();
     _productPriceController.dispose();
+    _productQuantityController.dispose();
     super.dispose();
   }
 
@@ -201,7 +220,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               SizedBox(height: 16.0),
               TextFormField(
                 controller: _productPriceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Product Price',
                 ),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -220,12 +239,30 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _productQuantityController,
+                decoration: const InputDecoration(
+                  labelText: 'Product Quantity',
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*')),
+                ],
+              ),
+              TextFormField(
+                controller: _expiryDateController,
+                decoration: const InputDecoration(
+                  labelText: 'Expiry Date',
+                ),
+                readOnly: true,
+                onTap: () => _selectExpiryDate(context),
+              ),
               // Image Picking and Display:
               ElevatedButton(
                 onPressed: _pickImage, // Trigger image picking
-                child: Text('Pick Image'),
+                child: const Text('Pick Image'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _imageData != null
                   ? Image.memory(
                       _imageData!,
@@ -233,8 +270,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       height: 200,
                       fit: BoxFit.cover,
                     )
-                  : Text('No image selected'),
-              SizedBox(height: 20),
+                  : const Text('No image selected'),
+              const SizedBox(height: 20),
               _isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
