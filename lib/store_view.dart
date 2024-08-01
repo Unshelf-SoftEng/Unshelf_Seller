@@ -10,14 +10,20 @@ class StoreView extends StatelessWidget {
 
   StoreView({Key? key}) : super(key: key);
 
-  Future<StoreModel> _fetchUserProfile() async {
+  Future<StoreModel> _fetchStoreDetails() async {
     if (user == null) {
       throw Exception("User is not logged in");
     }
+
     DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .get();
+
+    if (!doc.exists) {
+      throw Exception("User profile not found");
+    }
+
     return StoreModel.fromSnapshot(doc);
   }
 
@@ -48,7 +54,7 @@ class StoreView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<StoreModel>(
-      future: _fetchUserProfile(),
+      future: _fetchStoreDetails(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -101,11 +107,11 @@ class StoreView extends StatelessWidget {
           );
         }
 
-        final userProfile = snapshot.data!;
+        final storeDetails = snapshot.data!;
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(userProfile.storeName),
+            title: Text(storeDetails.storeName),
           ),
           body: Padding(
             padding: EdgeInsets.all(16.0),
@@ -114,16 +120,15 @@ class StoreView extends StatelessWidget {
                 Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
-                    title: Text('Email'),
-                    subtitle: Text(userProfile.email ?? 'N/A'),
-                    leading: Icon(Icons.email),
-                  ),
+                      title: Text('Email'),
+                      subtitle: Text(storeDetails.email ?? 'N/A'),
+                      leading: Icon(Icons.email)),
                 ),
                 Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
                     title: Text('Name'),
-                    subtitle: Text(userProfile.name ?? 'N/A'),
+                    subtitle: Text(storeDetails.name ?? 'N/A'),
                     leading: Icon(Icons.person),
                   ),
                 ),
@@ -131,7 +136,7 @@ class StoreView extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
                     title: Text('Phone Number'),
-                    subtitle: Text(userProfile.phoneNumber ?? 'N/A'),
+                    subtitle: Text(storeDetails.phoneNumber ?? 'N/A'),
                     leading: Icon(Icons.phone),
                   ),
                 ),
@@ -143,9 +148,9 @@ class StoreView extends StatelessWidget {
                         child: ListTile(
                           title: Text('Store Hours'),
                           subtitle: Text(
-                            userProfile.storeSchedule != null
+                            storeDetails.storeSchedule != null
                                 ? formatStoreSchedule(
-                                    userProfile.storeSchedule!)
+                                    storeDetails.storeSchedule!)
                                 : 'No schedule available',
                           ),
                           leading: Icon(Icons.access_time),
@@ -158,7 +163,7 @@ class StoreView extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => EditStoreSchedScreen(
-                                  userProfile: userProfile),
+                                  storeDetails: storeDetails),
                             ),
                           );
                         },
@@ -173,7 +178,7 @@ class StoreView extends StatelessWidget {
                       Expanded(
                         child: ListTile(
                           title: Text('Store Location'),
-                          subtitle: Text(userProfile.storeLocation ?? 'N/A'),
+                          subtitle: Text(storeDetails.storeLocation ?? 'N/A'),
                           leading: Icon(Icons.location_on),
                         ),
                       ),
@@ -183,8 +188,7 @@ class StoreView extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EditStoreLocationScreen(
-                                  userProfile: userProfile),
+                              builder: (context) => EditStoreLocationView(),
                             ),
                           );
                         },

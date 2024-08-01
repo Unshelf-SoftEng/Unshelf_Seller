@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
 class EditStoreSchedScreen extends StatefulWidget {
-  final StoreModel userProfile;
+  final StoreModel storeDetails;
 
-  EditStoreSchedScreen({required this.userProfile});
+  EditStoreSchedScreen({required this.storeDetails});
 
   @override
   _EditStoreSchedScreenState createState() => _EditStoreSchedScreenState();
@@ -20,7 +20,7 @@ class _EditStoreSchedScreenState extends State<EditStoreSchedScreen> {
   @override
   void initState() {
     super.initState();
-    _storeSchedule = widget.userProfile.storeSchedule ??
+    _storeSchedule = widget.storeDetails.storeSchedule ??
         {
           'Monday': {'open': 'Closed', 'close': 'Closed'},
           'Tuesday': {'open': 'Closed', 'close': 'Closed'},
@@ -51,7 +51,7 @@ class _EditStoreSchedScreenState extends State<EditStoreSchedScreen> {
     if (_formKey.currentState!.validate()) {
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.userProfile.userId)
+          .doc(widget.storeDetails.userId)
           .update({
         'store_schedule': _storeSchedule,
       });
