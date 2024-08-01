@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unshelf_seller/login_page.dart';
+import 'package:unshelf_seller/login_view.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterViewState createState() => _RegisterViewState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterViewState extends State<RegisterView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -28,11 +28,26 @@ class _RegisterPageState extends State<RegisterPage> {
         'name': name,
         'email': user.email,
         'phone_number': phoneNumber,
+      });
+
+      await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
         'store_name': storeName,
+        'store_schedule': {
+          'Monday': {'open': 'Closed', 'close': 'Closed'},
+          'Tuesday': {'open': 'Closed', 'close': 'Closed'},
+          'Wednesday': {'open': 'Closed', 'close': 'Closed'},
+          'Thursday': {'open': 'Closed', 'close': 'Closed'},
+          'Friday': {'open': 'Closed', 'close': 'Closed'},
+          'Saturday': {'open': 'Closed', 'close': 'Closed'},
+          'Sunday': {'open': 'Closed', 'close': 'Closed'},
+        },
+        'longitude': 0,
+        'latitude': 0,
       });
     } catch (e) {
-      // Handle error
-      print('Error saving user data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create user data')),
+      );
     }
   }
 
@@ -56,7 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         // Go to login page
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => SignInPage()));
+            MaterialPageRoute(builder: (context) => SignInView()));
       } on FirebaseAuthException catch (e) {
         String message;
         if (e.code == 'weak-password') {
@@ -90,6 +105,16 @@ class _RegisterPageState extends State<RegisterPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              TextFormField(
+                controller: _sellerNameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
@@ -140,16 +165,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
               ),
               TextFormField(
-                controller: _sellerNameController,
-                decoration: const InputDecoration(labelText: 'Seller Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your seller name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
                 controller: _storeNameController,
                 decoration: const InputDecoration(labelText: 'Store Name'),
                 validator: (value) {
@@ -170,8 +185,8 @@ class _RegisterPageState extends State<RegisterPage> {
               const Text('Already have an account?'),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SignInPage()));
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => SignInView()));
                 },
                 child: const Text('Sign In'),
               ),

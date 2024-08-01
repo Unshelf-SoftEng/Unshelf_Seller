@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:unshelf_seller/home_page.dart';
+import 'package:unshelf_seller/home_view.dart';
+import 'package:unshelf_seller/register_view.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInView extends StatefulWidget {
   @override
-  _SignInPageState createState() => _SignInPageState();
+  _SignInViewState createState() => _SignInViewState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInViewState extends State<SignInView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,7 +28,7 @@ class _SignInPageState extends State<SignInPage> {
         // Go to home page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => HomeView()),
         );
       } on FirebaseAuthException catch (e) {
         String message;
@@ -83,6 +84,15 @@ class _SignInPageState extends State<SignInPage> {
               ElevatedButton(
                 onPressed: _signIn,
                 child: const Text('Sign In'),
+              ),
+              const SizedBox(height: 20),
+              const Text("Don't have an account?"),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => RegisterView()));
+                },
+                child: const Text('Sign Up'),
               ),
             ],
           ),

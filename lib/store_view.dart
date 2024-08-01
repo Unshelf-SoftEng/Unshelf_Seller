@@ -121,7 +121,7 @@ class StoreView extends StatelessWidget {
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
                       title: Text('Email'),
-                      subtitle: Text(storeDetails.email ?? 'N/A'),
+                      subtitle: Text(user?.email ?? 'N/A'),
                       leading: Icon(Icons.email)),
                 ),
                 Card(
