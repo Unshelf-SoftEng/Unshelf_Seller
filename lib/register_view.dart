@@ -71,7 +71,7 @@ class _RegisterViewState extends State<RegisterView> {
 
         // Go to login page
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => SignInView()));
+            MaterialPageRoute(builder: (context) => LoginView()));
       } on FirebaseAuthException catch (e) {
         String message;
         if (e.code == 'weak-password') {
@@ -105,6 +105,10 @@ class _RegisterViewState extends State<RegisterView> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              Image.network(
+                'https://firebasestorage.googleapis.com/v0/b/unshelf-d4567.appspot.com/o/Unshelf.png?alt=media&token=ea449292-f36d-4dfe-a90a-2bef5c341694',
+                height: 100,
+              ),
               TextFormField(
                 controller: _sellerNameController,
                 decoration: const InputDecoration(labelText: 'Name'),
@@ -186,7 +190,7 @@ class _RegisterViewState extends State<RegisterView> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => SignInView()));
+                      MaterialPageRoute(builder: (context) => LoginView()));
                 },
                 child: const Text('Sign In'),
               ),

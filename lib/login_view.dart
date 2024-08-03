@@ -3,17 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/home_view.dart';
 import 'package:unshelf_seller/register_view.dart';
 
-class SignInView extends StatefulWidget {
+class LoginView extends StatefulWidget {
   @override
-  _SignInViewState createState() => _SignInViewState();
+  _LoginViewState createState() => _LoginViewState();
 }
 
-class _SignInViewState extends State<SignInView> {
+class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future<void> _signIn() async {
+  Future<void> _Login() async {
     if (_formKey.currentState!.validate()) {
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -58,6 +58,10 @@ class _SignInViewState extends State<SignInView> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              Image.network(
+                'https://firebasestorage.googleapis.com/v0/b/unshelf-d4567.appspot.com/o/Unshelf.png?alt=media&token=ea449292-f36d-4dfe-a90a-2bef5c341694',
+                height: 100,
+              ),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
@@ -78,11 +82,11 @@ class _SignInViewState extends State<SignInView> {
                   }
                   return null;
                 },
-                onFieldSubmitted: (value) => _signIn(),
+                onFieldSubmitted: (value) => _Login(),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _signIn,
+                onPressed: _Login,
                 child: const Text('Sign In'),
               ),
               const SizedBox(height: 20),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:unshelf_seller/add_product_details_view.dart';
+import 'package:unshelf_seller/product_summary_view.dart';
 import 'package:unshelf_seller/login_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),
-      home: AddProductDetailsView(),
+      home: LoginView(),
     );
   }
 }
