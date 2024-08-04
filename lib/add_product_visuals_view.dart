@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -205,6 +204,45 @@ class _AddProductViewState extends State<AddProductView> {
           key: _formKey,
           child: Column(
             children: [
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: Colors.green, width: 5), // Thick border
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    Center(
+                        child: Text(
+                      '1/2',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ))
+                  ],
+                ),
+                SizedBox(width: 16.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Product Details',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      'Enter product details',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                )
+              ]),
+
               TextFormField(
                 controller: _productNameController,
                 decoration: InputDecoration(

@@ -3,6 +3,7 @@ import 'package:unshelf_seller/dashboard_view.dart';
 import 'package:unshelf_seller/orders_view.dart';
 import 'package:unshelf_seller/listings_view.dart';
 import 'package:unshelf_seller/store_view.dart';
+import 'package:unshelf_seller/add_product_details_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -58,6 +59,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF6A994E),
         automaticallyImplyLeading: _buildLeadingIcon() == null,
         leading: _buildLeadingIcon(),
         title: Row(
@@ -67,29 +69,43 @@ class _HomeViewState extends State<HomeView> {
                 child: Text(_titles[_selectedIndex]),
               ),
             ),
-            PopupMenuButton<int>(
-              icon: Icon(Icons.notifications),
-              onSelected: (value) {
-                // Handle notification menu selection
-                // e.g., navigate to a notifications screen
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem<int>(
-                    value: 1,
-                    child: Text('Notification 1'),
-                  ),
-                  const PopupMenuItem<int>(
-                    value: 2,
-                    child: Text('Notification 2'),
-                  ),
-                  const PopupMenuItem<int>(
-                    value: 3,
-                    child: Text('Notification 3'),
-                  ),
-                ];
-              },
-            ),
+            if (_selectedIndex == 2)
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddProductDetailsView(
+                              productId: null,
+                            )),
+                  );
+                },
+              )
+            else
+              PopupMenuButton<int>(
+                icon: const Icon(Icons.notifications),
+                onSelected: (value) {
+                  // Handle notification menu selection
+                  // e.g., navigate to a notifications screen
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: Text('Notification 1'),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: Text('Notification 2'),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 3,
+                      child: Text('Notification 3'),
+                    ),
+                  ];
+                },
+              ),
           ],
         ),
       ),

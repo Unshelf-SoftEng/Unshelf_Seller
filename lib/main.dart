@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:unshelf_seller/add_product_details_view.dart';
 import 'package:unshelf_seller/login_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +29,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Unshelf',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF386641)),
         useMaterial3: true,
+        textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),
-      home: SignInView(),
+      home: AddProductDetailsView(),
     );
   }
 }

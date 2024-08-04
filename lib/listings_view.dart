@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:unshelf_seller/add_product_view.dart';
+import 'package:unshelf_seller/add_product_details_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ListingsView extends StatelessWidget {
@@ -64,7 +64,7 @@ class ListingsView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AddProductView(
+                            builder: (context) => AddProductDetailsView(
                               productId: products[index].id,
                             ),
                           ),
@@ -86,19 +86,6 @@ class ListingsView extends StatelessWidget {
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AddProductView(
-                      productId: null,
-                    )),
-          );
-        },
-        child: Icon(Icons.add),
-        tooltip: 'Add Product',
       ),
     );
   }
