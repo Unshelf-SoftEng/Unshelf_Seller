@@ -1,0 +1,27 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class PayMongoService {
+  final String _baseUrl =
+      'https://api.paymongo.com'; // Replace with actual PayMongo API base URL
+  final String _apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+
+  Future<double> getWalletBalance() async {
+    final response = await http.get(
+      Uri.parse(
+          '$_baseUrl/your-endpoint-for-wallet-balance'), // Replace with actual endpoint
+      headers: {
+        'Authorization': 'Basic ${base64Encode(utf8.encode('$_apiKey:'))}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // Adjust according to the response structure
+      return data['balance']?.toDouble() ?? 0.0;
+    } else {
+      throw Exception('Failed to load wallet balance');
+    }
+  }
+}

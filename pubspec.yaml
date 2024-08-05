@@ -25,6 +25,7 @@ dependencies:
   webview_flutter: ^4.0.0
   google_fonts: ^6.2.1
   provider: ^6.1.2
+  paymongo_sdk: ^1.7.0
 
 dev_dependencies:
   flutter_test:
