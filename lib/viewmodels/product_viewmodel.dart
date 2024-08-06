@@ -30,6 +30,7 @@ class ProductViewModel extends ChangeNotifier {
 
   bool _isMainImageNew = false;
   List<bool> _isAdditionalImageNewList = List.generate(4, (_) => false);
+
   bool _errorFound = false;
   bool get errorFound => _errorFound;
 

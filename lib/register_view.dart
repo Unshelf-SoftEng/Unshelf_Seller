@@ -98,6 +98,7 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -187,7 +188,7 @@ class _RegisterViewState extends State<RegisterView> {
                   "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy"),
               const SizedBox(height: 20),
               const Text('Already have an account?'),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => LoginView()));
