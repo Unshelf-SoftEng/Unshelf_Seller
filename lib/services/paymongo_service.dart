@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 class PayMongoService {
   final String _baseUrl =
       'https://api.paymongo.com'; // Replace with actual PayMongo API base URL
-  final String _apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+  final String _apiKey =
+      'pk_test_fGVMd5njs9hDoq48NyS5LjEA'; // Replace with your actual API key
 
   Future<double> getWalletBalance() async {
     final response = await http.get(

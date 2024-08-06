@@ -17,13 +17,13 @@ dependencies:
   firebase_storage: ^12.1.2
   image_picker: ^1.1.2
   cached_network_image: ^3.3.1
-  http: ^1.2.2
+  http: ^0.13.6
   intl: ^0.19.0
   google_maps_flutter: ^2.7.1
   flutter_dotenv: ^5.1.0
   google_maps_flutter_web: ^0.5.9
   webview_flutter: ^4.0.0
-  google_fonts: ^6.2.1
+  google_fonts: ^4.0.4
   provider: ^6.1.2
   paymongo_sdk: ^1.7.0
 
