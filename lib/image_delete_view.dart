@@ -13,7 +13,7 @@ class ImageWithDelete extends StatefulWidget {
     required this.onDelete,
     this.width = 70.0,
     this.height = 70.0,
-    this.margin = const EdgeInsets.only(right: 8.0),
+    this.margin = const EdgeInsets.only(right: 2.0),
   });
 
   @override

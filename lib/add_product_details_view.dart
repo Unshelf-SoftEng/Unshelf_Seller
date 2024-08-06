@@ -110,11 +110,14 @@ class AddProductDetailsView extends StatelessWidget {
                         child: LayoutBuilder(
                           builder: (context, constraints) {
                             // Calculate the width of each item based on the available width
-                            double itemWidth = (400 - 10 * 2.0) / 4;
+                            double itemWidth =
+                                ((constraints.maxWidth - 10 * 2.0) / 4) - 19.0;
 
                             // Ensure additionalImageDataList has at least 4 items
                             final imageList = List.generate(
-                                4,
+                                viewModel.additionalImageDataList.length < 4
+                                    ? 3
+                                    : 4,
                                 (index) => viewModel
                                             .additionalImageDataList.length >
                                         index
@@ -143,17 +146,16 @@ class AddProductDetailsView extends StatelessWidget {
                                             Text(
                                               'More Images',
                                               style: TextStyle(
-                                                  color: Colors.white),
+                                                  color: Colors.white,
+                                                  fontSize: 12.0),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ],
                                         ),
                                       ),
                                     ),
                                   ),
-                                ...List.generate(
-                                    viewModel.additionalImageDataList.length < 4
-                                        ? 3
-                                        : 4, (index) {
+                                ...List.generate(imageList.length, (index) {
                                   final imageData = imageList[index];
                                   return Container(
                                     width: itemWidth,
