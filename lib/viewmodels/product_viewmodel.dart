@@ -199,7 +199,7 @@ class ProductViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addOrUpdateProduct() async {
+  Future<void> addOrUpdateProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       _isLoading = true;
       notifyListeners();
@@ -208,18 +208,26 @@ class ProductViewModel extends ChangeNotifier {
 
         if (user != null) {
           if (productId == null) {
+            List<String> images = await uploadImages();
+
             DocumentReference productDoc =
                 await FirebaseFirestore.instance.collection('products').add({
+              'sellerId': user.uid,
               'name': nameController.text,
               'description': descriptionController.text,
               'price': double.parse(priceController.text),
               'stock': int.parse(quantityController.text),
               'expiryDate': DateTime.parse(expiryDateController.text),
               'discount': int.parse(discountController.text),
-              'mainImageUrl': '',
-              'additionalImageUrls': [],
+              'mainImageUrl': images[0],
+              'additionalImageUrls': images.sublist(1),
             });
             productId = productDoc.id;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Product added successfully!'),
+              ),
+            );
           } else {
             await FirebaseFirestore.instance
                 .collection('products')

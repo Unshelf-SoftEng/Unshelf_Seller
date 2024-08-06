@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),
-      home: AddProductDetailsView(),
+      home: LoginView(),
     );
   }
 }

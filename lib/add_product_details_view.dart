@@ -432,7 +432,9 @@ class AddProductDetailsView extends StatelessWidget {
                                 width: 200,
                                 height: 30,
                                 child: ElevatedButton(
-                                  onPressed: viewModel.addOrUpdateProduct,
+                                  onPressed: () async {
+                                    await viewModel.addOrUpdateProduct(context);
+                                  },
                                   child: Text('Next'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFF6A994E),
