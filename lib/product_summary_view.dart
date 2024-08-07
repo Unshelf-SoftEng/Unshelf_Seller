@@ -212,7 +212,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product Images'),
+        title: Text('Product Summary'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

@@ -22,6 +22,8 @@ class ProductViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isEditMode = false;
+
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
 
@@ -39,33 +41,43 @@ class ProductViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchProductData() async {
-    final productDoc = await FirebaseFirestore.instance
-        .collection('products')
-        .doc(productId)
-        .get();
+    _isLoading = true;
+    notifyListeners();
 
-    if (productDoc.exists) {
-      final product = ProductModel.fromSnapshot(productDoc);
+    try {
+      final productDoc = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productId)
+          .get();
 
-      nameController.text = product.name;
-      priceController.text = product.price.toString();
-      quantityController.text = product.stock.toString();
-      expiryDateController.text = product.expiryDate.toString();
-      descriptionController.text = product.description;
-      discountController.text = product.discount.toString();
+      if (productDoc.exists) {
+        final product = ProductModel.fromSnapshot(productDoc);
 
-      final mainImageUrl = product.mainImageUrl;
-      final additionalImageUrls = product.additionalImageUrls;
+        nameController.text = product.name;
+        priceController.text = product.price.toString();
+        quantityController.text = product.stock.toString();
+        expiryDateController.text = product.expiryDate.toString();
+        descriptionController.text = product.description;
+        discountController.text = product.discount.toString();
 
-      if (mainImageUrl != null) {
-        await loadImageFromUrl(mainImageUrl, true);
-      }
+        final mainImageUrl = product.mainImageUrl;
+        final additionalImageUrls = product.additionalImageUrls;
 
-      for (int i = 0; i < additionalImageUrls!.length; i++) {
-        if (i < _additionalImageDataList.length) {
-          await loadImageFromUrl(additionalImageUrls[i], false, index: i);
+        if (mainImageUrl != null) {
+          await loadImageFromUrl(mainImageUrl, true);
+        }
+
+        for (int i = 0; i < additionalImageUrls!.length; i++) {
+          if (i < _additionalImageDataList.length) {
+            await loadImageFromUrl(additionalImageUrls[i], false, index: i);
+          }
         }
       }
+    } catch (e) {
+      // Handle errors
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

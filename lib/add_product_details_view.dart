@@ -18,7 +18,7 @@ class AddProductDetailsView extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
               backgroundColor: Color(0xFF6A994E),
-              title: const Text('Product Details')),
+              title: const Text('Add Product Details')),
           body: SingleChildScrollView(
             padding: EdgeInsets.all(15.0),
             child: Column(
@@ -185,8 +185,8 @@ class AddProductDetailsView extends StatelessWidget {
                         ),
                       ),
                       if (viewModel.errorFound)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8.0),
                           child: Text(
                             'Main image is required',
                             style: TextStyle(color: Colors.red),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:unshelf_seller/add_product_details_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:unshelf_seller/product_summary_view.dart';
+import 'package:unshelf_seller/add_product_details_view.dart';
 
 class ListingsView extends StatelessWidget {
   @override
@@ -41,46 +42,58 @@ class ListingsView extends StatelessWidget {
               final productName = product['name'] ?? 'Unnamed Product';
               final productPrice = product['price'] ?? 0.0;
 
-              return ListTile(
-                leading: CachedNetworkImage(
-                  // Use CachedNetworkImage
-                  imageUrl: product['image_url'] ??
-                      '', // Provide default empty string
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) =>
-                      Icon(Icons.error, size: 50),
-                ),
-                title: Text(productName),
-                subtitle: Text('₱ ${productPrice.toStringAsFixed(2)}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min, // Add this line
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddProductDetailsView(
-                              productId: products[index].id,
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductSummaryView(
+                        productId: products[index].id,
+                      ),
+                    ),
+                  );
+                },
+                child: ListTile(
+                  leading: CachedNetworkImage(
+                    // Use CachedNetworkImage
+                    imageUrl: product['mainImageUrl'] ??
+                        '', // Provide default empty string
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Icon(Icons.error, size: 50),
+                  ),
+                  title: Text(productName),
+                  subtitle: Text('₱ ${productPrice.toStringAsFixed(2)}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddProductDetailsView(
+                                productId: products[index].id,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () async {
-                        await FirebaseFirestore.instance
-                            .collection('products')
-                            .doc(productId)
-                            .delete();
-                      },
-                    ),
-                  ],
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () async {
+                          await FirebaseFirestore.instance
+                              .collection('products')
+                              .doc(productId)
+                              .delete();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
