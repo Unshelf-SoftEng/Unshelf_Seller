@@ -8,6 +8,9 @@ class StoreModel {
   final String storeName;
   final String? storeLocation; // Nullable
   final Map<String, Map<String, String>>? storeSchedule;
+  final String? storeProfilePictureUrl; // Nullable
+  final double? storeRating;
+  final int? numberOfFollowers;
 
   StoreModel({
     required this.userId,
@@ -17,6 +20,9 @@ class StoreModel {
     required this.storeName,
     this.storeSchedule,
     this.storeLocation,
+    this.storeProfilePictureUrl,
+    this.storeRating,
+    this.numberOfFollowers,
   });
 
   // Factory method to create StoreModel from Firebase document snapshot
@@ -37,6 +43,9 @@ class StoreModel {
         ),
       ),
       storeLocation: data['store_location'],
+      storeProfilePictureUrl: data['store_profile_picture_url'],
+      storeRating: data['store_rating'] ?? 4.5,
+      numberOfFollowers: data['number_of_followers'] ?? 1200,
     );
   }
 }
