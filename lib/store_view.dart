@@ -1,4 +1,3 @@
-// store_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,10 +9,6 @@ class StoreView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<StoreViewModel>(context);
-
-    // Hardcoded values for store ratings and number of followers
-    final double storeRating = 4.5;
-    final int numberOfFollowers = 1200;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,25 +34,160 @@ class StoreView extends StatelessWidget {
                 )
               : Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: ListView(
                     children: [
-                      Text(
-                        'Store Name: ${viewModel.storeDetails?.storeName ?? 'N/A'}',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                      if (viewModel.storeDetails?.storeProfilePictureUrl !=
+                          null)
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(
+                              viewModel.storeDetails!.storeProfilePictureUrl!),
+                        ),
+                      SizedBox(height: 16.0),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListTile(
+                          title: Text('Email'),
+                          subtitle: Text(
+                              FirebaseAuth.instance.currentUser?.email ??
+                                  'N/A'),
+                          leading: Icon(Icons.email),
+                        ),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Store Rating: $storeRating',
-                        style: TextStyle(fontSize: 16),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListTile(
+                          title: Text('Name'),
+                          subtitle: Text(viewModel.storeDetails?.name ?? 'N/A'),
+                          leading: Icon(Icons.person),
+                        ),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Followers: $numberOfFollowers',
-                        style: TextStyle(fontSize: 16),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListTile(
+                          title: Text('Phone Number'),
+                          subtitle: Text(
+                              viewModel.storeDetails?.phoneNumber ?? 'N/A'),
+                          leading: Icon(Icons.phone),
+                        ),
                       ),
-                      // Add more store details here as needed
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                title: Text('Store Hours'),
+                                subtitle: Text(
+                                  viewModel.storeDetails?.storeSchedule != null
+                                      ? viewModel.formatStoreSchedule(viewModel
+                                          .storeDetails!.storeSchedule!)
+                                      : 'No schedule available',
+                                ),
+                                leading: Icon(Icons.access_time),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditStoreSchedScreen(
+                                        storeDetails: viewModel.storeDetails!),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                title: Text('Store Location'),
+                                subtitle: Text(
+                                    viewModel.storeDetails?.storeLocation ??
+                                        'N/A'),
+                                leading: Icon(Icons.location_on),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditStoreLocationView(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                title: Text('Store Rating'),
+                                subtitle: Text(viewModel
+                                        .storeDetails?.storeRating
+                                        .toString() ??
+                                    'N/A'),
+                                leading: Icon(Icons.location_on),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditStoreLocationView(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                title: Text('Store Followers'),
+                                subtitle: Text(viewModel
+                                        .storeDetails?.storeFollowers
+                                        .toString() ??
+                                    'N/A'),
+                                leading: Icon(Icons.location_on),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditStoreLocationView(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
