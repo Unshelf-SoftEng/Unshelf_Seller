@@ -3,23 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:unshelf_seller/login_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:unshelf_seller/background_tasks.dart';
-import 'package:workmanager/workmanager.dart';
-
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    switch (task) {
-      case 'checkExpiredProducts':
-        await checkExpiredProducts();
-        break;
-
-      default:
-        print('Unknown task: $task');
-    }
-    return Future.value(true);
-  });
-}
+import 'package:background_fetch/background_fetch.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,15 +17,11 @@ void main() async {
       storageBucket: "unshelf-d4567.appspot.com",
     ),
   );
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
-  scheduleTasks();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
