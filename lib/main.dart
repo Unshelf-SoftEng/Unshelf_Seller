@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:unshelf_seller/add_product_details_view.dart';
 import 'package:unshelf_seller/login_view.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:unshelf_seller/background_tasks.dart';
+import 'package:workmanager/workmanager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,8 @@ void main() async {
       storageBucket: "unshelf-d4567.appspot.com",
     ),
   );
+  Workmanager().initialize(callbackDispatcher);
+  scheduleTasks();
   runApp(MyApp());
 }
 

@@ -233,10 +233,11 @@ class ProductViewModel extends ChangeNotifier {
               'discount': int.parse(discountController.text),
               'mainImageUrl': images[0],
               'additionalImageUrls': images.sublist(1),
+              'isListed': true,
             });
             productId = productDoc.id;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Product added successfully!'),
               ),
             );

@@ -7,7 +7,7 @@ class OrdersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Fetch orders when the view is built
-    final ordersViewModel = Provider.of<OrderViewModel>(context);
+    final ordersViewModel = Provider.of<OrderViewModel>(context, listen: false);
     ordersViewModel.fetchOrders();
 
     return Scaffold(

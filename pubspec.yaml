@@ -26,6 +26,7 @@ dependencies:
   google_fonts: ^4.0.4
   provider: ^6.1.2
   paymongo_sdk: ^1.7.0
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:
