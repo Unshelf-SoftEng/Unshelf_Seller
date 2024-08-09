@@ -6,6 +6,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:unshelf_seller/background_tasks.dart';
 import 'package:workmanager/workmanager.dart';
 
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case 'checkExpiredProducts':
+        await checkExpiredProducts();
+        break;
+
+      default:
+        print('Unknown task: $task');
+    }
+    return Future.value(true);
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -18,9 +33,9 @@ void main() async {
       storageBucket: "unshelf-d4567.appspot.com",
     ),
   );
-  Workmanager().initialize(callbackDispatcher);
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   scheduleTasks();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

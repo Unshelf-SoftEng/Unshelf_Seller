@@ -1,20 +1,6 @@
 import 'package:workmanager/workmanager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Define the callback function to execute tasks
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    switch (task) {
-      case 'checkExpiredProducts':
-        await checkExpiredProducts();
-        break;
-      default:
-        print('Unknown task: $task');
-    }
-    return Future.value(true);
-  });
-}
-
 // Example function to check expired products
 Future<void> checkExpiredProducts() async {
   final now = DateTime.now();
