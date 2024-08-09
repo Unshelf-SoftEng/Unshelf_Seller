@@ -1,4 +1,3 @@
-// view_models/orders_view_model.dart
 import 'package:flutter/foundation.dart';
 import 'package:unshelf_seller/models/order_model.dart';
 

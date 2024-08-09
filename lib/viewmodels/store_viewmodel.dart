@@ -21,22 +21,31 @@ class StoreViewModel extends ChangeNotifier {
       return;
     }
 
+    isLoading = true;
+    notifyListeners();
+
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user!.uid)
           .get();
 
-      if (!doc.exists) {
-        errorMessage = "User profile not found";
+      DocumentSnapshot storeDoc = await FirebaseFirestore.instance
+          .collection('stores')
+          .doc(user!.uid)
+          .get();
+
+      if (!userDoc.exists || !storeDoc.exists) {
+        errorMessage = "User profile or store not found";
         storeDetails = null;
       } else {
-        storeDetails = StoreModel.fromSnapshot(doc);
+        storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
         storeDetails!.storeFollowers =
             await fetchStoreFollowers(); // Assign followers count here
+        errorMessage = null; // Clear any previous error message
       }
     } catch (e) {
-      errorMessage = "Error fetching user profile";
+      errorMessage = "Error fetching user profile: ${e.toString()}";
       storeDetails = null;
     } finally {
       isLoading = false;

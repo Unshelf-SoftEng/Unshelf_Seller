@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:unshelf_seller/login_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:background_fetch/background_fetch.dart';
+import 'package:provider/provider.dart';
+import 'package:unshelf_seller/login_view.dart';
+import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +21,19 @@ void main() async {
       storageBucket: "unshelf-d4567.appspot.com",
     ),
   );
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => OrderViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => ProductViewModel(productId: null),
+        ),
+        ChangeNotifierProvider(create: (_) => StoreViewModel()),
+        ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

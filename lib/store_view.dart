@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/edit_store_location_view.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class StoreView extends StatelessWidget {
   @override
@@ -93,7 +94,7 @@ class StoreView extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => EditStoreSchedScreen(
+                                    builder: (context) => EditStoreSchedView(
                                         storeDetails: viewModel.storeDetails!),
                                   ),
                                 );
@@ -104,15 +105,56 @@ class StoreView extends StatelessWidget {
                       ),
                       Card(
                         margin: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: ListTile(
-                                title: Text('Store Location'),
-                                subtitle: Text(
-                                    viewModel.storeDetails?.storeLocation ??
-                                        'N/A'),
-                                leading: Icon(Icons.location_on),
+                            ListTile(
+                              title: Text('Store Location'),
+                              subtitle: Text(viewModel
+                                          .storeDetails!.storeLatitude !=
+                                      null
+                                  ? '${viewModel.storeDetails!.storeLatitude}, ${viewModel.storeDetails!.storeLongitude}'
+                                  : 'N/A'),
+                              leading: Icon(Icons.location_on),
+                            ),
+                            Container(
+                              height: 100.0,
+                              child: GoogleMap(
+                                initialCameraPosition: CameraPosition(
+                                  target:
+                                      viewModel.storeDetails!.storeLatitude !=
+                                              null
+                                          ? LatLng(
+                                              viewModel
+                                                  .storeDetails!.storeLatitude!,
+                                              viewModel.storeDetails!
+                                                  .storeLongitude!,
+                                            )
+                                          : const LatLng(37.7749, -122.4194),
+                                  zoom: 14.0,
+                                ),
+                                markers: viewModel
+                                            .storeDetails!.storeLatitude !=
+                                        null
+                                    ? {
+                                        Marker(
+                                          markerId: MarkerId('storeLocation'),
+                                          position: LatLng(
+                                            viewModel
+                                                .storeDetails!.storeLatitude!,
+                                            viewModel
+                                                .storeDetails!.storeLongitude!,
+                                          ),
+                                        ),
+                                      }
+                                    : {},
+                                onMapCreated: (GoogleMapController controller) {
+                                  // Optionally, you can store the controller if needed
+                                },
+                                myLocationEnabled: false,
+                                zoomControlsEnabled: false,
+                                scrollGesturesEnabled: false,
+                                tiltGesturesEnabled: false,
+                                rotateGesturesEnabled: false,
                               ),
                             ),
                             IconButton(
