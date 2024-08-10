@@ -156,7 +156,6 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
       });
 
       try {
-        User? user = FirebaseAuth.instance.currentUser;
         List<String> imageUrls = await _uploadImages();
 
         final mainImageUrl =

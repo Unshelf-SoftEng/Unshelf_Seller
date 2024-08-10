@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/store_model.dart';
-import 'package:unshelf_seller/viewmodels/edit_store_profile_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/store_profile_viewmodel.dart';
 
 class EditStoreProfileView extends StatelessWidget {
   final StoreModel storeDetails;
