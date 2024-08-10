@@ -23,10 +23,10 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   final List<String> _titles = [
-    'Dashboard',
-    'Orders',
-    'Listings',
-    'Store',
+    'DASHBOARD',
+    'ORDERS',
+    'LISTINGS',
+    'PROFILE',
   ];
 
   void _onItemTapped(int index) {
@@ -70,7 +70,14 @@ class _HomeViewState extends State<HomeView> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: Text(_titles[_selectedIndex]),
+                child: Text(
+                  _titles[_selectedIndex],
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             if (_selectedIndex == 2)

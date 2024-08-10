@@ -13,9 +13,6 @@ class StoreView extends StatelessWidget {
     final viewModel = Provider.of<StoreViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(viewModel.storeDetails?.storeName ?? 'Store View'),
-      ),
       body: viewModel.isLoading
           ? Center(child: CircularProgressIndicator())
           : viewModel.errorMessage != null
