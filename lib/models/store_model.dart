@@ -9,7 +9,7 @@ class StoreModel {
   final double? storeLongitude; // Nullable
   final double? storeLatitude; // Nullable
   final Map<String, Map<String, String>>? storeSchedule;
-  final String? storeProfilePictureUrl; // Nullable
+  final String? storeImageUrl; // Nullable
   double? storeRating;
   int? storeFollowers;
 
@@ -22,7 +22,7 @@ class StoreModel {
     this.storeSchedule,
     this.storeLongitude,
     this.storeLatitude,
-    this.storeProfilePictureUrl,
+    this.storeImageUrl,
     this.storeRating,
     this.storeFollowers,
   });
@@ -59,7 +59,7 @@ class StoreModel {
       ),
       storeLongitude: storeData['longitude'],
       storeLatitude: storeData['latitude'],
-      storeProfilePictureUrl: storeData['store_profile_picture_url'],
+      storeImageUrl: storeData['store_image_url'],
       storeRating: 4.5,
       storeFollowers: 1200,
     );

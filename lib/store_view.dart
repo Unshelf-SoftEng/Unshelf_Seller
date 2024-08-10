@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/edit_store_location_view.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:unshelf_seller/edit_store_profile_view.dart';
 
 class StoreView extends StatelessWidget {
   @override
@@ -37,14 +38,44 @@ class StoreView extends StatelessWidget {
                   padding: EdgeInsets.all(16.0),
                   child: ListView(
                     children: [
-                      if (viewModel.storeDetails?.storeProfilePictureUrl !=
-                          null)
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(
-                              viewModel.storeDetails!.storeProfilePictureUrl!),
+                      Card(
+                        margin: EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            radius: 30,
+                            backgroundImage: viewModel
+                                        .storeDetails?.storeImageUrl !=
+                                    null
+                                ? NetworkImage(
+                                    viewModel.storeDetails!.storeImageUrl!)
+                                : AssetImage('assets/default_profile.png')
+                                    as ImageProvider, // Replace with a default image if needed
+                          ),
+                          title: Text(viewModel.storeDetails?.storeName ??
+                              'Store Name'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  'Followers: ${viewModel.storeDetails?.storeFollowers ?? 'N/A'}'),
+                              Text(
+                                  'Rating: ${viewModel.storeDetails?.storeRating?.toString() ?? 'N/A'}'),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditStoreProfileView(
+                                      storeDetails: viewModel.storeDetails!),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      SizedBox(height: 16.0),
+                      ),
                       Card(
                         margin: EdgeInsets.symmetric(vertical: 8.0),
                         child: ListTile(
@@ -155,64 +186,6 @@ class StoreView extends StatelessWidget {
                                 scrollGesturesEnabled: false,
                                 tiltGesturesEnabled: false,
                                 rotateGesturesEnabled: false,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditStoreLocationView(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Card(
-                        margin: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                title: Text('Store Rating'),
-                                subtitle: Text(viewModel
-                                        .storeDetails?.storeRating
-                                        .toString() ??
-                                    'N/A'),
-                                leading: Icon(Icons.location_on),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditStoreLocationView(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Card(
-                        margin: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                title: Text('Store Followers'),
-                                subtitle: Text(viewModel
-                                        .storeDetails?.storeFollowers
-                                        .toString() ??
-                                    'N/A'),
-                                leading: Icon(Icons.location_on),
                               ),
                             ),
                             IconButton(
