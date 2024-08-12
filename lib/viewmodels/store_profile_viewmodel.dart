@@ -20,7 +20,8 @@ class EditStoreProfileViewModel extends ChangeNotifier {
   TextEditingController get nameController => _nameController;
   Uint8List? get profileImage => _profileImage;
 
-  get isLoading => null;
+  get isLoading => _loading;
+  bool _loading = false;
 
   Future<void> pickImage() async {
     XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -32,6 +33,7 @@ class EditStoreProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> updateStoreProfile() async {
+    _loading = true;
     if (_nameController.text.isNotEmpty) {
       try {
         // Update store details in Firestore
@@ -45,10 +47,11 @@ class EditStoreProfileViewModel extends ChangeNotifier {
         if (_profileImage != null) {
           // Assuming you have a method to upload the image and get the URL
           final imageUrl = await uploadImage(_profileImage!);
-          updateData['store_profile_picture_url'] = imageUrl;
+          updateData['store_image_url'] = imageUrl;
         }
 
         await storeRef.update(updateData);
+        _loading = false;
         notifyListeners(); // Notify listeners if necessary
       } catch (e) {
         // Handle errors

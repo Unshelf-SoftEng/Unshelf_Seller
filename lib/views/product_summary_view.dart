@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
-import 'package:unshelf_seller/image_delete_view.dart';
+import 'package:unshelf_seller/views/image_delete_view.dart';
 
 class ProductSummaryView extends StatefulWidget {
   final String? productId;

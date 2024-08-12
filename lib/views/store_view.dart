@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
-import 'package:unshelf_seller/edit_store_schedule_view.dart';
-import 'package:unshelf_seller/edit_store_location_view.dart';
-import 'package:unshelf_seller/edit_store_profile_view.dart';
+import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
+import 'package:unshelf_seller/views/edit_store_location_view.dart';
+import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 
 class StoreView extends StatelessWidget {
   @override
@@ -40,13 +40,11 @@ class StoreView extends StatelessWidget {
                         child: ListTile(
                           leading: CircleAvatar(
                             radius: 30,
-                            backgroundImage: viewModel
-                                        .storeDetails?.storeImageUrl !=
-                                    null
-                                ? NetworkImage(
-                                    viewModel.storeDetails!.storeImageUrl!)
-                                : AssetImage('assets/default_profile.png')
-                                    as ImageProvider, // Replace with a default image if needed
+                            backgroundImage:
+                                viewModel.storeDetails?.storeImageUrl != null
+                                    ? NetworkImage(
+                                        viewModel.storeDetails!.storeImageUrl!)
+                                    : null,
                           ),
                           title: Text(viewModel.storeDetails?.storeName ??
                               'Store Name'),
@@ -158,7 +156,7 @@ class StoreView extends StatelessWidget {
                                                   .storeLongitude!,
                                             )
                                           : const LatLng(37.7749, -122.4194),
-                                  zoom: 14.0,
+                                  zoom: 16.0,
                                 ),
                                 markers: viewModel
                                             .storeDetails!.storeLatitude !=

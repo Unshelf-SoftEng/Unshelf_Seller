@@ -33,5 +33,7 @@ class StoreLocationViewModel extends ChangeNotifier {
     } catch (error) {
       throw Exception('Failed to save location: $error');
     }
+
+    notifyListeners();
   }
 }

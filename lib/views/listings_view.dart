@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:unshelf_seller/product_summary_view.dart';
-import 'package:unshelf_seller/add_product_details_view.dart';
+import 'package:unshelf_seller/views/product_summary_view.dart';
+import 'package:unshelf_seller/views/add_product_details_view.dart';
 
 class ListingsView extends StatelessWidget {
   @override

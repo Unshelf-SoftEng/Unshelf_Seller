@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/dashboard_view.dart';
-import 'package:unshelf_seller/orders_view.dart';
-import 'package:unshelf_seller/listings_view.dart';
-import 'package:unshelf_seller/store_view.dart';
-import 'package:unshelf_seller/add_product_details_view.dart';
-import 'package:unshelf_seller/wallet_view.dart';
+import 'package:unshelf_seller/views/dashboard_view.dart';
+import 'package:unshelf_seller/views/orders_view.dart';
+import 'package:unshelf_seller/views/listings_view.dart';
+import 'package:unshelf_seller/views/store_view.dart';
+import 'package:unshelf_seller/views/add_product_details_view.dart';
+import 'package:unshelf_seller/views/wallet_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -141,7 +141,8 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
+        unselectedItemColor: const Color(0xFF6A994E),
+        selectedItemColor: Colors.black,
         onTap: _onItemTapped,
       ),
     );

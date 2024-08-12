@@ -40,6 +40,8 @@ class StoreViewModel extends ChangeNotifier {
         storeDetails = null;
       } else {
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
+
+        print(storeDetails!.storeImageUrl);
         storeDetails!.storeFollowers =
             await fetchStoreFollowers(); // Assign followers count here
         errorMessage = null; // Clear any previous error message

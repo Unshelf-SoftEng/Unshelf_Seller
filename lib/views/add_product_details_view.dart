@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
-import 'package:unshelf_seller/image_delete_view.dart';
+import 'package:unshelf_seller/views/image_delete_view.dart';
 
 class AddProductDetailsView extends StatelessWidget {
   final String? productId;
