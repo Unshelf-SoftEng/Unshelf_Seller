@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/settings_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
 import 'package:unshelf_seller/views/login_view.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
@@ -35,7 +36,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
         ChangeNotifierProvider(create: (_) => RestockViewModel()),
         ChangeNotifierProvider(create: (_) => BundleViewModel()),
-        ChangeNotifierProvider(create: (_) => SettingsViewModel())
+        ChangeNotifierProvider(create: (_) => SettingsViewModel()),
+        ChangeNotifierProvider(create: (_) => UserProfileViewModel()),
       ],
       child: const MyApp(),
     ),

@@ -22,23 +22,10 @@ class SettingsView extends StatelessWidget {
                 },
               ),
               ListTile(
-                title: Text('Language: ${viewModel.settings.language}'),
-                onTap: () {
-                  // Show language selection dialog or navigate to a new screen
-                },
-              ),
-              ListTile(
                 leading: Icon(Icons.help),
                 title: Text('Help & Feedback'),
                 onTap: () {
                   // Navigate to Help & Feedback
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text('Log Out'),
-                onTap: () {
-                  // Log out
                 },
               ),
             ],
