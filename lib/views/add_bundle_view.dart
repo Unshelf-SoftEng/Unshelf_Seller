@@ -5,6 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 
 class AddBundleView extends StatelessWidget {
+  final String? bundleId;
+
+  AddBundleView({this.bundleId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

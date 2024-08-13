@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:unshelf_seller/viewmodels/listings_viewmodel.dart';
 import 'package:unshelf_seller/views/dashboard_view.dart';
 import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
-import 'package:unshelf_seller/views/add_product_details_view.dart';
+import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/add_bundle_view.dart';
 import 'package:unshelf_seller/views/batch_restock_view.dart';
-import 'package:unshelf_seller/views/wallet_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -85,15 +86,19 @@ class _HomeViewState extends State<HomeView> {
             if (_selectedIndex == 2)
               PopupMenuButton<String>(
                 icon: Icon(Icons.add),
-                onSelected: (value) {
+                onSelected: (value) async {
                   switch (value) {
                     case 'add_product':
-                      Navigator.push(
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddProductDetailsView(),
+                          builder: (context) => AddProductView(),
                         ),
                       );
+                      if (result == true) {
+                        Provider.of<ListingViewModel>(context, listen: false)
+                            .refreshItems();
+                      }
                       break;
                     case 'add_bundle':
                       Navigator.push(
@@ -115,13 +120,17 @@ class _HomeViewState extends State<HomeView> {
                 },
                 itemBuilder: (BuildContext context) {
                   return [
-                    PopupMenuItem<String>(
+                    const PopupMenuItem<String>(
                       value: 'add_product',
                       child: Text('Add Product'),
                     ),
-                    PopupMenuItem<String>(
+                    const PopupMenuItem<String>(
                       value: 'add_bundle',
                       child: Text('Add Bundle'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: "batch_restock",
+                      child: Text('Batch Restock'),
                     ),
                     // Add other options as needed
                   ];

@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 
-class AddProductDetailsView extends StatelessWidget {
+class AddProductView extends StatelessWidget {
   final String? productId;
 
-  AddProductDetailsView({this.productId});
+  AddProductView({this.productId});
 
   @override
   Widget build(BuildContext context) {
@@ -433,8 +433,15 @@ class AddProductDetailsView extends StatelessWidget {
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     await viewModel.addOrUpdateProduct(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Product added successfully!'),
+                                      ),
+                                    );
+                                    Navigator.pop(context);
                                   },
-                                  child: Text('Next'),
+                                  child: Text('Add Product'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFF6A994E),
                                     foregroundColor: Colors.white,

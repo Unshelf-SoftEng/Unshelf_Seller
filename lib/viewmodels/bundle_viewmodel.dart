@@ -32,9 +32,11 @@ class BundleViewModel extends ChangeNotifier {
   void createBundle() {
     if (_newBundleName.isNotEmpty && _selectedProductIds.isNotEmpty) {
       final newBundle = BundleModel(
-        id: DateTime.now().toString(), // Generate a unique ID
+        bundleId: DateTime.now().toString(), // Generate a unique ID
         name: _newBundleName,
+        price: 0.0,
         productIds: _selectedProductIds,
+        mainImageUrl: '',
       );
       _bundles.add(newBundle);
       _newBundleName = '';

@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/models/item_model.dart';
 
-class ProductModel {
+class ProductModel implements ItemModel {
+  @override
+  String get id => productId;
   final String productId;
   String name;
   String description;

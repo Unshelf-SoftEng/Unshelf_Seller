@@ -16,9 +16,6 @@ class StoreView extends StatelessWidget {
     final viewModel = Provider.of<StoreViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Store View'),
-      ),
       body: viewModel.isLoading
           ? _buildLoading()
           : viewModel.errorMessage != null
@@ -54,13 +51,29 @@ class StoreView extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildStoreCard(viewModel, context),
             SizedBox(height: 16.0),
+            _buildSectionTitle('Store Information'),
             _buildDetailsAndActionsSection(context, viewModel),
             SizedBox(height: 20),
+            _buildSectionTitle('Management & Settings'),
             _buildGeneralActions(context),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -88,14 +101,18 @@ class StoreView extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: Icon(Icons.edit),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) =>
                     EditStoreProfileView(storeDetails: viewModel.storeDetails!),
               ),
             );
+
+            if (result == true) {
+              viewModel.fetchStoreDetails(); // Refresh store details
+            }
           },
         ),
       ),
@@ -124,37 +141,35 @@ class StoreView extends StatelessWidget {
           ),
           ListTile(
             title: Text('Store Hours'),
+            subtitle: Text('View and edit your store hours'),
             leading: Icon(Icons.access_time),
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditStoreSchedView(
-                        storeDetails: viewModel.storeDetails!),
-                  ),
-                );
-              },
-            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditStoreSchedView(storeDetails: viewModel.storeDetails!),
+                ),
+              );
+            },
           ),
           ListTile(
             title: Text('Store Location'),
-            subtitle: Text(viewModel.storeDetails?.storeLatitude != null
-                ? '${viewModel.storeDetails!.storeLatitude}, ${viewModel.storeDetails!.storeLongitude}'
-                : 'N/A'),
+            subtitle: Text('View and edit your store location'),
             leading: Icon(Icons.location_on),
-            trailing: IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditStoreLocationView(),
-                  ),
-                );
-              },
-            ),
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditStoreLocationView(
+                      storeDetails: viewModel.storeDetails!),
+                ),
+              );
+
+              if (result == true) {
+                viewModel.fetchStoreDetails(); // Refresh store details
+              }
+            },
           ),
           Container(
             height: 100.0,

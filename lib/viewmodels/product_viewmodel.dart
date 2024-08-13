@@ -22,8 +22,6 @@ class ProductViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  bool _isEditMode = false;
-
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
 
@@ -222,8 +220,7 @@ class ProductViewModel extends ChangeNotifier {
           if (productId == null) {
             List<String> images = await uploadImages();
 
-            DocumentReference productDoc =
-                await FirebaseFirestore.instance.collection('products').add({
+            await FirebaseFirestore.instance.collection('products').add({
               'sellerId': user.uid,
               'name': nameController.text,
               'description': descriptionController.text,
@@ -235,13 +232,6 @@ class ProductViewModel extends ChangeNotifier {
               'additionalImageUrls': images.sublist(1),
               'isListed': true,
             });
-            productId = productDoc.id;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Product added successfully!'),
-              ),
-            );
-            // Go back to previous scree
           } else {
             await FirebaseFirestore.instance
                 .collection('products')
@@ -257,8 +247,6 @@ class ProductViewModel extends ChangeNotifier {
               'additionalImageUrls': [],
             });
           }
-
-          Navigator.of(context).pop();
         } else {
           // Handle user not logged in
         }

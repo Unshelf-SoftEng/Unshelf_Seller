@@ -35,8 +35,7 @@ class EditStoreProfileView extends StatelessWidget {
                                   : storeDetails.storeImageUrl != null
                                       ? NetworkImage(
                                           storeDetails.storeImageUrl!)
-                                      : AssetImage('assets/default_profile.png')
-                                          as ImageProvider,
+                                      : null,
                               child: Align(
                                 alignment: Alignment.bottomRight,
                                 child: Icon(Icons.camera_alt,
@@ -56,8 +55,12 @@ class EditStoreProfileView extends StatelessWidget {
                               ? null
                               : () async {
                                   await viewModel.updateStoreProfile();
-                                  Navigator.pop(
-                                      context); // Navigate back after updating
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Store Profile updated successfully!')),
+                                  );
+                                  Navigator.pop(context, true);
                                 },
                           child: Text('Save Changes'),
                         ),
