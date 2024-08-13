@@ -7,6 +7,7 @@ import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/views/settings_view.dart';
 
 class StoreView extends StatelessWidget {
   @override
@@ -219,15 +220,25 @@ class StoreView extends StatelessWidget {
                                 children: [
                                   ElevatedButton(
                                     onPressed: () async {
-                                      Navigator.push(context, '/settings');
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              SettingsView(), // Replace with your actual settings view widget
+                                        ),
+                                      );
                                     },
                                     child: Text('Settings'),
                                   ),
                                   ElevatedButton(
                                     onPressed: () async {
                                       await FirebaseAuth.instance.signOut();
-                                      Navigator.pushReplacementNamed(
-                                          context, '/login');
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder: (context) => LoginView(),
+                                        ),
+                                        (Route<dynamic> route) => false,
+                                      );
                                     },
                                     child: Text('Log Out'),
                                   ),
