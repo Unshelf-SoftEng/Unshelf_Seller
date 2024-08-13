@@ -8,6 +8,8 @@ import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
+import 'package:unshelf_seller/views/register_view.dart';
+import 'package:unshelf_seller/views/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,13 +43,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Unshelf',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF386641)),
-        useMaterial3: true,
-        textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
-      ),
-      home: LoginView(),
-    );
+        title: 'Unshelf',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF386641)),
+          useMaterial3: true,
+          textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
+        ),
+        home: LoginView(),
+        routes: {
+          '/login': (context) => LoginView(),
+          '/register': (context) => RegisterView(),
+          '/home': (context) => HomeView(),
+          '/settings': (context) => SettingsView(),
+        });
   }
 }

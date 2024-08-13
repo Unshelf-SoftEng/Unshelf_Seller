@@ -241,6 +241,7 @@ class ProductViewModel extends ChangeNotifier {
                 content: Text('Product added successfully!'),
               ),
             );
+            // Go back to previous scree
           } else {
             await FirebaseFirestore.instance
                 .collection('products')
@@ -256,6 +257,8 @@ class ProductViewModel extends ChangeNotifier {
               'additionalImageUrls': [],
             });
           }
+
+          Navigator.of(context).pop();
         } else {
           // Handle user not logged in
         }
