@@ -25,19 +25,41 @@ class ListingViewModel extends ChangeNotifier {
 
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      // Fetch products
-      final productSnapshot = await FirebaseFirestore.instance
-          .collection('products')
-          .where('seller_id', isEqualTo: user.uid)
-          .get();
-      final products = productSnapshot.docs
-          .map((doc) => ProductModel.fromSnapshot(doc))
-          .toList();
+      try {
+        // Fetch products
+        final productSnapshot = await FirebaseFirestore.instance
+            .collection('products')
+            .where('sellerId', isEqualTo: user.uid)
+            .get();
 
-      // Fetch bundles
-      const bundles = null;
+        print('Mapping products');
+        final products = productSnapshot.docs
+            .map((doc) {
+              try {
+                return ProductModel.fromSnapshot(doc) as ItemModel?;
+              } catch (e) {
+                print('Error mapping product: $e');
+                return null;
+              }
+            })
+            .where((product) => product != null)
+            .cast<ItemModel>()
+            .toList();
 
-      _items = showingProducts ? products : bundles;
+        print('Products: $products');
+        // Fetch bundles
+        const bundles = null;
+
+        _items = showingProducts ? products : bundles;
+      } catch (e) {
+        print('Error fetching items: $e');
+        _items = [];
+      } finally {
+        _isLoading = false;
+        notifyListeners();
+      }
+    } else {
+      _items = [];
       _isLoading = false;
       notifyListeners();
     }

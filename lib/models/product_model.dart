@@ -35,10 +35,10 @@ class ProductModel implements ItemModel {
       description: data['description'] ?? '',
       price: (data['price'] ?? 0.0).toDouble(),
       stock: data['stock'] ?? 0,
-      expiryDate: (data['expiry_date'] as Timestamp).toDate(),
+      expiryDate: (data['expiryDate'] as Timestamp).toDate(),
       discount: data['discount'] ?? 0,
-      mainImageUrl: data['main_image_url'] ?? '',
-      additionalImageUrls: (data['additional_image_urls'] as List<dynamic>?)
+      mainImageUrl: data['mainImageUrl'] ?? '',
+      additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
     );

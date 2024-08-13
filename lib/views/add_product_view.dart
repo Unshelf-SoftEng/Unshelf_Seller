@@ -439,7 +439,7 @@ class AddProductView extends StatelessWidget {
                                             Text('Product added successfully!'),
                                       ),
                                     );
-                                    Navigator.pop(context);
+                                    Navigator.pop(context, true);
                                   },
                                   child: Text('Add Product'),
                                   style: ElevatedButton.styleFrom(

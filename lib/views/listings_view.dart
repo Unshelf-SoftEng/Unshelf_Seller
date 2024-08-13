@@ -4,27 +4,37 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
-import 'package:unshelf_seller/viewmodels/listings_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/models/item_model.dart';
 import 'package:unshelf_seller/views/product_summary_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/add_bundle_view.dart';
+import 'package:unshelf_seller/views/batch_restock_view.dart';
 
 class ListingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Listings'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.swap_horiz),
-            onPressed: () {
-              Provider.of<ListingViewModel>(context, listen: false)
-                  .toggleView();
-            },
-          ),
-        ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Consumer<ListingViewModel>(
+          builder: (context, viewModel, child) {
+            return AppBar(
+              title: Text(viewModel.showingProducts
+                  ? 'Product Listings'
+                  : 'Bundle Listings'),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.swap_horiz),
+                  onPressed: () {
+                    Provider.of<ListingViewModel>(context, listen: false)
+                        .toggleView();
+                  },
+                ),
+              ],
+            );
+          },
+        ),
       ),
       body: Consumer<ListingViewModel>(
         builder: (context, viewModel, child) {
@@ -33,7 +43,11 @@ class ListingsView extends StatelessWidget {
           }
 
           if (viewModel.items.isEmpty) {
-            return Center(child: Text('No items found'));
+            if (viewModel.showingProducts) {
+              return Center(child: Text('No products found'));
+            } else {
+              return Center(child: Text('No bundles found'));
+            }
           }
 
           return ListView.builder(
@@ -103,6 +117,39 @@ class ListingsView extends StatelessWidget {
                 ),
               );
             },
+          );
+        },
+      ),
+      floatingActionButton: Consumer<ListingViewModel>(
+        builder: (context, viewModel, child) {
+          return FloatingActionButton(
+            onPressed: () async {
+              if (viewModel.showingProducts) {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddProductView(),
+                  ),
+                );
+                if (result == true) {
+                  Provider.of<ListingViewModel>(context, listen: false)
+                      .refreshItems();
+                }
+              } else {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddBundleView(),
+                  ),
+                );
+                if (result == true) {
+                  Provider.of<ListingViewModel>(context, listen: false)
+                      .refreshItems();
+                }
+              }
+            },
+            child: Icon(Icons.add),
+            tooltip: viewModel.showingProducts ? 'Add Product' : 'Add Bundle',
           );
         },
       ),
