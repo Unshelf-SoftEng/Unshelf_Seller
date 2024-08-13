@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductModel {
   final String productId;
-  final String name;
-  final String description;
-  final double price;
-  final int stock;
-  final DateTime expiryDate;
-  final int discount;
-  final String mainImageUrl;
-  final List<String>? additionalImageUrls;
+  String name;
+  String description;
+  double price;
+  int stock;
+  DateTime expiryDate;
+  int discount;
+  String mainImageUrl;
+  List<String>? additionalImageUrls;
 
   ProductModel({
     required this.productId,

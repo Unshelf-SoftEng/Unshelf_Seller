@@ -4,6 +4,8 @@ import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
 import 'package:unshelf_seller/views/add_product_details_view.dart';
+import 'package:unshelf_seller/views/add_bundle_view.dart';
+import 'package:unshelf_seller/views/batch_restock_view.dart';
 import 'package:unshelf_seller/views/wallet_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -81,16 +83,48 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             if (_selectedIndex == 2)
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddProductDetailsView(
-                              productId: null,
-                            )),
-                  );
+              PopupMenuButton<String>(
+                icon: Icon(Icons.add),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'add_product':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddProductDetailsView(),
+                        ),
+                      );
+                      break;
+                    case 'add_bundle':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddBundleView(),
+                        ),
+                      );
+                      break;
+                    case 'batch_restock':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BatchRestockView(),
+                        ),
+                      );
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem<String>(
+                      value: 'add_product',
+                      child: Text('Add Product'),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'add_bundle',
+                      child: Text('Add Bundle'),
+                    ),
+                    // Add other options as needed
+                  ];
                 },
               )
             else
