@@ -51,6 +51,8 @@ class OrderViewModel extends ChangeNotifier {
         _orders = List<OrderModel>.generate(5, (index) => _orders[0]);
       }
 
+      orders[1].status = OrderStatus.ready;
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {

@@ -21,10 +21,13 @@ class OrderModel {
   final String id;
   final DocumentReference buyerId;
   final List<OrderItem> items;
-  final OrderStatus status;
+  OrderStatus status;
   final Timestamp createdAt;
   List<ProductModel> products = [];
   double totalPrice;
+  String buyerName;
+  Timestamp? completionDate;
+  String? pickUpCode;
 
   OrderModel({
     required this.id,
@@ -34,6 +37,9 @@ class OrderModel {
     required this.createdAt,
     this.totalPrice = 0,
     this.products = const [],
+    this.buyerName = '',
+    this.completionDate,
+    this.pickUpCode = '',
   });
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
@@ -63,6 +69,7 @@ class OrderModel {
         data['order_items'].map((item) => OrderItem.fromMap(item)),
       ),
       products: [],
+      completionDate: data['completion_date'] as Timestamp?,
     );
 
     List<DocumentReference> productRefs = [];
@@ -77,6 +84,14 @@ class OrderModel {
         .map((snapshot) => ProductModel.fromSnapshot(snapshot))
         .toList();
 
+    // Fetch the buyer's name
+    await FirebaseFirestore.instance
+        .doc(orderModel.buyerId.path)
+        .get()
+        .then((buyerSnapshot) {
+      orderModel.buyerName = buyerSnapshot.data()!['name'] as String;
+    });
+
     // Return a new OrderModel with the populated products
     return OrderModel(
       id: orderModel.id,
@@ -89,6 +104,7 @@ class OrderModel {
         0,
         (previousValue, element) => previousValue + element.price,
       ),
+      buyerName: orderModel.buyerName,
     );
   }
 }
