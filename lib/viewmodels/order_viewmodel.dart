@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/order_model.dart';
 
 class OrderViewModel extends ChangeNotifier {
@@ -7,8 +9,16 @@ class OrderViewModel extends ChangeNotifier {
   OrderModel? _selectedOrder;
   OrderModel? get selectedOrder => _selectedOrder;
   List<OrderModel> get orders => _orders;
-  OrderStatus get currentStatus =>
-      _currentStatus; // Added to get the current filter status
+  OrderStatus get currentStatus => _currentStatus;
+
+  bool get isLoading => _isLoading;
+  bool _isLoading = false;
+
+  late Future<void> fetchOrdersFuture;
+
+  OrderViewModel() {
+    fetchOrdersFuture = fetchOrders();
+  }
 
   List<OrderModel> get filteredOrders {
     if (_currentStatus == OrderStatus.all) {
@@ -17,27 +27,58 @@ class OrderViewModel extends ChangeNotifier {
     return _orders.where((order) => order.status == _currentStatus).toList();
   }
 
-  void fetchOrders() {
-    // Simulate fetching data from a repository or API
-    _orders = [
-      OrderModel(
-          id: '1', item: 'Item A', quantity: 2, status: OrderStatus.pending),
-      OrderModel(
-          id: '2', item: 'Item B', quantity: 1, status: OrderStatus.completed),
-      OrderModel(
-          id: '3', item: 'Item C', quantity: 5, status: OrderStatus.shipped),
-    ];
+  Future<void> fetchOrders() async {
+    _isLoading = true;
     notifyListeners();
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('User not logged in');
+      }
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('seller_id',
+              isEqualTo: FirebaseFirestore.instance.doc('users/${user.uid}'))
+          .orderBy('created_at', descending: true)
+          .get();
+
+      _orders = await Future.wait<OrderModel>(querySnapshot.docs
+          .map((doc) => OrderModel.fetchOrderWithProducts(doc))
+          .toList());
+
+      if (_orders.length == 1) {
+        _orders = List<OrderModel>.generate(5, (index) => _orders[0]);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print('Failed to fetch orders: $e');
+      // Handle errors appropriately
+    }
   }
 
   OrderModel? selectOrder(String orderId) {
+    _isLoading = true;
     _selectedOrder = _orders.firstWhere((order) => order.id == orderId);
+
+    _isLoading = false;
     notifyListeners();
     return _selectedOrder;
   }
 
-  void setFilter(OrderStatus status) {
-    _currentStatus = status; // Update the current filter status
+  void filterOrdersByStatus(String? status) {
+    if (status == null || status == 'All') {
+      _currentStatus = OrderStatus.all;
+    } else if (status == 'Pending') {
+      // Filter orders based on status
+      _currentStatus = OrderStatus.pending;
+    } else if (status == 'Completed') {
+      _currentStatus = OrderStatus.completed;
+    } else if (status == 'Ready') {
+      _currentStatus = OrderStatus.ready;
+    }
     notifyListeners();
   }
 
