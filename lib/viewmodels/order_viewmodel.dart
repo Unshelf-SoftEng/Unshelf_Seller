@@ -40,4 +40,11 @@ class OrderViewModel extends ChangeNotifier {
     _currentStatus = status; // Update the current filter status
     notifyListeners();
   }
+
+  void clear() {
+    _orders = [];
+    _selectedOrder = null;
+    _currentStatus = OrderStatus.all;
+    notifyListeners();
+  }
 }

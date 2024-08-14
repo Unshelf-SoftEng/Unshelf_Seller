@@ -48,7 +48,7 @@ class BundleSuggestionsView extends StatelessWidget {
                     title: Text(suggestion.name),
                     subtitle: Text('Products: $productNames'),
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AddBundleView(

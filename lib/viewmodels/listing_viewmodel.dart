@@ -107,4 +107,10 @@ class ListingViewModel extends ChangeNotifier {
   void refreshItems() {
     _fetchItems();
   }
+
+  void clear() {
+    _items = [];
+    _isLoading = true;
+    notifyListeners();
+  }
 }

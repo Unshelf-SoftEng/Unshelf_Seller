@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
 class StoreViewModel extends ChangeNotifier {
-  final User? user = FirebaseAuth.instance.currentUser;
   StoreModel? storeDetails;
   bool isLoading = true;
   String? errorMessage;
@@ -14,6 +13,9 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchStoreDetails() async {
+    // Check if the user is logged in
+    User? user = FirebaseAuth.instance.currentUser;
+
     if (user == null) {
       errorMessage = "User is not logged in";
       isLoading = false;
@@ -40,11 +42,12 @@ class StoreViewModel extends ChangeNotifier {
         storeDetails = null;
       } else {
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
-
+        print(storeDetails!.storeName);
         print(storeDetails!.storeImageUrl);
-        storeDetails!.storeFollowers =
-            await fetchStoreFollowers(); // Assign followers count here
-        errorMessage = null; // Clear any previous error message
+        print(storeDetails!.storeSchedule);
+        storeDetails!.storeFollowers = await fetchStoreFollowers();
+
+        notifyListeners();
       }
     } catch (e) {
       errorMessage = "Error fetching user profile: ${e.toString()}";
@@ -56,6 +59,8 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<int> fetchStoreFollowers() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
     if (user == null) {
       errorMessage = "User is not logged in";
       isLoading = false;
@@ -82,6 +87,8 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<double> fetchStoreRatings() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
     if (user == null) {
       errorMessage = "User is not logged in";
       isLoading = false;
@@ -132,5 +139,11 @@ class StoreViewModel extends ChangeNotifier {
           ? '$day: Closed'
           : '$day: $open - $close';
     }).join('\n');
+  }
+
+  void clear() {
+    storeDetails = null;
+    errorMessage = null;
+    notifyListeners();
   }
 }

@@ -46,6 +46,7 @@ class BundleViewModel extends ChangeNotifier {
     bundleDiscountController.text = bundle.discount.toString();
 
     _selectedProductIds = bundle.productIds.toSet();
+    _updateBundleStock();
   }
 
   Future<void> _fetchProducts() async {
@@ -124,6 +125,7 @@ class BundleViewModel extends ChangeNotifier {
       };
 
       await FirebaseFirestore.instance.collection('bundles').add(bundleData);
+
       notifyListeners();
     } catch (e) {
       // Handle errors appropriately

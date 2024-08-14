@@ -225,7 +225,7 @@ class AddBundleView extends StatelessWidget {
                           return 'Please enter a valid stock number';
                         }
                         if (stock > viewModel.maxStock) {
-                          return 'Stock cannot be greater than the lowest stock of the products in the bundle';
+                          return 'Max Stock is ${viewModel.maxStock}. Stock cannot be greater than the lowest stock of the products in the bundle';
                         }
                         return null;
                       },

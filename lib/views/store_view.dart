@@ -6,11 +6,30 @@ import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
+import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/user_profile_view.dart';
+import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 
-class StoreView extends StatelessWidget {
+class StoreView extends StatefulWidget {
+  @override
+  _StoreViewState createState() => _StoreViewState();
+}
+
+class _StoreViewState extends State<StoreView> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch store details when the view is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = Provider.of<StoreViewModel>(context, listen: false);
+      viewModel.fetchStoreDetails();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<StoreViewModel>(context);
@@ -37,6 +56,8 @@ class StoreView extends StatelessWidget {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              final viewModel =
+                  Provider.of<StoreViewModel>(context, listen: false);
               viewModel.fetchStoreDetails();
             },
             child: Text('Retry'),
@@ -111,6 +132,8 @@ class StoreView extends StatelessWidget {
             );
 
             if (result == true) {
+              final viewModel =
+                  Provider.of<StoreViewModel>(context, listen: false);
               viewModel.fetchStoreDetails(); // Refresh store details
             }
           },
@@ -167,6 +190,8 @@ class StoreView extends StatelessWidget {
               );
 
               if (result == true) {
+                final viewModel =
+                    Provider.of<StoreViewModel>(context, listen: false);
                 viewModel.fetchStoreDetails(); // Refresh store details
               }
             },
@@ -228,6 +253,10 @@ class StoreView extends StatelessWidget {
             leading: Icon(Icons.logout),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
+              Provider.of<StoreViewModel>(context, listen: false).clear();
+              Provider.of<ListingViewModel>(context, listen: false).clear();
+              Provider.of<OrderViewModel>(context, listen: false).clear();
+
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (context) => LoginView(),
