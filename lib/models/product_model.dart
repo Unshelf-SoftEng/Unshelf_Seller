@@ -43,4 +43,32 @@ class ProductModel implements ItemModel {
           .toList(),
     );
   }
+
+  // Method to convert StoreModel to Json
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': productId,
+      'name': name,
+      'description': description,
+      'price': price,
+      'stock': stock,
+      'expiryDate': expiryDate.toIso8601String(),
+      'discount': discount,
+    };
+  }
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      productId: json['id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      price: json['price'] ?? 0.0,
+      stock: json['stock'] ?? 0,
+      expiryDate: json['expiryDate'] != null
+          ? DateTime.parse(json['expiryDate'])
+          : DateTime.now(),
+      discount: json['discount'] ?? 0,
+      mainImageUrl: json['mainImageUrl'] ?? '',
+    );
+  }
 }

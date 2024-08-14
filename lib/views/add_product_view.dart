@@ -81,7 +81,7 @@ class AddProductView extends StatelessWidget {
                                   height: 400.0, // Add border
                                   margin: EdgeInsets.all(0),
                                 )
-                              : Center(
+                              : const Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -135,7 +135,7 @@ class AddProductView extends StatelessWidget {
                                       height: itemWidth,
                                       margin: EdgeInsets.only(right: 2.0),
                                       color: const Color(0xFF386641),
-                                      child: Center(
+                                      child: const Center(
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,

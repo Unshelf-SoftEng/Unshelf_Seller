@@ -46,9 +46,24 @@ class ListingViewModel extends ChangeNotifier {
             .cast<ItemModel>()
             .toList();
 
-        print('Products: $products');
         // Fetch bundles
-        const bundles = null;
+        final bundleSnapshot = await FirebaseFirestore.instance
+            .collection('bundles')
+            .where('sellerId', isEqualTo: user.uid)
+            .get();
+
+        final bundles = bundleSnapshot.docs
+            .map((doc) {
+              try {
+                return BundleModel.fromSnapshot(doc) as ItemModel?;
+              } catch (e) {
+                print('Error mapping bundle: $e');
+                return null;
+              }
+            })
+            .where((bundle) => bundle != null)
+            .cast<ItemModel>()
+            .toList();
 
         _items = showingProducts ? products : bundles;
       } catch (e) {

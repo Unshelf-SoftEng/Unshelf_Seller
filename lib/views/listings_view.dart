@@ -5,11 +5,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
-import 'package:unshelf_seller/models/item_model.dart';
 import 'package:unshelf_seller/views/product_summary_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/add_bundle_view.dart';
-import 'package:unshelf_seller/views/batch_restock_view.dart';
 
 class ListingsView extends StatelessWidget {
   @override
