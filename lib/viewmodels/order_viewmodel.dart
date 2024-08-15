@@ -96,10 +96,18 @@ class OrderViewModel extends ChangeNotifier {
         final snapshot = await transaction.get(productRef);
         final currentStock = snapshot.get('stock');
 
+        final newStock = currentStock - item.quantity;
+
         // Update the stock within the transaction
         transaction.update(productRef, {
-          'stock': currentStock - item.quantity,
+          'stock': newStock,
         });
+
+        if (newStock == 0) {
+          transaction.update(productRef, {
+            'isListed': false,
+          });
+        }
       });
     });
 

@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
-import 'package:unshelf_seller/models/user_model.dart';
 
 class UserProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<UserProfileViewModel>(context);
-    final nameController =
-        TextEditingController(text: viewModel.userProfile.name);
-    final emailController =
-        TextEditingController(text: viewModel.userProfile.email);
-    final phoneController =
-        TextEditingController(text: viewModel.userProfile.phoneNumber);
-    final passwordController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: Text('User Profile'),
@@ -29,34 +20,41 @@ class UserProfileView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextField(
-                        controller: nameController,
+                        controller: viewModel.nameController,
                         decoration: InputDecoration(labelText: 'Name'),
                       ),
                       TextField(
-                        controller: emailController,
+                        controller: viewModel.emailController,
                         decoration: InputDecoration(labelText: 'Email'),
                       ),
                       TextField(
-                        controller: phoneController,
+                        controller: viewModel.phoneController,
                         decoration: InputDecoration(labelText: 'Phone Number'),
                       ),
                       TextField(
-                        controller: passwordController,
+                        controller: viewModel.passwordController,
                         obscureText: true,
                         decoration: InputDecoration(labelText: 'Password'),
+                      ),
+                      TextField(
+                        controller: viewModel.confirmPasswordController,
+                        obscureText: true,
+                        decoration:
+                            InputDecoration(labelText: 'Confirm Password'),
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          final updatedProfile = UserProfileModel(
-                            name: nameController.text,
-                            email: emailController.text,
-                            phoneNumber: phoneController.text,
-                            password: passwordController.text.isNotEmpty
-                                ? passwordController.text
-                                : viewModel.userProfile.password,
-                          );
-                          viewModel.updateUserProfile(updatedProfile);
+                          viewModel.updateUserProfile();
+
+                          if (viewModel.errorMessage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Profile updated successfully'),
+                              ),
+                            );
+                          }
+                          Navigator.pop(context);
                         },
                         child: Text('Save Changes'),
                       ),

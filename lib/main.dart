@@ -41,7 +41,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => RestockViewModel()),
         ChangeNotifierProvider(create: (_) => BundleViewModel()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
-        ChangeNotifierProvider(create: (_) => UserProfileViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => UserProfileViewModel(userProfile: null)),
         ChangeNotifierProvider(create: (_) => ListingViewModel()),
       ],
       child: const MyApp(),

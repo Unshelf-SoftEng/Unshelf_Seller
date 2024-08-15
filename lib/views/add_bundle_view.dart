@@ -27,7 +27,7 @@ class AddBundleView extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.autorenew), // Icon for AI suggestions
             onPressed: () async {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => BundleSuggestionsView(),
@@ -86,8 +86,7 @@ class AddBundleView extends StatelessWidget {
                     SizedBox(
                       height: 200,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8.0), // Add padding around the list
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ListView.builder(
                           itemCount: viewModel.products.length,
                           itemBuilder: (context, index) {

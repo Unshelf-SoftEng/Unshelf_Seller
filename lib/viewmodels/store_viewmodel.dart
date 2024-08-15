@@ -2,14 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/store_model.dart';
+import 'package:unshelf_seller/models/user_model.dart';
 
 class StoreViewModel extends ChangeNotifier {
   StoreModel? storeDetails;
+  UserProfileModel? userProfile;
+
   bool isLoading = true;
   String? errorMessage;
 
   StoreViewModel() {
     fetchStoreDetails();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      errorMessage = "User is not logged in";
+      isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    isLoading = true;
+    notifyListeners();
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        errorMessage = "User profile not found";
+        userProfile = null;
+      } else {
+        userProfile = UserProfileModel.fromSnapshot(userDoc);
+        notifyListeners();
+      }
+    } catch (e) {
+      errorMessage = "Error fetching user profile: ${e.toString()}";
+      userProfile = null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> fetchStoreDetails() async {

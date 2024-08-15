@@ -122,6 +122,7 @@ class BundleViewModel extends ChangeNotifier {
         'discount': bundleDiscount,
         'mainImageUrl': mainImageUrl,
         'sellerId': user.uid,
+        'isListed': false,
       };
 
       await FirebaseFirestore.instance.collection('bundles').add(bundleData);

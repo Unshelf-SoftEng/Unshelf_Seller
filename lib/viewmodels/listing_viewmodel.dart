@@ -30,6 +30,7 @@ class ListingViewModel extends ChangeNotifier {
         final productSnapshot = await FirebaseFirestore.instance
             .collection('products')
             .where('sellerId', isEqualTo: user.uid)
+            .where('isListed', isEqualTo: true)
             .get();
 
         print('Mapping products');
@@ -46,10 +47,10 @@ class ListingViewModel extends ChangeNotifier {
             .cast<ItemModel>()
             .toList();
 
-        // Fetch bundles
         final bundleSnapshot = await FirebaseFirestore.instance
             .collection('bundles')
             .where('sellerId', isEqualTo: user.uid)
+            .where('isListed', isEqualTo: true)
             .get();
 
         final bundles = bundleSnapshot.docs
