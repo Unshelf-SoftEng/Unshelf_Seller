@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/views/home_view.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -19,6 +21,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _sellerNameController = TextEditingController();
   final TextEditingController _storeNameController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Function to save user data
   Future<void> saveUserData(
@@ -90,6 +93,62 @@ class _RegisterViewState extends State<RegisterView> {
           SnackBar(content: Text('An error occurred: $e. Please try again.')),
         );
       }
+    }
+  }
+
+  Future<void> _registerWithGoogle() async {
+    try {
+      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
+
+      _auth.signInWithProvider(_googleAuthProvider);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration successful')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeView()),
+      );
+    } catch (e) {
+      String errorMessage;
+
+      // Check if the error is a FirebaseAuthException
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'account-exists-with-different-credential':
+            errorMessage =
+                'An account already exists with a different credential.';
+            break;
+          case 'invalid-credential':
+            errorMessage = 'The credential provided is not valid.';
+            break;
+          case 'operation-not-allowed':
+            errorMessage =
+                'Operation not allowed. Please check your configuration.';
+            break;
+          case 'user-disabled':
+            errorMessage = 'The user has been disabled.';
+            break;
+          case 'user-not-found':
+            errorMessage = 'No user found for this email.';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Wrong password provided.';
+            break;
+          default:
+            errorMessage = 'An unexpected error occurred. Please try again.';
+            break;
+        }
+      } else {
+        // Handle other types of errors, such as network errors
+        errorMessage = '${e} Google sign-in failed. Please try again.';
+        print(e);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     }
   }
 
@@ -174,10 +233,48 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: _register,
                 child: const Text('Sign Up'),
               ),
+              const SizedBox(height: 10),
               const Text(
                   "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy"),
               const SizedBox(height: 20),
+              // Adding space above the sign-in section
+              const SizedBox(height: 20),
+
+              // Styled separator text
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(child: Divider(color: Colors.grey[400])),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text('or sign up with',
+                        style: TextStyle(color: Colors.grey)),
+                  ),
+                  Expanded(child: Divider(color: Colors.grey[400])),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Google Sign-In button with icon
+              ElevatedButton.icon(
+                onPressed: _registerWithGoogle,
+                label: const Text('Sign up with Google'),
+                icon: Image.network(
+                    'https://firebasestorage.googleapis.com/v0/b/unshelf-d4567.appspot.com/o/image8-2.png?alt=media&token=4bfbc600-ed28-449e-ae22-86074884db57',
+                    width: 24,
+                    height: 24),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                ),
+              ),
+
+              const SizedBox(height: 40),
               const Text('Already have an account?'),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(

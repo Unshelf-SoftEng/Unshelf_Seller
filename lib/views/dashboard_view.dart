@@ -5,24 +5,21 @@ import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => DashboardViewModel(),
-      child: Scaffold(
-        body: Consumer<DashboardViewModel>(
-          builder: (context, viewModel, child) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDailyAnalyticsCard(viewModel),
-                  SizedBox(height: 16.0),
-                  _buildStoreInsightsCard(viewModel),
-                ],
-              ),
-            );
-          },
-        ),
+    return Scaffold(
+      body: Consumer<DashboardViewModel>(
+        builder: (context, viewModel, child) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDailyAnalyticsCard(viewModel),
+                SizedBox(height: 16.0),
+                _buildStoreInsightsCard(viewModel),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
