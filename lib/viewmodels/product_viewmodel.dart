@@ -68,13 +68,12 @@ class ProductViewModel extends ChangeNotifier {
         expiryDateController.text = product.expiryDate.toString();
         descriptionController.text = product.description;
         discountController.text = product.discount.toString();
+        selectedCategory = product.category;
+        selectedQuantifier = product.quantifier;
 
         final mainImageUrl = product.mainImageUrl;
         final additionalImageUrls = product.additionalImageUrls;
-
-        if (mainImageUrl != null) {
-          await loadImageFromUrl(mainImageUrl, true);
-        }
+        await loadImageFromUrl(mainImageUrl, true);
 
         for (int i = 0; i < additionalImageUrls!.length; i++) {
           if (i < _additionalImageDataList.length) {

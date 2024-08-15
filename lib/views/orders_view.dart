@@ -15,7 +15,6 @@ class _OrdersViewState extends State<OrdersView> {
   @override
   void initState() {
     super.initState();
-    // Fetch orders when the view is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ordersViewModel =
           Provider.of<OrderViewModel>(context, listen: false);
@@ -33,7 +32,7 @@ class _OrdersViewState extends State<OrdersView> {
           DropdownButton<String>(
             value: _selectedStatus,
             hint: Text('Filter by Status'),
-            items: <String>['All', 'Pending', 'Completed', 'Cancelled']
+            items: <String>['All', 'Pending', 'Completed', 'Ready']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -77,13 +76,13 @@ class _OrdersViewState extends State<OrdersView> {
                 }
 
                 return ListView.separated(
-                  itemCount: ordersViewModel.orders.length,
+                  itemCount: ordersViewModel.filteredOrders.length,
                   separatorBuilder: (context, index) => Divider(
                     color: Colors.grey[300], // Customize the border color
                     thickness: 1.0, // Customize the border thickness
                   ),
                   itemBuilder: (context, index) {
-                    final order = ordersViewModel.orders[index];
+                    final order = ordersViewModel.filteredOrders[index];
                     return ListTile(
                       contentPadding: EdgeInsets.all(16.0),
                       title: Row(
@@ -109,10 +108,8 @@ class _OrdersViewState extends State<OrdersView> {
                                     height: 60,
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: NetworkImage(order
-                                                .products.isNotEmpty
-                                            ? order.products[0].mainImageUrl
-                                            : 'https://via.placeholder.com/60'),
+                                        image: NetworkImage(
+                                            order.products[0].mainImageUrl),
                                         fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.circular(8.0),
@@ -180,7 +177,7 @@ class _OrdersViewState extends State<OrdersView> {
                                       ),
                                     ),
                                     child: Text(
-                                      '\$${order.totalPrice.toStringAsFixed(2)}', // Assuming the order has a totalPrice field
+                                      '${order.totalPrice.toStringAsFixed(2)} Php', // Assuming the order has a totalPrice field
                                       style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),

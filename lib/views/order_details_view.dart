@@ -119,7 +119,7 @@ class OrderDetailsView extends StatelessWidget {
                                             .ellipsis, // Handle overflow of text
                                       ),
                                       Text(
-                                        'Quantity: ${product.stock}',
+                                        'Quantity: ${order.items[index].quantity}',
                                         style: TextStyle(
                                           fontSize: 10,
                                           color: Colors.grey[600],
@@ -143,11 +143,39 @@ class OrderDetailsView extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle fulfill order action
+                        // Show confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Confirm Fulfillment'),
+                              content: Text(
+                                  'Are you sure you want to fulfill this order?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    viewModel
+                                        .fulfillOrder(); // Fulfill the order
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                  child: Text('Fulfill'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFA7C957), // Background color
-                        foregroundColor: Colors.white, // Text color
+                        backgroundColor: Color(0xFFA7C957),
+                        foregroundColor: Colors.white,
                         padding:
                             EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         shape: RoundedRectangleBorder(
@@ -176,7 +204,7 @@ class OrderDetailsView extends StatelessWidget {
                   Center(
                     child: Text(
                       'Date of Completion: ${order.completionDate}',
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.green),

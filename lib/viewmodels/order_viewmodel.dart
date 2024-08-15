@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/order_model.dart';
+import 'package:nanoid/nanoid.dart';
 
 class OrderViewModel extends ChangeNotifier {
   List<OrderModel> _orders = [];
@@ -38,8 +39,7 @@ class OrderViewModel extends ChangeNotifier {
 
       final querySnapshot = await FirebaseFirestore.instance
           .collection('orders')
-          .where('seller_id',
-              isEqualTo: FirebaseFirestore.instance.doc('users/${user.uid}'))
+          .where('seller_id', isEqualTo: user.uid)
           .orderBy('created_at', descending: true)
           .get();
 
@@ -47,24 +47,16 @@ class OrderViewModel extends ChangeNotifier {
           .map((doc) => OrderModel.fetchOrderWithProducts(doc))
           .toList());
 
-      if (_orders.length == 1) {
-        _orders = List<OrderModel>.generate(5, (index) => _orders[0]);
-      }
-
-      orders[1].status = OrderStatus.ready;
-
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       print('Failed to fetch orders: $e');
-      // Handle errors appropriately
     }
   }
 
   OrderModel? selectOrder(String orderId) {
     _isLoading = true;
     _selectedOrder = _orders.firstWhere((order) => order.id == orderId);
-
     _isLoading = false;
     notifyListeners();
     return _selectedOrder;
@@ -82,6 +74,55 @@ class OrderViewModel extends ChangeNotifier {
       _currentStatus = OrderStatus.ready;
     }
     notifyListeners();
+  }
+
+  Future<void> fulfillOrder() async {
+    _selectedOrder?.status = OrderStatus.ready;
+
+    // Update the order status in Firestore
+    FirebaseFirestore.instance
+        .collection('orders')
+        .doc(_selectedOrder?.id)
+        .update({'status': 'Ready'});
+
+    // Update the product stock in Firestore
+    _selectedOrder?.items.forEach((item) async {
+      final productRef =
+          FirebaseFirestore.instance.collection('products').doc(item.productId);
+
+      // Use a transaction for safe stock updates
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        // Get the latest stock value within the transaction
+        final snapshot = await transaction.get(productRef);
+        final currentStock = snapshot.get('stock');
+
+        // Update the stock within the transaction
+        transaction.update(productRef, {
+          'stock': currentStock - item.quantity,
+        });
+      });
+    });
+
+    print('Order ${_selectedOrder?.id} fulfilled');
+
+    generatePickUpCode();
+
+    notifyListeners();
+  }
+
+  void generatePickUpCode() {
+    // Use the nanoid library to generate a short, unique, and URL-safe code
+    final code = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
+
+    _selectedOrder?.pickUpCode = code;
+
+    // Update the pick up code in Firestore
+    FirebaseFirestore.instance
+        .collection('orders')
+        .doc(_selectedOrder?.id)
+        .update({'pick_up_code': code});
+
+    print('Pick up code: $code');
   }
 
   void clear() {

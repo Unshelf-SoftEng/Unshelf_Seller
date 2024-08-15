@@ -7,7 +7,9 @@ class ProductModel implements ItemModel {
   final String productId;
   String name;
   String description;
+  String category;
   double price;
+  String quantifier;
   int stock;
   DateTime expiryDate;
   int discount;
@@ -18,7 +20,9 @@ class ProductModel implements ItemModel {
     required this.productId,
     required this.name,
     required this.description,
+    required this.category,
     required this.price,
+    required this.quantifier,
     required this.stock,
     required this.expiryDate,
     required this.discount,
@@ -33,7 +37,9 @@ class ProductModel implements ItemModel {
       productId: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
+      category: data['category'] ?? '',
       price: (data['price'] ?? 0.0).toDouble(),
+      quantifier: data['quantifier'] ?? '',
       stock: data['stock'] ?? 0,
       expiryDate: (data['expiryDate'] as Timestamp).toDate(),
       discount: data['discount'] ?? 0,
@@ -62,7 +68,9 @@ class ProductModel implements ItemModel {
       productId: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
+      category: json['category'] ?? '',
       price: json['price'] ?? 0.0,
+      quantifier: json['quantifier'] ?? '',
       stock: json['stock'] ?? 0,
       expiryDate: json['expiryDate'] != null
           ? DateTime.parse(json['expiryDate'])

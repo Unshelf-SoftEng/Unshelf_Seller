@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 
 enum OrderStatus { all, pending, ready, completed }
@@ -19,7 +18,7 @@ OrderStatus orderStatusFromString(String status) {
 
 class OrderModel {
   final String id;
-  final DocumentReference buyerId;
+  final String buyerId;
   final List<OrderItem> items;
   OrderStatus status;
   final Timestamp createdAt;
@@ -49,7 +48,7 @@ class OrderModel {
       id: doc.id,
       status: orderStatusFromString(data['status'] as String),
       createdAt: data['created_at'] as Timestamp,
-      buyerId: data['buyer_id'] as DocumentReference,
+      buyerId: data['buyer_id'],
       items: List<OrderItem>.from(
         data['order_items'].map((item) => OrderItem.fromMap(item)),
       ),
@@ -64,7 +63,7 @@ class OrderModel {
       id: doc.id,
       status: orderStatusFromString(data['status'] as String),
       createdAt: data['created_at'] as Timestamp,
-      buyerId: data['buyer_id'] as DocumentReference,
+      buyerId: data['buyer_id'],
       items: List<OrderItem>.from(
         data['order_items'].map((item) => OrderItem.fromMap(item)),
       ),
@@ -72,25 +71,29 @@ class OrderModel {
       completionDate: data['completion_date'] as Timestamp?,
     );
 
-    List<DocumentReference> productRefs = [];
-    for (var item in orderModel.items) {
-      productRefs.add(item.productId);
+    List<String> productIds =
+        orderModel.items.map((item) => item.productId).toList();
+
+    final productSnapshots = await FirebaseFirestore.instance
+        .collection('products')
+        .where(FieldPath.documentId, whereIn: productIds)
+        .get();
+
+    List<ProductModel> products = productSnapshots.docs.map((doc) {
+      return ProductModel.fromSnapshot(doc);
+    }).toList();
+
+    DocumentSnapshot buyerSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(orderModel.buyerId)
+        .get();
+
+    if (buyerSnapshot.exists) {
+      orderModel.buyerName = buyerSnapshot.get('name');
+    } else {
+      // Handle the case where the document does not exist
+      print('Buyer document does not exist');
     }
-
-    final productSnapshots =
-        await Future.wait(productRefs.map((ref) => ref.get()));
-
-    final products = productSnapshots
-        .map((snapshot) => ProductModel.fromSnapshot(snapshot))
-        .toList();
-
-    // Fetch the buyer's name
-    await FirebaseFirestore.instance
-        .doc(orderModel.buyerId.path)
-        .get()
-        .then((buyerSnapshot) {
-      orderModel.buyerName = buyerSnapshot.data()!['name'] as String;
-    });
 
     // Return a new OrderModel with the populated products
     return OrderModel(
@@ -111,7 +114,7 @@ class OrderModel {
 
 class OrderItem {
   final int quantity;
-  final DocumentReference productId;
+  final String productId;
 
   OrderItem({
     required this.quantity,
@@ -121,7 +124,7 @@ class OrderItem {
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
       quantity: map['quantity'] as int,
-      productId: map['product_id'] as DocumentReference,
+      productId: map['product_id'],
     );
   }
 }
