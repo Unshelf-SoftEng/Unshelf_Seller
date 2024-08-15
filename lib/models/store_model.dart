@@ -6,8 +6,8 @@ class StoreModel {
   final String name;
   final String phoneNumber;
   final String storeName;
-  final double? storeLongitude; // Nullable
-  final double? storeLatitude; // Nullable
+  double? storeLongitude; // Nullable
+  double? storeLatitude; // Nullable
   final Map<String, Map<String, String>>? storeSchedule;
   final String? storeImageUrl; // Nullable
   double? storeRating;
@@ -57,11 +57,11 @@ class StoreModel {
           ),
         ),
       ),
-      storeLongitude: storeData['longitude'],
-      storeLatitude: storeData['latitude'],
-      storeImageUrl: storeData['store_image_url'],
-      storeRating: 4.5,
-      storeFollowers: 1200,
+      storeLongitude: storeData['longitude'] ?? 0.0,
+      storeLatitude: storeData['latitude'] ?? 0.0,
+      storeImageUrl: storeData['store_image_url'] ?? '',
+      storeRating: 0.0,
+      storeFollowers: 0,
     );
   }
 }

@@ -1,19 +1,58 @@
-// views/edit_store_location_view.dart
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
+import 'package:provider/provider.dart';
+import 'package:unshelf_seller/models/store_model.dart';
+
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
-class EditStoreLocationView extends StatelessWidget {
+class EditStoreLocationView extends StatefulWidget {
   final StoreModel storeDetails;
 
   EditStoreLocationView({required this.storeDetails});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = Provider.of<StoreLocationViewModel>(context);
+  _EditStoreLocationViewState createState() => _EditStoreLocationViewState();
+}
 
+class _EditStoreLocationViewState extends State<EditStoreLocationView> {
+  late StoreLocationViewModel viewModel;
+  late StoreModel storeDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    storeDetails = widget.storeDetails;
+    viewModel = Provider.of<StoreLocationViewModel>(context, listen: false);
+    _initializeLocation();
+  }
+
+  Future<void> _initializeLocation() async {
+    if (storeDetails.storeLatitude == null ||
+        storeDetails.storeLatitude == 0.0 ||
+        storeDetails.storeLongitude == null ||
+        storeDetails.storeLongitude == 0.0) {
+      Position position = await _getUserLocation();
+      setState(() {
+        storeDetails.storeLatitude = position.latitude;
+        storeDetails.storeLongitude = position.longitude;
+      });
+    }
+  }
+
+  Future<Position> _getUserLocation() async {
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Choose a Location'),

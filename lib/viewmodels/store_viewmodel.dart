@@ -29,12 +29,12 @@ class StoreViewModel extends ChangeNotifier {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user!.uid)
+          .doc(user.uid)
           .get();
 
       DocumentSnapshot storeDoc = await FirebaseFirestore.instance
           .collection('stores')
-          .doc(user!.uid)
+          .doc(user.uid)
           .get();
 
       if (!userDoc.exists || !storeDoc.exists) {
@@ -50,7 +50,7 @@ class StoreViewModel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      errorMessage = "Error fetching user profile: ${e.toString()}";
+      errorMessage = "Error fetching store details: ${e.toString()}";
       storeDetails = null;
     } finally {
       isLoading = false;
@@ -65,14 +65,14 @@ class StoreViewModel extends ChangeNotifier {
       errorMessage = "User is not logged in";
       isLoading = false;
       notifyListeners();
-      return 0; // or throw an exception if needed
+      return 0;
     }
 
     try {
       // Example path to fetch followers from the Firestore database
       QuerySnapshot followersSnapshot = await FirebaseFirestore.instance
           .collection('stores')
-          .doc(user!.uid)
+          .doc(user.uid)
           .collection('followers')
           .get();
 

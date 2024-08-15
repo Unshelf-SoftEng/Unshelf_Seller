@@ -25,6 +25,8 @@ dependencies:
   provider: ^6.1.2
   paymongo_sdk: ^1.7.0
   google_sign_in: ^5.2.1
+  permission_handler: ^11.3.1
+  geolocator: ^12.0.0
 
 dev_dependencies:
   flutter_test:

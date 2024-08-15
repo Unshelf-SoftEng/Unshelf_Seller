@@ -163,7 +163,9 @@ class BundleViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchSuggestions() async {
-    const url = 'http://localhost:8000/api/recommend-bundles/';
+    const url =
+        'https://unshelfai-production.up.railway.app/api/recommend-bundles/';
+
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode(
       products.map((product) => product.toJson()).toList(),

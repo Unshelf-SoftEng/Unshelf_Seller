@@ -34,7 +34,6 @@ class _RegisterViewState extends State<RegisterView> {
       });
 
       await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
-        'store_name': storeName,
         'store_schedule': {
           'Monday': {'open': 'Closed', 'close': 'Closed'},
           'Tuesday': {'open': 'Closed', 'close': 'Closed'},
@@ -44,8 +43,6 @@ class _RegisterViewState extends State<RegisterView> {
           'Saturday': {'open': 'Closed', 'close': 'Closed'},
           'Sunday': {'open': 'Closed', 'close': 'Closed'},
         },
-        'longitude': 0,
-        'latitude': 0,
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +69,6 @@ class _RegisterViewState extends State<RegisterView> {
           const SnackBar(content: Text('Registration Successful')),
         );
 
-        // Go to login page
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LoginView()));
       } on FirebaseAuthException catch (e) {
@@ -159,7 +155,7 @@ class _RegisterViewState extends State<RegisterView> {
         title: const Text('Register'),
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
