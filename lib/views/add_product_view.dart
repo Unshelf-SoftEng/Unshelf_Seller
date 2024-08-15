@@ -47,8 +47,8 @@ class AddProductView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(width: 16.0),
-                  Column(
+                  const SizedBox(width: 16.0),
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Product Details',
@@ -61,7 +61,7 @@ class AddProductView extends StatelessWidget {
                     ],
                   )
                 ]),
-                SizedBox(height: 30.0),
+                const SizedBox(height: 30.0),
                 Form(
                   key: viewModel.formKey,
                   child: Column(
@@ -104,7 +104,7 @@ class AddProductView extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: double.infinity,
                         child: LayoutBuilder(
                           builder: (context, constraints) {
@@ -256,6 +256,45 @@ class AddProductView extends StatelessWidget {
                         style: TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 20),
+                      const Text(
+                        'Category',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      DropdownButtonFormField<String>(
+                        value: viewModel.selectedCategory,
+                        items: viewModel.categories.map((String category) {
+                          return DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color.fromARGB(255, 228, 228, 228),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 12.0),
+                          labelStyle: const TextStyle(color: Colors.black),
+                        ),
+                        onChanged: (String? newValue) {
+                          viewModel.selectedCategory = newValue!;
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a category';
+                          }
+                          return null;
+                        },
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      const SizedBox(height: 20),
                       Row(
                         children: [
                           Expanded(
@@ -307,21 +346,29 @@ class AddProductView extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 20),
+                          const SizedBox(width: 10),
                           Expanded(
+                            flex: 1,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Quantity',
+                                  'Quantifier',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                                TextFormField(
-                                  controller: viewModel.quantityController,
+                                DropdownButtonFormField<String>(
+                                  value: viewModel.selectedQuantifier,
+                                  items: viewModel.quantifiers
+                                      .map((String quantifier) {
+                                    return DropdownMenuItem<String>(
+                                      value: quantifier,
+                                      child: Text(quantifier),
+                                    );
+                                  }).toList(),
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: const Color.fromARGB(
@@ -335,13 +382,12 @@ class AddProductView extends StatelessWidget {
                                     labelStyle:
                                         const TextStyle(color: Colors.black),
                                   ),
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
+                                  onChanged: (String? newValue) {
+                                    viewModel.selectedQuantifier = newValue!;
+                                  },
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter a quantity';
+                                      return 'Please select a quantifier';
                                     }
                                     return null;
                                   },
@@ -351,6 +397,40 @@ class AddProductView extends StatelessWidget {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Quantity',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: viewModel.quantityController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color.fromARGB(255, 228, 228, 228),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 12.0),
+                          labelStyle: const TextStyle(color: Colors.black),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a quantity';
+                          }
+                          return null;
+                        },
+                        style: const TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 20),
                       const Text(

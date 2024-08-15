@@ -22,20 +22,40 @@ class StoreLocationViewModel extends ChangeNotifier {
   }
 
   Future<Position?> getUserLocation(BuildContext context) async {
+    // Request location permission
     await requestLocationPermission();
 
+    // Check if permission is granted
     var status = await Permission.location.status;
     if (status.isGranted) {
       return await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-    } else {
-      String message = 'Location permissions are required to use this feature';
+    } else if (status.isDenied) {
+      String message =
+          'Location permission is required to use this feature. Please enable it in settings.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
-
+      return null;
+    } else if (status.isPermanentlyDenied) {
+      // Permission is permanently denied
+      String message =
+          'Location permission is permanently denied. Please enable it in app settings.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: SnackBarAction(
+            label: 'Settings',
+            onPressed: () {
+              openAppSettings();
+            },
+          ),
+        ),
+      );
       return null;
     }
+
+    return null;
   }
 
   Future<void> saveLocation() async {

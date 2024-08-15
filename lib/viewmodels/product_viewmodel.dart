@@ -34,6 +34,17 @@ class ProductViewModel extends ChangeNotifier {
   bool _errorFound = false;
   bool get errorFound => _errorFound;
 
+  String? selectedCategory;
+  List<String> categories = [
+    'Grocery',
+    'Fruits',
+    'Vegetables',
+    'Baked Goods',
+  ];
+
+  String? selectedQuantifier;
+  List<String> quantifiers = ['1 kg', '500 g', '200 g', 'piece', 'pack'];
+
   ProductViewModel({required this.productId}) {
     if (productId != null) fetchProductData();
   }
@@ -224,7 +235,9 @@ class ProductViewModel extends ChangeNotifier {
               'sellerId': user.uid,
               'name': nameController.text,
               'description': descriptionController.text,
+              'category': selectedCategory,
               'price': double.parse(priceController.text),
+              'quantifier': selectedQuantifier,
               'stock': int.parse(quantityController.text),
               'expiryDate': DateTime.parse(expiryDateController.text),
               'discount': int.parse(discountController.text),
@@ -239,7 +252,9 @@ class ProductViewModel extends ChangeNotifier {
                 .update({
               'name': nameController.text,
               'description': descriptionController.text,
+              'category': selectedCategory,
               'price': double.parse(priceController.text),
+              'quantifier': selectedQuantifier,
               'stock': int.parse(quantityController.text),
               'expiryDate': DateTime.parse(expiryDateController.text),
               'discount': int.parse(discountController.text),
@@ -247,9 +262,7 @@ class ProductViewModel extends ChangeNotifier {
               'additionalImageUrls': [],
             });
           }
-        } else {
-          // Handle user not logged in
-        }
+        } else {}
       } catch (e) {
         // Handle errors
       } finally {
