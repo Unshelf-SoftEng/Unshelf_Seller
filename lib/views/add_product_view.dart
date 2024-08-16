@@ -283,7 +283,8 @@ class AddProductView extends StatelessWidget {
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 12),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.black),
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -352,38 +353,40 @@ class AddProductView extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 5),
                                 DropdownButtonFormField<String>(
-                                  value: viewModel.selectedQuantifier,
-                                  items: viewModel.quantifiers
-                                      .map((String quantifier) {
-                                    return DropdownMenuItem<String>(
-                                      value: quantifier,
-                                      child: Text(quantifier),
-                                    );
-                                  }).toList(),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color.fromARGB(
-                                        255, 228, 228, 228),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      borderSide: BorderSide.none,
+                                    value: viewModel.selectedQuantifier,
+                                    items: viewModel.quantifiers
+                                        .map((String quantifier) {
+                                      return DropdownMenuItem<String>(
+                                        value: quantifier,
+                                        child: Text(quantifier),
+                                      );
+                                    }).toList(),
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: const Color.fromARGB(
+                                          255, 228, 228, 228),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 12.0, horizontal: 12.0),
+                                      labelStyle:
+                                          const TextStyle(color: Colors.black),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 12.0, horizontal: 12.0),
-                                    labelStyle:
-                                        const TextStyle(color: Colors.black),
-                                  ),
-                                  onChanged: (String? newValue) {
-                                    viewModel.selectedQuantifier = newValue!;
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please select a quantifier';
-                                    }
-                                    return null;
-                                  },
-                                  style: const TextStyle(fontSize: 12),
-                                ),
+                                    onChanged: (String? newValue) {
+                                      viewModel.selectedQuantifier = newValue!;
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please select a quantifier';
+                                      }
+                                      return null;
+                                    },
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.black)),
                               ],
                             ),
                           ),

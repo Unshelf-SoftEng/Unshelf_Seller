@@ -231,7 +231,8 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               const SizedBox(height: 10),
               const Text(
-                  "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy"),
+                  "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy.",
+                  textAlign: TextAlign.center),
               const SizedBox(height: 20),
               // Adding space above the sign-in section
               const SizedBox(height: 20),

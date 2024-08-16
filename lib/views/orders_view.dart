@@ -28,6 +28,7 @@ class _OrdersViewState extends State<OrdersView> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         actions: [
           DropdownButton<String>(
             value: _selectedStatus,

@@ -7,7 +7,7 @@ import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 
-class AddBundleView extends StatelessWidget {
+class AddBundleView extends StatefulWidget {
   final String? bundleId;
   final BundleModel? bundle;
   final bool fromSuggestions;
@@ -15,12 +15,24 @@ class AddBundleView extends StatelessWidget {
   AddBundleView({this.bundleId, this.bundle, this.fromSuggestions = false});
 
   @override
+  _AddBundleViewState createState() => _AddBundleViewState();
+}
+
+class _AddBundleViewState extends State<AddBundleView> {
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = Provider.of<BundleViewModel>(context, listen: false);
+    if (widget.bundle != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.initializeControllers(widget.bundle!);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<BundleViewModel>(context, listen: false);
-
-    if (bundle != null) {
-      viewModel.initializeControllers(bundle!);
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +40,7 @@ class AddBundleView extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            if (fromSuggestions) {
+            if (widget.fromSuggestions) {
               Navigator.pop(context);
             } else {
               Navigator.popUntil(
