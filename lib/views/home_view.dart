@@ -112,25 +112,25 @@ class _HomeViewState extends State<HomeView> {
             PopupMenuButton<int>(
               icon: Stack(
                 children: [
-                  Icon(Icons.notifications, size: 30),
+                  const Icon(Icons.notifications, size: 30),
                   if (_notifications.any((n) => !n['seen']))
                     Positioned(
                       right: 0,
                       top: 0,
                       child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
                         ),
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           minWidth: 18,
                           minHeight: 18,
                         ),
                         child: Center(
                           child: Text(
                             _unseenCount.toString(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                             ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
+import 'package:unshelf_seller/views/batch_restock_view.dart';
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
@@ -167,6 +168,25 @@ class _StoreViewState extends State<StoreView> {
                   viewModel.userProfile!.phoneNumber =
                       updatedProfile.phoneNumber;
                 });
+              }
+            },
+          ),
+          ListTile(
+            title: Text('Store Inventory'),
+            subtitle: Text('View and edit your store inventory'),
+            leading: Icon(Icons.inventory),
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BatchRestockView(),
+                ),
+              );
+
+              if (result == true) {
+                final viewModel =
+                    Provider.of<StoreViewModel>(context, listen: false);
+                viewModel.fetchStoreDetails(); // Refresh store details
               }
             },
           ),

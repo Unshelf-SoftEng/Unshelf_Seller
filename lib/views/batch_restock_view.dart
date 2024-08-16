@@ -2,13 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
 
-class BatchRestockView extends StatelessWidget {
+class BatchRestockView extends StatefulWidget {
+  @override
+  _BatchRestockViewState createState() => _BatchRestockViewState();
+}
+
+class _BatchRestockViewState extends State<BatchRestockView> {
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = Provider.of<RestockViewModel>(context, listen: false);
+    viewModel.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<RestockViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Batch Restock')),
+      appBar: AppBar(
+        title: Text('Batch Restock'),
+        backgroundColor: Color(0xFF6A994E),
+      ),
       body: viewModel.isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(

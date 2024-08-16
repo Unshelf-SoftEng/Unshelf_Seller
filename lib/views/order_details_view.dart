@@ -50,39 +50,41 @@ class OrderDetailsView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  margin: EdgeInsets.only(bottom: 16.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Order ID: ${order.id}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                Container(
+                  width: double.infinity,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order ID: ${order.id}',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Buyer: ${order.buyerName}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[700],
+                          SizedBox(height: 10),
+                          Text(
+                            'Buyer: ${order.buyerName}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[700],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Divider(),
-                        Text(
-                          'Products',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                        ],
+                      ),
                     ),
+                  ),
+                ),
+                Divider(),
+                Text(
+                  'Products',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Expanded(
@@ -98,18 +100,6 @@ class OrderDetailsView extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final product = order.products[index];
                       return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -124,23 +114,23 @@ class OrderDetailsView extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     product.name,
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    'Qty: ${order.items[index].quantity}',
+                                    '${order.items[index].quantity} ${order.products[index].quantifier}',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 16,
                                       color: Colors.grey[600],
                                     ),
                                   ),

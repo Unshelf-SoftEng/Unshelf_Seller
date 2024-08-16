@@ -36,15 +36,6 @@ class AddProductView extends StatelessWidget {
                           color: Colors.transparent,
                         ),
                       ),
-                      const Center(
-                        child: Text(
-                          '1/2',
-                          style: TextStyle(
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(width: 16.0),

@@ -40,7 +40,6 @@ class ListingViewModel extends ChangeNotifier {
   }
 
   Future<void> refreshItems() async {
-    // Refresh items logic here
     _filterItems();
   }
 
@@ -109,12 +108,12 @@ class ListingViewModel extends ChangeNotifier {
 
   Future<void> addProduct(Map<String, dynamic> productData) async {
     await FirebaseFirestore.instance.collection('products').add(productData);
-    _fetchItems(); // Refresh the list
+    _fetchItems();
   }
 
   Future<void> addBundle(Map<String, dynamic> bundleData) async {
     await FirebaseFirestore.instance.collection('bundles').add(bundleData);
-    _fetchItems(); // Refresh the list
+    _fetchItems();
   }
 
   Future<void> deleteItem(String itemId, bool isProduct) async {
@@ -123,12 +122,12 @@ class ListingViewModel extends ChangeNotifier {
         .collection(collection)
         .doc(itemId)
         .delete();
-    _fetchItems(); // Refresh the list
+    _fetchItems();
   }
 
   void toggleView() {
     _showingProducts = !_showingProducts;
-    _fetchItems(); // Refresh the list based on the selected view
+    _fetchItems();
   }
 
   void clear() {

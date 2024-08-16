@@ -46,7 +46,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
-      color: Colors.green,
+      color: Color(0xFF6A994E),
       elevation: 6.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -88,7 +88,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildStoreInsightsCard(DashboardViewModel viewModel) {
     return Card(
-      color: Colors.green,
+      color: Color(0xFF6A994E),
       elevation: 6.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -101,7 +101,7 @@ class _DashboardViewState extends State<DashboardView> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        fontSize: 24.0))),
+                        fontSize: 30.0))),
             const SizedBox(height: 5.0),
             const Center(
                 child: const Text(

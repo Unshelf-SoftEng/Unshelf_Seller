@@ -171,7 +171,7 @@ class _ListingsViewState extends State<ListingsView> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
+                          icon: Icon(Icons.edit, color: Color(0xFF6A994E)),
                           onPressed: () {
                             if (item is ProductModel) {
                               Navigator.push(

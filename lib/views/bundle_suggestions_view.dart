@@ -9,6 +9,7 @@ class BundleSuggestionsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('AI Bundle Suggestions'),
+        backgroundColor: Color(0xFF6A994E),
       ),
       body: Consumer<BundleViewModel>(
         builder: (context, viewModel, child) {

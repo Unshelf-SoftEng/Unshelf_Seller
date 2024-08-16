@@ -18,6 +18,7 @@ class UserProfileView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Profile'),
+        backgroundColor: Color(0xFF6A994E),
       ),
       body: viewModel.isLoading
           ? Center(child: CircularProgressIndicator())
