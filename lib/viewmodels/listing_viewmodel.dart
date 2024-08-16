@@ -8,15 +8,40 @@ import 'package:unshelf_seller/models/item_model.dart';
 
 class ListingViewModel extends ChangeNotifier {
   List<ItemModel> _items = [];
+  List<dynamic> _filteredItems = [];
   bool _isLoading = true;
   bool _showingProducts = true;
-
   List<ItemModel> get items => _items;
   bool get isLoading => _isLoading;
   bool get showingProducts => _showingProducts;
+  String _searchQuery = '';
+  List<dynamic> get filteredItems => _filteredItems;
 
   ListingViewModel() {
     _fetchItems();
+  }
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    _filterItems();
+    notifyListeners();
+  }
+
+  void _filterItems() {
+    if (_searchQuery.isEmpty) {
+      _filteredItems = _items;
+    } else {
+      _filteredItems = _items.where((item) {
+        final name = item.name.toLowerCase();
+        final query = _searchQuery.toLowerCase();
+        return name.contains(query);
+      }).toList();
+    }
+  }
+
+  Future<void> refreshItems() async {
+    // Refresh items logic here
+    _filterItems();
   }
 
   Future<void> _fetchItems() async {
@@ -67,6 +92,7 @@ class ListingViewModel extends ChangeNotifier {
             .toList();
 
         _items = showingProducts ? products : bundles;
+        _filteredItems = _items;
       } catch (e) {
         print('Error fetching items: $e');
         _items = [];
@@ -103,10 +129,6 @@ class ListingViewModel extends ChangeNotifier {
   void toggleView() {
     _showingProducts = !_showingProducts;
     _fetchItems(); // Refresh the list based on the selected view
-  }
-
-  void refreshItems() {
-    _fetchItems();
   }
 
   void clear() {
