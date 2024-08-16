@@ -198,7 +198,6 @@ class BundleViewModel extends ChangeNotifier {
       return _fetchSuggestionsFuture!;
     }
 
-    // Otherwise, start fetching and store the future
     _fetchSuggestionsFuture = fetchSuggestions();
     return _fetchSuggestionsFuture!;
   }

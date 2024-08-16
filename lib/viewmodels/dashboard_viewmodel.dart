@@ -10,6 +10,8 @@ class DashboardViewModel extends ChangeNotifier {
   int completedOrders;
   int totalOrders;
   double totalSales;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   DashboardViewModel()
       : today = DateTime.now(),
@@ -22,6 +24,9 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchDashboardData() async {
+    _isLoading = true;
+    notifyListeners();
+
     User? user = FirebaseAuth.instance.currentUser;
     try {
       final now = DateTime.now();
@@ -32,7 +37,7 @@ class DashboardViewModel extends ChangeNotifier {
           .collection('orders')
           .where('created_at', isGreaterThanOrEqualTo: startOfDay)
           .where('created_at', isLessThan: endOfDay)
-          .where('user_id', isEqualTo: user?.uid)
+          .where('seller_id', isEqualTo: user?.uid)
           .get();
 
       pendingOrders =
@@ -43,6 +48,10 @@ class DashboardViewModel extends ChangeNotifier {
           .where((doc) => doc['status'] == 'Completed')
           .length;
 
+      print('Pending orders: $pendingOrders');
+      print('Processed orders: $processedOrders');
+      print('Completed orders: $completedOrders');
+
       // // Assuming 'total' field exists in each order document for total price
       final startOfMonth = DateTime(now.year, now.month);
       final endOfMonth =
@@ -50,8 +59,9 @@ class DashboardViewModel extends ChangeNotifier {
 
       var ordersMonthly = await FirebaseFirestore.instance
           .collection('orders')
-          .where('completed_at', isGreaterThanOrEqualTo: startOfMonth)
-          .where('completed_at', isLessThan: endOfMonth)
+          .where('created_at', isGreaterThanOrEqualTo: startOfMonth)
+          .where('created_at', isLessThan: endOfMonth)
+          .where('seller_id', isEqualTo: user?.uid)
           .get();
 
       totalSales = 0;
@@ -72,8 +82,12 @@ class DashboardViewModel extends ChangeNotifier {
           totalSales += productPrice * quantity;
         }
       }
+      print('Total sales: $totalSales');
 
       totalOrders = ordersMonthly.docs.length;
+
+      print('Total orders: $totalOrders');
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
       // Handle errors appropriately, e.g., log them or show a user-friendly message

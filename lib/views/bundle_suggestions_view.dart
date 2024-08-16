@@ -32,33 +32,64 @@ class BundleSuggestionsView extends StatelessWidget {
               // Limit to 3 suggestions
               final suggestions = viewModel.suggestions.take(3).toList();
 
-              print('Suggestions passed to the view: $suggestions');
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView.builder(
+                  itemCount: suggestions.length,
+                  itemBuilder: (context, index) {
+                    final suggestion = suggestions[index];
 
-              return ListView.builder(
-                itemCount: suggestions.length,
-                itemBuilder: (context, index) {
-                  final suggestion = suggestions[index];
+                    // Create a string of product names
+                    final productNames = suggestion.products
+                        ?.map((product) => product.name)
+                        .join(', ');
 
-                  // Create a string of product names
-                  final productNames = suggestion.products
-                      ?.map((product) => product.name)
-                      .join(', ');
-
-                  return ListTile(
-                    title: Text(suggestion.name),
-                    subtitle: Text('Products: $productNames'),
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddBundleView(
-                            bundle: suggestion,
+                    return Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        title: Text(
+                          suggestion.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 8),
+                            Text(
+                              'Products: $productNames',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddBundleView(
+                                bundle: suggestion,
+                                fromSuggestions: true,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );

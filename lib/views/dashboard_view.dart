@@ -2,12 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 
-class DashboardView extends StatelessWidget {
+class DashboardView extends StatefulWidget {
+  @override
+  _DashboardViewState createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch dashboard data when the view is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DashboardViewModel>(context, listen: false)
+          .fetchDashboardData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
+          if (viewModel.isLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           return SingleChildScrollView(
             padding: EdgeInsets.all(16.0),
             child: Column(

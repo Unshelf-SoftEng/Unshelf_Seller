@@ -48,6 +48,8 @@ class OrderModel {
       id: doc.id,
       status: orderStatusFromString(data['status'] as String),
       createdAt: data['created_at'] as Timestamp,
+      completionDate: data['completion_date'] as Timestamp?,
+      pickUpCode: data['pick_up_code'] as String?,
       buyerId: data['buyer_id'],
       items: List<OrderItem>.from(
         data['order_items'].map((item) => OrderItem.fromMap(item)),
@@ -69,6 +71,7 @@ class OrderModel {
       ),
       products: [],
       completionDate: data['completion_date'] as Timestamp?,
+      pickUpCode: data['pick_up_code'] as String?,
     );
 
     List<String> productIds =
@@ -108,6 +111,8 @@ class OrderModel {
         (previousValue, element) => previousValue + element.price,
       ),
       buyerName: orderModel.buyerName,
+      completionDate: orderModel.completionDate,
+      pickUpCode: orderModel.pickUpCode,
     );
   }
 }

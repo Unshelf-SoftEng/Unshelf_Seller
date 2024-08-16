@@ -137,7 +137,9 @@ class ListingsView extends StatelessWidget {
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddBundleView(),
+                    builder: (context) => AddBundleView(
+                      fromSuggestions: true,
+                    ),
                   ),
                 );
                 if (result == true) {

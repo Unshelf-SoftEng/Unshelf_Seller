@@ -6,13 +6,12 @@ import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
-import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/login_view.dart';
-import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/user_profile_view.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
+import 'package:unshelf_seller/models/user_model.dart';
 
 class StoreView extends StatefulWidget {
   @override
@@ -23,7 +22,6 @@ class _StoreViewState extends State<StoreView> {
   @override
   void initState() {
     super.initState();
-    // Fetch store details when the view is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = Provider.of<StoreViewModel>(context, listen: false);
       viewModel.fetchStoreDetails();
@@ -152,14 +150,24 @@ class _StoreViewState extends State<StoreView> {
             title: Text('User Profile'),
             subtitle: Text('View and edit your profile'),
             leading: Icon(Icons.person),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final updatedProfile = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      UserProfileView(), // Navigate to User Profile screen
+                      UserProfileView(userProfile: viewModel.userProfile!),
                 ),
               );
+
+              if (updatedProfile != null &&
+                  updatedProfile is UserProfileModel) {
+                setState(() {
+                  viewModel.userProfile!.name = updatedProfile.name;
+                  viewModel.userProfile!.email = updatedProfile.email;
+                  viewModel.userProfile!.phoneNumber =
+                      updatedProfile.phoneNumber;
+                });
+              }
             },
           ),
           ListTile(

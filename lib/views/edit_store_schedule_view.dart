@@ -25,7 +25,15 @@ class EditStoreSchedView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ListView(
-                        children: viewModel.storeSchedule.keys.map((day) {
+                        children: [
+                          'Monday',
+                          'Tuesday',
+                          'Wednesday',
+                          'Thursday',
+                          'Friday',
+                          'Saturday',
+                          'Sunday'
+                        ].map((day) {
                           return Card(
                             margin: EdgeInsets.symmetric(vertical: 8.0),
                             child: ListTile(
@@ -35,7 +43,7 @@ class EditStoreSchedView extends StatelessWidget {
                                 children: [
                                   viewModel.storeSchedule[day]!['open'] ==
                                           'Closed'
-                                      ? Text('Closed all day',
+                                      ? const Text('Closed all day',
                                           style: TextStyle(color: Colors.red))
                                       : Text(
                                           'Open: ${viewModel.storeSchedule[day]!['open']} - ${viewModel.storeSchedule[day]!['close']}'),

@@ -5,12 +5,14 @@ import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
+import 'package:unshelf_seller/views/listings_view.dart';
 
 class AddBundleView extends StatelessWidget {
   final String? bundleId;
   final BundleModel? bundle;
+  final bool fromSuggestions;
 
-  AddBundleView({this.bundleId, this.bundle});
+  AddBundleView({this.bundleId, this.bundle, this.fromSuggestions = false});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,20 @@ class AddBundleView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Product Bundle'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            if (fromSuggestions) {
+              Navigator.pop(context);
+            } else {
+              Navigator.popUntil(
+                context,
+                (route) =>
+                    route is MaterialPageRoute && route.builder is ListingsView,
+              );
+            }
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.autorenew), // Icon for AI suggestions

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +18,12 @@ class UserProfileViewModel extends ChangeNotifier {
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
+
+  void initializeControllers(UserProfileModel userProfile) {
+    nameController.text = userProfile.name;
+    emailController.text = userProfile.email;
+    phoneController.text = userProfile.phoneNumber;
+  }
 
   void updateUserProfile() async {
     _isLoading = true;
@@ -42,17 +47,11 @@ class UserProfileViewModel extends ChangeNotifier {
         return;
       }
 
-      await FirebaseAuth.instance.currentUser!
-          .updatePassword(passwordController.text);
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({
-        'name': nameController.text,
-        'email': emailController.text,
-        'phoneNumber': phoneController.text,
-      });
+      if (passwordController.text.isNotEmpty &&
+          confirmPasswordController.text.isNotEmpty) {
+        await FirebaseAuth.instance.currentUser!
+            .updatePassword(passwordController.text);
+      }
 
       userProfile = UserProfileModel(
         userId: user.uid,
@@ -61,11 +60,31 @@ class UserProfileViewModel extends ChangeNotifier {
         phoneNumber: phoneController.text,
         password: passwordController.text,
       );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'name': nameController.text,
+        'email': emailController.text,
+        'phone_number': phoneController.text,
+      });
+
+      _isLoading = false;
+      notifyListeners();
     } catch (error) {
       _errorMessage = 'Failed to update user profile';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    super.dispose();
   }
 }
