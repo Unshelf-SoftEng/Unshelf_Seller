@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/product_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RestockViewModel extends ChangeNotifier {
   List<ProductModel> _products = [];
@@ -18,8 +19,21 @@ class RestockViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('products').get();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        _error = 'No user is logged in.';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final sellerId = currentUser.uid;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('sellerId', isEqualTo: sellerId)
+          .get();
+
       _products =
           snapshot.docs.map((doc) => ProductModel.fromSnapshot(doc)).toList();
     } catch (e) {
