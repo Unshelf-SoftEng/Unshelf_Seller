@@ -121,7 +121,7 @@ class _ListingsViewState extends State<ListingsView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.collections, size: 80, color: Colors.grey),
+                    Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
                     SizedBox(height: 16),
                     Text('No bundles found',
                         style: TextStyle(fontSize: 18, color: Colors.grey)),

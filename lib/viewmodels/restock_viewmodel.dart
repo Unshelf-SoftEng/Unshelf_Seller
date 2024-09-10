@@ -4,10 +4,12 @@ import 'package:unshelf_seller/models/product_model.dart';
 
 class RestockViewModel extends ChangeNotifier {
   List<ProductModel> _products = [];
+  List<ProductModel> _selectedProducts = []; // For the second screen
   bool _isLoading = false;
   String _error = '';
 
   List<ProductModel> get products => _products;
+  List<ProductModel> get selectedProducts => _selectedProducts;
   bool get isLoading => _isLoading;
   String get error => _error;
 
@@ -26,6 +28,16 @@ class RestockViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void addSelectedProduct(ProductModel product) {
+    _selectedProducts.add(product);
+    notifyListeners();
+  }
+
+  void removeSelectedProduct(ProductModel product) {
+    _selectedProducts.remove(product);
+    notifyListeners();
   }
 
   Future<void> batchRestock(List<ProductModel> productsToRestock) async {

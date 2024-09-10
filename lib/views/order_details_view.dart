@@ -46,47 +46,51 @@ class OrderDetailsView extends StatelessWidget {
             ),
           ),
           body: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: double.infinity,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Order ID: ${order.id}',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Order ID: ${order.id}',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
                           ),
-                          SizedBox(height: 10),
-                          Text(
-                            'Buyer: ${order.buyerName}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[700],
-                            ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Buyer: ${order.buyerName}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
                           ),
-                          SizedBox(height: 10),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                Divider(),
+                SizedBox(height: 20),
                 Text(
                   'Products',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
+                SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -99,7 +103,11 @@ class OrderDetailsView extends StatelessWidget {
                     itemCount: order.products.length,
                     itemBuilder: (context, index) {
                       final product = order.products[index];
-                      return Container(
+                      return Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -114,7 +122,7 @@ class OrderDetailsView extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(4.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -123,6 +131,7 @@ class OrderDetailsView extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -143,120 +152,102 @@ class OrderDetailsView extends StatelessWidget {
                     },
                   ),
                 ),
-                SizedBox(height: 20),
-                Card(
-                  margin: EdgeInsets.symmetric(vertical: 16.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (order.status == OrderStatus.pending)
-                          Center(
-                            child: Container(
-                              width: double
-                                  .infinity, // Ensures the container takes up the full width
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0), // Optional padding
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Show confirmation dialog
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Confirm Fulfillment'),
-                                        content: Text(
-                                            'Are you sure you want to fulfill this order?'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .pop(); // Close the dialog
-                                            },
-                                            child: Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              viewModel
-                                                  .fulfillOrder(); // Fulfill the order
-                                              Navigator.of(context)
-                                                  .pop(); // Close the dialog
-                                            },
-                                            child: Text('Fulfill'),
-                                          ),
-                                        ],
-                                      );
+              ],
+            ),
+          ),
+          bottomNavigationBar: Card(
+            elevation: 8,
+            margin: EdgeInsets.zero, // Make the card stick to the edges
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize
+                    .min, // Ensures the card takes up minimal height
+                children: [
+                  if (order.status == OrderStatus.pending)
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Show confirmation dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirm Fulfillment'),
+                                content: Text(
+                                    'Are you sure you want to fulfill this order?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
                                     },
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFA7C957),
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    child: Text('Cancel'),
                                   ),
-                                ),
-                                child: Text('Fulfill Order'),
-                              ),
-                            ),
-                          )
-                        else if (order.status == OrderStatus.ready)
-                          Center(
-                            child: Container(
-                              width: double
-                                  .infinity, // Ensures the container takes up the full width
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0), // Optional padding
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment
-                                    .center, // Aligns content in the center
-                                children: [
-                                  Text(
-                                    'Ready for Pickup',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Pickup Code: ${order.pickUpCode}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[700],
-                                    ),
+                                  TextButton(
+                                    onPressed: () {
+                                      viewModel
+                                          .fulfillOrder(); // Fulfill the order
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                    child: Text('Fulfill'),
                                   ),
                                 ],
-                              ),
-                            ),
-                          )
-                        else if (order.status == OrderStatus.completed)
-                          Center(
-                            child: Container(
-                              width: double
-                                  .infinity, // Ensures the container takes up the full width
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0), // Optional padding
-                              child: Text(
-                                'Completed on: ${DateFormat('yyyy-MM-dd').format(order.completionDate!.toDate())}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign
-                                    .center, // Center the text inside the container
-                              ),
-                            ),
-                          )
+                              );
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFA7C957),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text('Fulfill Order'),
+                      ),
+                    )
+                  else if (order.status == OrderStatus.ready)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Ready for Pickup',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Pickup Code: ${order.pickUpCode}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ],
+                    )
+                  else if (order.status == OrderStatus.completed)
+                    Text(
+                      'Completed on: ${DateFormat('yyyy-MM-dd').format(order.completionDate!.toDate())}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
