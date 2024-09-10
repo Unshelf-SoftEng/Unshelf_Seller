@@ -103,9 +103,9 @@ class _DashboardViewState extends State<DashboardView> {
                         color: Colors.white,
                         fontSize: 30.0))),
             const SizedBox(height: 5.0),
-            const Center(
-                child: const Text(
-                    'An overview of the shop data for July - August 2024',
+            Center(
+                child: Text(
+                    'An overview of the shop data for ${viewModel.monthYear}',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12.0,

@@ -25,7 +25,7 @@ class ProductViewModel extends ChangeNotifier {
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
 
-  List<Uint8List?> _additionalImageDataList = List.generate(4, (_) => null);
+  List<Uint8List?> _additionalImageDataList = [];
   List<Uint8List?> get additionalImageDataList => _additionalImageDataList;
 
   bool _isMainImageNew = false;
@@ -76,7 +76,7 @@ class ProductViewModel extends ChangeNotifier {
         await loadImageFromUrl(mainImageUrl, true);
 
         for (int i = 0; i < additionalImageUrls!.length; i++) {
-          if (i < _additionalImageDataList.length) {
+          if (i < _additionalImageDataList!.length) {
             await loadImageFromUrl(additionalImageUrls[i], false, index: i);
           }
         }
@@ -97,7 +97,7 @@ class ProductViewModel extends ChangeNotifier {
         if (isMainImage) {
           _mainImageData = response.bodyBytes;
         } else if (index != null) {
-          _additionalImageDataList[index] = response.bodyBytes;
+          _additionalImageDataList![index] = response.bodyBytes;
         }
         notifyListeners();
       }
@@ -110,14 +110,18 @@ class ProductViewModel extends ChangeNotifier {
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       final Uint8List imageData = await image.readAsBytes();
+      print('Picked Image Data: $imageData'); // Debugging
 
       if (isMainImage) {
         _mainImageData = imageData;
         _isMainImageNew = true;
       } else if (index != null) {
-        _additionalImageDataList[index] = imageData;
-        _isAdditionalImageNewList[index] = true;
+        _additionalImageDataList.add(imageData);
+        _isAdditionalImageNewList.add(true);
       }
+
+      print('Updated Additional Image Data List: $_additionalImageDataList');
+
       notifyListeners();
     }
   }
@@ -137,12 +141,13 @@ class ProductViewModel extends ChangeNotifier {
       }
     }
 
-    for (int i = 0; i < _additionalImageDataList.length; i++) {
-      if (_additionalImageDataList[i] != null && _isAdditionalImageNewList[i]) {
+    for (int i = 0; i < _additionalImageDataList!.length; i++) {
+      if (_additionalImageDataList![i] != null &&
+          _isAdditionalImageNewList[i]) {
         try {
           final additionalImageRef = FirebaseStorage.instance.ref().child(
               'product_images/additional_${DateTime.now().millisecondsSinceEpoch}_$i.jpg');
-          await additionalImageRef.putData(_additionalImageDataList[i]!);
+          await additionalImageRef.putData(_additionalImageDataList![i]!);
           final additionalImageUrl = await additionalImageRef.getDownloadURL();
           downloadUrls.add(additionalImageUrl);
         } catch (e) {
@@ -194,15 +199,8 @@ class ProductViewModel extends ChangeNotifier {
   }
 
   void deleteAdditionalImage(int index) {
-    _additionalImageDataList[index] = null;
-    _isAdditionalImageNewList[index] = false;
-    // Shift images to the left
-    for (int i = index; i < _additionalImageDataList.length - 1; i++) {
-      _additionalImageDataList[i] = _additionalImageDataList[i + 1];
-      _isAdditionalImageNewList[i] = _isAdditionalImageNewList[i + 1];
-    }
-    _additionalImageDataList[_additionalImageDataList.length - 1] = null;
-    _isAdditionalImageNewList[_additionalImageDataList.length - 1] = false;
+    _additionalImageDataList.removeAt(index);
+    _isAdditionalImageNewList.removeAt(index);
     notifyListeners();
   }
 

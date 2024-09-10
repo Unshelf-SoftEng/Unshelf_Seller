@@ -101,74 +101,104 @@ class AddProductView extends StatelessWidget {
                           builder: (context, constraints) {
                             // Calculate the width of each item based on the available width
                             double itemWidth =
-                                ((constraints.maxWidth - 10 * 2.0) / 4) - 19.0;
+                                (constraints.maxWidth - 10 * 2.0) / 4 - 10.0;
 
-                            // Ensure additionalImageDataList has at least 4 items
-                            final imageList = List.generate(
-                                viewModel.additionalImageDataList.length < 4
-                                    ? 3
-                                    : 4,
-                                (index) => viewModel
-                                            .additionalImageDataList.length >
-                                        index
-                                    ? viewModel.additionalImageDataList[index]
-                                    : null);
+                            // Retrieve the image list from the view model
+                            var imageList = viewModel.additionalImageDataList;
 
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (imageList.any((image) => image == null))
-                                  GestureDetector(
-                                    onTap: () => viewModel.pickImage(false,
-                                        index: imageList.indexOf(null)),
+                                SizedBox(
+                                  height: itemWidth *
+                                      ((imageList.length / 4)
+                                          .ceil()), // Fixed height based on number of images
+                                  child: GridView.builder(
+                                    shrinkWrap:
+                                        true, // Ensures the GridView takes up only the height specified
+                                    physics:
+                                        NeverScrollableScrollPhysics(), // Disables scrolling
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4, // Number of columns
+                                      crossAxisSpacing:
+                                          2.0, // Horizontal spacing
+                                      mainAxisSpacing: 2.0, // Vertical spacing
+                                      childAspectRatio:
+                                          1.0, // Maintain square aspect ratio
+                                    ),
+                                    itemCount: imageList.length,
+                                    itemBuilder: (context, index) {
+                                      final imageData = imageList[
+                                          index]; // Use null-aware operator
+                                      return Container(
+                                        width: itemWidth,
+                                        height: itemWidth,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: imageData != null
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            width: 1.0,
+                                          ),
+                                          color: imageData == null
+                                              ? Colors.grey[200]
+                                              : null, // Placeholder color for no image
+                                        ),
+                                        child: imageData != null
+                                            ? ImageWithDelete(
+                                                imageData: imageData,
+                                                width: itemWidth,
+                                                height: itemWidth,
+                                                onDelete: () => viewModel
+                                                    .deleteAdditionalImage(
+                                                        index),
+                                              )
+                                            : Center(
+                                                child: Icon(
+                                                  Icons.add_a_photo,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ), // Placeholder icon for empty slots
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 10.0),
+                                if (imageList.length >= 4)
+                                  Center(
                                     child: Container(
-                                      width: itemWidth,
-                                      height: itemWidth,
-                                      margin: EdgeInsets.only(right: 2.0),
-                                      color: const Color(0xFF386641),
-                                      child: const Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.add_a_photo,
-                                                color: Colors.white),
-                                            Text(
-                                              'More Images',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12.0),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10.0),
+                                      child: Text(
+                                        'Max images have been added',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ...List.generate(imageList.length, (index) {
-                                  final imageData = imageList[index];
-                                  return Container(
-                                    width: itemWidth,
-                                    height: itemWidth,
-                                    margin: EdgeInsets.only(right: 2.0),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: imageData != null
-                                              ? Colors.white
-                                              : Colors.transparent,
-                                          width: 1.0),
+                                  )
+                                else
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () => viewModel.pickImage(
+                                          false,
+                                          index: imageList.indexOf(null)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                            0xFF386641), // Button color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              12.0), // Button border radius
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Add Image',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
-                                    child: imageData != null
-                                        ? ImageWithDelete(
-                                            imageData: imageData,
-                                            width: itemWidth,
-                                            height: itemWidth,
-                                            onDelete: () => viewModel
-                                                .deleteAdditionalImage(index),
-                                          )
-                                        : Container(),
-                                  );
-                                }),
+                                  ),
                               ],
                             );
                           },
@@ -391,72 +421,6 @@ class AddProductView extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Quantity',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextFormField(
-                        controller: viewModel.quantityController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 228, 228, 228),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 12.0),
-                          labelStyle: const TextStyle(color: Colors.black),
-                        ),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a quantity';
-                          }
-                          return null;
-                        },
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Expiry Date',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextFormField(
-                        controller: viewModel.expiryDateController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 228, 228, 228),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 12.0),
-                          labelStyle: TextStyle(color: Colors.black),
-                        ),
-                        readOnly: true,
-                        onTap: () => viewModel.selectExpiryDate(context),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select an expiry date';
-                          }
-                          return null;
-                        },
-                        style: TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 20),
                       const Text(

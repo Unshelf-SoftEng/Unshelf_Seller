@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 class DashboardViewModel extends ChangeNotifier {
-  // Example data for the day
   DateTime today;
   int pendingOrders;
   int processedOrders;
@@ -12,6 +12,7 @@ class DashboardViewModel extends ChangeNotifier {
   double totalSales;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  late String monthYear; // Use `late` if initializing later
 
   DashboardViewModel()
       : today = DateTime.now(),
@@ -20,6 +21,7 @@ class DashboardViewModel extends ChangeNotifier {
         completedOrders = 0,
         totalOrders = 0,
         totalSales = 0.0 {
+    monthYear = getCurrentMonth(); // Initialize here
     fetchDashboardData();
   }
 
@@ -52,7 +54,7 @@ class DashboardViewModel extends ChangeNotifier {
       print('Processed orders: $processedOrders');
       print('Completed orders: $completedOrders');
 
-      // // Assuming 'total' field exists in each order document for total price
+      // Assuming 'total' field exists in each order document for total price
       final startOfMonth = DateTime(now.year, now.month);
       final endOfMonth =
           DateTime(now.year, now.month + 1); // Start of next month
@@ -93,5 +95,11 @@ class DashboardViewModel extends ChangeNotifier {
       // Handle errors appropriately, e.g., log them or show a user-friendly message
       print('Error fetching dashboard data: $e');
     }
+  }
+
+  String getCurrentMonth() {
+    final now = DateTime.now();
+    final dateFormat = DateFormat('MMMM yyyy');
+    return dateFormat.format(now);
   }
 }
