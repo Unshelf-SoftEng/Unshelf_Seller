@@ -6,6 +6,7 @@ import 'package:unshelf_seller/views/dashboard_view.dart';
 import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
+import 'package:unshelf_seller/views/wallet_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -270,7 +271,8 @@ class _HomeViewState extends State<HomeView> {
         return IconButton(
           icon: Icon(Icons.account_balance_wallet),
           onPressed: () {
-            // Navigate to WalletView or any other action
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => WalletView()));
           },
         );
       default:

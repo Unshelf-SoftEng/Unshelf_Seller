@@ -73,9 +73,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                                 lastDate: DateTime(2101),
                               );
                               if (pickedDate != null) {
-                                setState(() {
-                                  product.expiryDate = pickedDate;
-                                });
+                                viewModel.updateExpiryDate(product, pickedDate);
                               }
                             },
                             child: Container(
@@ -93,7 +91,8 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                                   Expanded(
                                     child: Text(
                                       product.expiryDate != null
-                                          ? 'Expiry Date: ${DateFormat.yMMMd().format(product.expiryDate!)}'
+                                          ? DateFormat('MM-dd-yyyy')
+                                              .format(product.expiryDate!)
                                           : 'Select Expiry Date',
                                       style: TextStyle(
                                         color: Colors.grey[800],
@@ -115,20 +114,35 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
-                final productsToRestock = viewModel.selectedProducts
-                    .where((product) => product.stock > 0)
-                    .toList();
-                await viewModel.batchRestock(productsToRestock);
+                // Check if all products have a quantity > 0 and expiry date selected
+                final isFormValid = viewModel.selectedProducts.every(
+                    (product) =>
+                        product.stock! > 0 && product.expiryDate != null);
+
+                if (!isFormValid) {
+                  // Show an error message if the validation fails
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please ensure all products have a quantity and expiry date selected.',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                await viewModel.batchRestock(viewModel.selectedProducts);
                 Navigator.popUntil(context, (route) => route.isFirst);
               },
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Color(0xFF6A994E),
               ),
-              child: Text(
+              child: const Text(
                 'Submit Restock',
                 style: TextStyle(fontSize: 18),
               ),

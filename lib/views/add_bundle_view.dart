@@ -123,7 +123,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               mainImageUrl: product.mainImageUrl,
                               productId: product.id,
                               name: product.name,
-                              stock: product.stock,
+                              stock: product.stock!,
                               isSelected: viewModel.selectedProductIds
                                   .contains(product.id),
                               onTap: () =>

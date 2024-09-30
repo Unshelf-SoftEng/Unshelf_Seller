@@ -151,10 +151,8 @@ class _LoginViewState extends State<LoginView> {
                 ElevatedButton.icon(
                   onPressed: _loginWithGoogle,
                   label: const Text('Sign in with Google'),
-                  icon: Image.network(
-                      'https://firebasestorage.googleapis.com/v0/b/unshelf-d4567.appspot.com/o/image8-2.png?alt=media&token=4bfbc600-ed28-449e-ae22-86074884db57',
-                      width: 24,
-                      height: 24),
+                  icon: Image.asset('assets/images/google_logo.png',
+                      width: 24, height: 24),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

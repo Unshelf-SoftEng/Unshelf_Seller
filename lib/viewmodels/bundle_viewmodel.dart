@@ -86,7 +86,7 @@ class BundleViewModel extends ChangeNotifier {
           .where((product) => _selectedProductIds.contains(product.id))
           .toList();
       _maxStock = selectedProducts
-          .map((product) => product.stock)
+          .map((product) => product.stock!)
           .reduce((min, stock) => stock < min ? stock : min);
     }
     notifyListeners();

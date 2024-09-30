@@ -10,8 +10,8 @@ class ProductModel implements ItemModel {
   String category;
   double price;
   String quantifier;
-  int stock;
-  DateTime expiryDate;
+  int? stock;
+  DateTime? expiryDate;
   int discount;
   String mainImageUrl;
   List<String>? additionalImageUrls;
@@ -58,7 +58,7 @@ class ProductModel implements ItemModel {
       'description': description,
       'price': price,
       'stock': stock,
-      'expiryDate': expiryDate.toIso8601String(),
+      'expiryDate': expiryDate!.toIso8601String(),
       'discount': discount,
     };
   }

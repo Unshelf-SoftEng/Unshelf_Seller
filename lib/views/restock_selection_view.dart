@@ -73,7 +73,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 ),
                               ),
                               subtitle: Text(
-                                'Current Quantity: ${product.stock}',
+                                'Current Quantity: ${product.stock ?? 0}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[700],

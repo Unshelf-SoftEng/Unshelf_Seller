@@ -16,10 +16,10 @@ class AddProductView extends StatelessWidget {
       child: Consumer<ProductViewModel>(builder: (context, viewModel, child) {
         return Scaffold(
           appBar: AppBar(
-              backgroundColor: Color(0xFF6A994E),
+              backgroundColor: const Color(0xFF6A994E),
               title: const Text('Add Product Details')),
           body: SingleChildScrollView(
-            padding: EdgeInsets.all(15.0),
+            padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
                 Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -31,8 +31,7 @@ class AddProductView extends StatelessWidget {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                              color: Colors.green, width: 5), // Thick border
+                          border: Border.all(color: Colors.green, width: 5),
                           color: Colors.transparent,
                         ),
                       ),
@@ -69,8 +68,8 @@ class AddProductView extends StatelessWidget {
                                   imageData: viewModel.mainImageData!,
                                   onDelete: viewModel.deleteMainImage,
                                   width: 400.0,
-                                  height: 400.0, // Add border
-                                  margin: EdgeInsets.all(0),
+                                  height: 400.0,
+                                  margin: const EdgeInsets.all(0),
                                 )
                               : const Center(
                                   child: Column(
@@ -111,26 +110,21 @@ class AddProductView extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   height: itemWidth *
-                                      ((imageList.length / 4)
-                                          .ceil()), // Fixed height based on number of images
+                                      ((imageList.length / 4).ceil()),
                                   child: GridView.builder(
-                                    shrinkWrap:
-                                        true, // Ensures the GridView takes up only the height specified
+                                    shrinkWrap: true,
                                     physics:
-                                        NeverScrollableScrollPhysics(), // Disables scrolling
+                                        const NeverScrollableScrollPhysics(),
                                     gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 4, // Number of columns
-                                      crossAxisSpacing:
-                                          2.0, // Horizontal spacing
-                                      mainAxisSpacing: 2.0, // Vertical spacing
-                                      childAspectRatio:
-                                          1.0, // Maintain square aspect ratio
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      crossAxisSpacing: 2.0,
+                                      mainAxisSpacing: 2.0,
+                                      childAspectRatio: 1.0,
                                     ),
                                     itemCount: imageList.length,
                                     itemBuilder: (context, index) {
-                                      final imageData = imageList[
-                                          index]; // Use null-aware operator
+                                      final imageData = imageList[index];
                                       return Container(
                                         width: itemWidth,
                                         height: itemWidth,
@@ -159,7 +153,7 @@ class AddProductView extends StatelessWidget {
                                                   Icons.add_a_photo,
                                                   color: Colors.grey[600],
                                                 ),
-                                              ), // Placeholder icon for empty slots
+                                              ),
                                       );
                                     },
                                   ),
@@ -186,11 +180,11 @@ class AddProductView extends StatelessWidget {
                                           false,
                                           index: imageList.indexOf(null)),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                            0xFF386641), // Button color
+                                        backgroundColor:
+                                            const Color(0xFF386641),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              12.0), // Button border radius
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
                                         ),
                                       ),
                                       child: const Text(
@@ -274,7 +268,7 @@ class AddProductView extends StatelessWidget {
                           }
                           return null;
                         },
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -343,7 +337,8 @@ class AddProductView extends StatelessWidget {
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 12.0, horizontal: 12.0),
-                                    labelStyle: TextStyle(color: Colors.black),
+                                    labelStyle:
+                                        const TextStyle(color: Colors.black),
                                   ),
                                   keyboardType:
                                       const TextInputType.numberWithOptions(
@@ -363,7 +358,7 @@ class AddProductView extends StatelessWidget {
                                     }
                                     return null;
                                   },
-                                  style: TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                               ],
                             ),
@@ -436,14 +431,14 @@ class AddProductView extends StatelessWidget {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Color.fromARGB(255, 228, 228, 228),
+                          fillColor: const Color.fromARGB(255, 228, 228, 228),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               vertical: 12.0, horizontal: 12.0),
-                          labelStyle: TextStyle(color: Colors.black),
+                          labelStyle: const TextStyle(color: Colors.black),
                         ),
                         validator: (value) {
                           final intValue = int.tryParse(value ?? '');
@@ -455,16 +450,15 @@ class AddProductView extends StatelessWidget {
                           return null;
                         },
                         inputFormatters: [
-                          FilteringTextInputFormatter
-                              .digitsOnly, // Allows only digits
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
-                        style: TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 40),
                       Align(
                         alignment: Alignment.center,
                         child: viewModel.isLoading
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : SizedBox(
                                 width: 200,
                                 height: 30,
@@ -479,11 +473,11 @@ class AddProductView extends StatelessWidget {
                                     );
                                     Navigator.pop(context, true);
                                   },
-                                  child: Text('Add Product'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF6A994E),
+                                    backgroundColor: const Color(0xFF6A994E),
                                     foregroundColor: Colors.white,
                                   ),
+                                  child: const Text('Add Product'),
                                 ),
                               ),
                       ),

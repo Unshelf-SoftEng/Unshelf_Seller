@@ -17,6 +17,7 @@ import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +48,7 @@ void main() async {
             create: (_) => UserProfileViewModel(userProfile: null)),
         ChangeNotifierProvider(create: (_) => ListingViewModel()),
         ChangeNotifierProvider(create: (_) => ProductSummaryViewModel()),
+        ChangeNotifierProvider(create: (_) => WalletViewModel()),
       ],
       child: const MyApp(),
     ),

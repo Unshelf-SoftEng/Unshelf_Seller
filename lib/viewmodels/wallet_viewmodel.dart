@@ -1,31 +1,106 @@
-import 'package:flutter/foundation.dart';
-import 'package:unshelf_seller/services/paymongo_service.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/models/order_model.dart';
+
+class Transaction {
+  final String type; // "withdraw" or "add"
+  final double amount;
+  final DateTime date;
+
+  Transaction({required this.type, required this.amount, required this.date});
+}
 
 class WalletViewModel extends ChangeNotifier {
-  final PayMongoService _payMongoService = PayMongoService();
-  double _balance = 0.0;
-  bool _isLoading = true;
-  String? _errorMessage;
+  double _balance = 100.0; // Initial balance for demonstration purposes
+  String _error = '';
+  List<Transaction> _transactions = [];
 
   double get balance => _balance;
-  bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  void set balance(double value) => _balance = value;
+  String get error => _error;
+  List<Transaction> get transactions => _transactions;
+  void set transactions(List<Transaction> value) => _transactions = value;
 
   WalletViewModel() {
-    _loadBalance();
+    _initializeDummyData(); // Load dummy data on initialization\
+    updateBalanceFromTransactions();
   }
 
-  Future<void> _loadBalance() async {
-    try {
-      _isLoading = true;
+  void _initializeDummyData() {
+    transactions = [
+      Transaction(
+          type: 'withdraw',
+          amount: 500, // More realistic withdrawal
+          date: DateTime.parse('2024-09-28 14:30:00')),
+      Transaction(
+          type: 'sale',
+          amount: 53.75,
+          date: DateTime.parse('2024-09-27 09:15:00')),
+      Transaction(
+          type: 'sale',
+          amount: 72.30,
+          date: DateTime.parse('2024-09-26 18:45:00')),
+      Transaction(
+          type: 'sale',
+          amount: 118.90,
+          date: DateTime.parse('2024-09-25 11:00:00')),
+      Transaction(
+          type: 'sale',
+          amount: 92.15,
+          date: DateTime.parse('2024-09-23 08:00:00')),
+      Transaction(
+          type: 'sale',
+          amount: 113.40,
+          date: DateTime.parse('2024-09-22 19:15:00')),
+      Transaction(
+          type: 'sale',
+          amount: 61.85,
+          date: DateTime.parse('2024-09-21 10:45:00')),
+      Transaction(
+          type: 'sale',
+          amount: 45.20,
+          date: DateTime.parse('2024-09-20 15:30:00')),
+      Transaction(
+          type: 'sale',
+          amount: 82.50,
+          date: DateTime.parse('2024-09-19 12:00:00')),
+    ];
+    notifyListeners(); // Notify listeners to update UI
+  }
+
+  // Method to withdraw funds from the wallet
+  void withdrawFunds(double amount) {
+    if (amount <= 0) {
+      _error = 'Amount must be greater than zero';
       notifyListeners();
-      _balance = await _payMongoService.getWalletBalance();
-      _errorMessage = null;
-    } catch (e) {
-      _errorMessage = 'Failed to load balance: $e';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+      return;
     }
+    if (amount > _balance) {
+      _error = 'Insufficient funds';
+      notifyListeners();
+      return;
+    }
+    _balance -= amount;
+    _transactions.add(Transaction(
+      type: 'withdraw',
+      amount: amount,
+      date: DateTime.now(),
+    ));
+    _error = '';
+    notifyListeners();
+  }
+
+  // Method to update balance based on the transactions
+  void updateBalanceFromTransactions() {
+    double newBalance = 0.0;
+    for (var transaction in _transactions) {
+      if (transaction.type == 'sale') {
+        newBalance += transaction.amount;
+      } else if (transaction.type == 'withdraw') {
+        newBalance -= transaction.amount;
+      }
+    }
+    _balance = newBalance;
+    notifyListeners();
   }
 }

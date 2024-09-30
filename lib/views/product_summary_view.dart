@@ -168,7 +168,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                 _buildProductDetail(
                   'Expiry Date',
                   DateFormat('yyyy-MM-dd')
-                      .format(viewModel.product!.expiryDate.toLocal()),
+                      .format(viewModel.product!.expiryDate!.toLocal()),
                 ),
                 _buildProductDetail(
                     'Discount', '${viewModel.product!.discount}% off'),
