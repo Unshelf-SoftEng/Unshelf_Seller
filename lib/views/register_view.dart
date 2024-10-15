@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:unshelf_seller/views/login_view.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 
@@ -30,11 +29,11 @@ class _RegisterViewState extends State<RegisterView> {
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'name': name,
         'email': user.email,
-        'phone_number': phoneNumber,
+        'phoneNumber': phoneNumber,
       });
 
       await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
-        'store_schedule': {
+        'storeSchedule': {
           'Monday': {'open': 'Closed', 'close': 'Closed'},
           'Tuesday': {'open': 'Closed', 'close': 'Closed'},
           'Wednesday': {'open': 'Closed', 'close': 'Closed'},
@@ -43,10 +42,12 @@ class _RegisterViewState extends State<RegisterView> {
           'Saturday': {'open': 'Closed', 'close': 'Closed'},
           'Sunday': {'open': 'Closed', 'close': 'Closed'},
         },
+        'storeName': "",
+        'storeImageUrl': "",
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create user data')),
+        const SnackBar(content: Text('Failed to create user data')),
       );
     }
   }
@@ -263,7 +264,8 @@ class _RegisterViewState extends State<RegisterView> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 ),
               ),
 

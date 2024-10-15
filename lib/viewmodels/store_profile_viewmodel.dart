@@ -6,13 +6,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class EditStoreProfileViewModel extends ChangeNotifier {
+class StoreProfileViewModel extends ChangeNotifier {
   final String storeId; // The ID of the store to update
   late TextEditingController _nameController;
   Uint8List? _profileImage;
   final ImagePicker picker = ImagePicker();
 
-  EditStoreProfileViewModel(StoreModel storeDetails)
+  StoreProfileViewModel(StoreModel storeDetails)
       : storeId = storeDetails.userId {
     _nameController = TextEditingController(text: storeDetails.storeName);
   }
@@ -40,14 +40,13 @@ class EditStoreProfileViewModel extends ChangeNotifier {
         final storeRef =
             FirebaseFirestore.instance.collection('stores').doc(storeId);
         final updateData = {
-          'store_name': _nameController.text,
-          // Handle image upload if a new image is selected
+          'storeName': _nameController.text,
         };
 
         if (_profileImage != null) {
           // Assuming you have a method to upload the image and get the URL
           final imageUrl = await uploadImage(_profileImage!);
-          updateData['store_image_url'] = imageUrl;
+          updateData['storeImageUrl'] = imageUrl;
         }
 
         await storeRef.update(updateData);

@@ -10,13 +10,14 @@ class EditStoreProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<EditStoreProfileViewModel>(
-      create: (_) => EditStoreProfileViewModel(storeDetails),
+    return ChangeNotifierProvider<StoreProfileViewModel>(
+      create: (_) => StoreProfileViewModel(storeDetails),
       child: Scaffold(
         appBar: AppBar(
           title: Text('Edit Store Profile'),
+          backgroundColor: const Color(0xFF6A994E),
         ),
-        body: Consumer<EditStoreProfileViewModel>(
+        body: Consumer<StoreProfileViewModel>(
           builder: (context, viewModel, child) {
             return Stack(
               children: [
