@@ -62,7 +62,7 @@ class OrderDetailsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Order ID: ${order.id}',
+                          'Order ID: ${order.orderId}',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,

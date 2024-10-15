@@ -18,6 +18,7 @@ OrderStatus orderStatusFromString(String status) {
 
 class OrderModel {
   final String id;
+  final String orderId;
   final String buyerId;
   final List<OrderItem> items;
   OrderStatus status;
@@ -30,6 +31,7 @@ class OrderModel {
 
   OrderModel({
     required this.id,
+    required this.orderId,
     required this.buyerId,
     required this.items,
     required this.status,
@@ -46,6 +48,7 @@ class OrderModel {
 
     return OrderModel(
       id: doc.id,
+      orderId: data['order_id'],
       status: orderStatusFromString(data['status'] as String),
       createdAt: data['created_at'] as Timestamp,
       completionDate: data['completion_date'] as Timestamp?,
@@ -63,6 +66,7 @@ class OrderModel {
 
     final orderModel = OrderModel(
       id: doc.id,
+      orderId: data['order_id'],
       status: orderStatusFromString(data['status'] as String),
       createdAt: data['created_at'] as Timestamp,
       buyerId: data['buyer_id'],
@@ -101,6 +105,7 @@ class OrderModel {
     // Return a new OrderModel with the populated products
     return OrderModel(
       id: orderModel.id,
+      orderId: orderModel.orderId,
       status: orderModel.status,
       createdAt: orderModel.createdAt,
       buyerId: orderModel.buyerId,

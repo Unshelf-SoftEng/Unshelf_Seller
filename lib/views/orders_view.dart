@@ -138,7 +138,7 @@ class _OrdersViewState extends State<OrdersView> {
                                         ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                          'Order ID: ${order.id}',
+                                          'Order ID: ${order.orderId}',
                                           style: TextStyle(
                                               fontSize: 12.0,
                                               color: Colors.grey[600]),

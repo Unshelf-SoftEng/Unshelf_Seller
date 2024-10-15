@@ -8,7 +8,7 @@ class BundleSuggestionsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('AI Bundle Suggestions'),
+        title: const Text('AI Bundle Suggestions'),
         backgroundColor: Color(0xFF6A994E),
       ),
       body: Consumer<BundleViewModel>(
@@ -17,20 +17,18 @@ class BundleSuggestionsView extends StatelessWidget {
             future: viewModel.getSuggestions(), // Use the stored future
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               }
 
-              // Check if data is loaded and not empty
               if (snapshot.connectionState == ConnectionState.done &&
                   viewModel.suggestions.isEmpty) {
-                return Center(child: Text('No suggestions available'));
+                return const Center(child: Text('No suggestions available'));
               }
 
-              // Limit to 3 suggestions
               final suggestions = viewModel.suggestions.take(3).toList();
 
               return Padding(
@@ -51,13 +49,13 @@ class BundleSuggestionsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 16,
                         ),
                         title: Text(
                           suggestion.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -65,10 +63,10 @@ class BundleSuggestionsView extends StatelessWidget {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               'Products: $productNames',
-                              style: TextStyle(fontSize: 14),
+                              style: const TextStyle(fontSize: 14),
                             ),
                           ],
                         ),

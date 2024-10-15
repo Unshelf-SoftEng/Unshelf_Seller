@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
+import 'package:unshelf_seller/views/analytics_view.dart';
 
 class DashboardView extends StatefulWidget {
   @override
@@ -24,18 +25,20 @@ class _DashboardViewState extends State<DashboardView> {
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildDailyAnalyticsCard(viewModel),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 _buildStoreInsightsCard(viewModel),
+                const SizedBox(height: 16.0),
+                _buildAnalyticsButton(),
               ],
             ),
           );
@@ -46,7 +49,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
-      color: Color(0xFF6A994E),
+      color: const Color(0xFF6A994E),
       elevation: 6.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -54,7 +57,7 @@ class _DashboardViewState extends State<DashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            const Center(
               child: Text(
                 'Daily Analytics',
                 style: TextStyle(
@@ -64,16 +67,16 @@ class _DashboardViewState extends State<DashboardView> {
                 ),
               ),
             ),
-            SizedBox(height: 8.0),
+            const SizedBox(height: 8.0),
             Center(
               child: Text(
                 'Date: ${viewModel.today.toLocal().toString().split(' ')[0]}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildAnalyticsRow(
                 'Pending', viewModel.pendingOrders, Icons.hourglass_empty),
             _buildAnalyticsRow(
@@ -88,7 +91,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildStoreInsightsCard(DashboardViewModel viewModel) {
     return Card(
-      color: Color(0xFF6A994E),
+      color: const Color(0xFF6A994E),
       elevation: 6.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -106,7 +109,7 @@ class _DashboardViewState extends State<DashboardView> {
             Center(
                 child: Text(
                     'An overview of the shop data for ${viewModel.monthYear}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12.0,
                     ))),
@@ -135,25 +138,25 @@ class _DashboardViewState extends State<DashboardView> {
               Icon(icon, color: Colors.white, size: 32.0),
             ],
           ),
-          SizedBox(width: 16.0),
+          const SizedBox(width: 16.0),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Center(
                 child: Text(
-                  '${value}',
-                  style: TextStyle(
+                  '$value',
+                  style: const TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFFFFDC5F)),
                 ),
               ),
-              SizedBox(height: 4.0),
+              const SizedBox(height: 4.0),
               Center(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14.0,
                     color: Colors.white,
                   ),
@@ -170,13 +173,13 @@ class _DashboardViewState extends State<DashboardView> {
     return Center(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final textStyleValue = TextStyle(
+          const textStyleValue = TextStyle(
             fontSize: 14.0,
             fontWeight: FontWeight.bold,
             color: Color(0xFFFFDC5F),
           );
 
-          final textStyleTitle = TextStyle(
+          const textStyleTitle = TextStyle(
             fontSize: 14.0,
             color: Colors.white,
           );
@@ -206,7 +209,7 @@ class _DashboardViewState extends State<DashboardView> {
                   Icon(icon, color: Colors.white, size: 32.0),
                 ],
               ),
-              SizedBox(width: 16.0),
+              const SizedBox(width: 16.0),
               // Text Column with fixed width
               Container(
                 constraints: BoxConstraints(
@@ -220,7 +223,7 @@ class _DashboardViewState extends State<DashboardView> {
                       value,
                       style: textStyleValue,
                     ),
-                    SizedBox(height: 4.0),
+                    const SizedBox(height: 4.0),
                     Text(
                       title,
                       style: textStyleTitle,
@@ -231,6 +234,24 @@ class _DashboardViewState extends State<DashboardView> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildAnalyticsButton() {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => AnalyticsView()),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              const Color(0xFF6A994E), // Use the same color as the cards
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+        ),
+        child: const Text('View Analytics'),
       ),
     );
   }

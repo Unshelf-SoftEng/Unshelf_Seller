@@ -47,6 +47,8 @@ class OrderViewModel extends ChangeNotifier {
           .map((doc) => OrderModel.fetchOrderWithProducts(doc))
           .toList());
 
+      print(_orders);
+
       _isLoading = false;
       notifyListeners();
     } catch (e) {
