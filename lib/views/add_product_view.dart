@@ -318,7 +318,7 @@ class AddProductView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Price',
+                                  'Price (₱)',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -377,41 +377,34 @@ class AddProductView extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                                DropdownButtonFormField<String>(
-                                    value: viewModel.selectedQuantifier,
-                                    items: viewModel.quantifiers
-                                        .map((String quantifier) {
-                                      return DropdownMenuItem<String>(
-                                        value: quantifier,
-                                        child: Text(quantifier),
-                                      );
-                                    }).toList(),
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: const Color.fromARGB(
-                                          255, 228, 228, 228),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 12.0, horizontal: 12.0),
-                                      labelStyle:
-                                          const TextStyle(color: Colors.black),
+                                TextFormField(
+                                  controller: viewModel.quantifierController,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(
+                                        255, 228, 228, 228),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderSide: BorderSide.none,
                                     ),
-                                    onChanged: (String? newValue) {
-                                      viewModel.selectedQuantifier = newValue!;
-                                    },
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please select a quantifier';
-                                      }
-                                      return null;
-                                    },
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.black)),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 12.0, horizontal: 12.0),
+                                    labelText: 'Enter Quantifier',
+                                    labelStyle:
+                                        const TextStyle(color: Colors.black),
+                                  ),
+                                  onChanged: (value) {
+                                    viewModel.quantifierController.text = value;
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a quantifier';
+                                    }
+                                    return null;
+                                  },
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.black),
+                                ),
                               ],
                             ),
                           ),

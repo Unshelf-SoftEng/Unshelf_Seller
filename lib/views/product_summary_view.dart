@@ -160,7 +160,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                 _buildProductDetail(
                     'Description', viewModel.product!.description),
                 _buildProductDetail('Category', viewModel.product!.category),
-                _buildProductDetail('Price', '\$${viewModel.product!.price}'),
+                _buildProductDetail('Price', '₱ ${viewModel.product!.price}'),
                 _buildProductDetail(
                     'Quantifier', viewModel.product!.quantifier),
                 _buildProductDetail(

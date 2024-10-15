@@ -29,5 +29,22 @@
   <body>
     <!-- Your Flutter Web application script -->
     <script src="flutter_bootstrap.js" async></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyC0BHSDm6UjGfPfbp1uI6CxOXOBnnWNLyI",
+        authDomain: "unshelf-d4567.firebaseapp.com",
+        projectId: "unshelf-d4567",
+        storageBucket: "unshelf-d4567.appspot.com",
+        messagingSenderId: "733152787617",
+        appId: "1:733152787617:web:87785f704ad9420af544e0",
+        measurementId: "G-VXPZ8FH1T7",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
   </body>
 </html>

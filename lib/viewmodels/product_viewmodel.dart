@@ -14,6 +14,7 @@ class ProductViewModel extends ChangeNotifier {
   final TextEditingController expiryDateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController discountController = TextEditingController();
+  final TextEditingController quantifierController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
@@ -42,9 +43,6 @@ class ProductViewModel extends ChangeNotifier {
     'Baked Goods',
   ];
 
-  String? selectedQuantifier;
-  List<String> quantifiers = ['1 kg', '500 g', '200 g', 'piece', 'pack'];
-
   ProductViewModel({required this.productId}) {
     if (productId != null) fetchProductData();
   }
@@ -68,8 +66,8 @@ class ProductViewModel extends ChangeNotifier {
         expiryDateController.text = product.expiryDate.toString();
         descriptionController.text = product.description;
         discountController.text = product.discount.toString();
+        quantifierController.text = product.quantifier;
         selectedCategory = product.category;
-        selectedQuantifier = product.quantifier;
 
         final mainImageUrl = product.mainImageUrl;
         final additionalImageUrls = product.additionalImageUrls;
@@ -234,7 +232,7 @@ class ProductViewModel extends ChangeNotifier {
               'description': descriptionController.text,
               'category': selectedCategory,
               'price': double.parse(priceController.text),
-              'quantifier': selectedQuantifier,
+              'quantifier': quantifierController.text,
               'stock': int.parse(quantityController.text),
               'expiryDate': DateTime.parse(expiryDateController.text),
               'discount': int.parse(discountController.text),
@@ -251,7 +249,7 @@ class ProductViewModel extends ChangeNotifier {
               'description': descriptionController.text,
               'category': selectedCategory,
               'price': double.parse(priceController.text),
-              'quantifier': selectedQuantifier,
+              'quantifier': quantifierController.text,
               'stock': int.parse(quantityController.text),
               'expiryDate': DateTime.parse(expiryDateController.text),
               'discount': int.parse(discountController.text),

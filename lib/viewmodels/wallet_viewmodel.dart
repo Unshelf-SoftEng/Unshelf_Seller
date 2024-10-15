@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/order_model.dart';
 
@@ -11,7 +12,7 @@ class Transaction {
 }
 
 class WalletViewModel extends ChangeNotifier {
-  double _balance = 100.0; // Initial balance for demonstration purposes
+  double _balance = 0;
   String _error = '';
   List<Transaction> _transactions = [];
 
@@ -22,50 +23,7 @@ class WalletViewModel extends ChangeNotifier {
   void set transactions(List<Transaction> value) => _transactions = value;
 
   WalletViewModel() {
-    _initializeDummyData(); // Load dummy data on initialization\
     updateBalanceFromTransactions();
-  }
-
-  void _initializeDummyData() {
-    transactions = [
-      Transaction(
-          type: 'withdraw',
-          amount: 500, // More realistic withdrawal
-          date: DateTime.parse('2024-09-28 14:30:00')),
-      Transaction(
-          type: 'sale',
-          amount: 53.75,
-          date: DateTime.parse('2024-09-27 09:15:00')),
-      Transaction(
-          type: 'sale',
-          amount: 72.30,
-          date: DateTime.parse('2024-09-26 18:45:00')),
-      Transaction(
-          type: 'sale',
-          amount: 118.90,
-          date: DateTime.parse('2024-09-25 11:00:00')),
-      Transaction(
-          type: 'sale',
-          amount: 92.15,
-          date: DateTime.parse('2024-09-23 08:00:00')),
-      Transaction(
-          type: 'sale',
-          amount: 113.40,
-          date: DateTime.parse('2024-09-22 19:15:00')),
-      Transaction(
-          type: 'sale',
-          amount: 61.85,
-          date: DateTime.parse('2024-09-21 10:45:00')),
-      Transaction(
-          type: 'sale',
-          amount: 45.20,
-          date: DateTime.parse('2024-09-20 15:30:00')),
-      Transaction(
-          type: 'sale',
-          amount: 82.50,
-          date: DateTime.parse('2024-09-19 12:00:00')),
-    ];
-    notifyListeners(); // Notify listeners to update UI
   }
 
   // Method to withdraw funds from the wallet
@@ -75,11 +33,13 @@ class WalletViewModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
+
     if (amount > _balance) {
       _error = 'Insufficient funds';
       notifyListeners();
       return;
     }
+
     _balance -= amount;
     _transactions.add(Transaction(
       type: 'withdraw',
@@ -91,8 +51,22 @@ class WalletViewModel extends ChangeNotifier {
   }
 
   // Method to update balance based on the transactions
-  void updateBalanceFromTransactions() {
+  Future<void> updateBalanceFromTransactions() async {
     double newBalance = 0.0;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('orders')
+        .where('seller_id', isEqualTo: user.uid)
+        .where('status', isEqualTo: "Completed")
+        .orderBy('created_at', descending: true)
+        .get();
+
     for (var transaction in _transactions) {
       if (transaction.type == 'sale') {
         newBalance += transaction.amount;

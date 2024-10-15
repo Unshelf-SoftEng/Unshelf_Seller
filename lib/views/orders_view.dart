@@ -178,7 +178,7 @@ class _OrdersViewState extends State<OrdersView> {
                                       ),
                                     ),
                                     child: Text(
-                                      '${order.totalPrice.toStringAsFixed(2)} Php', // Assuming the order has a totalPrice field
+                                      '₱ ${order.totalPrice.toStringAsFixed(2)}', // Assuming the order has a totalPrice field
                                       style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold),
