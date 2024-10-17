@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
@@ -10,28 +11,10 @@ class AnalyticsViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   List<String> dates = [];
-  List<int> dailyOrders = [];
-  List<double> dailySales = [];
+  Map<String, int> dailyOrdersMap = {};
+  Map<String, double> dailySalesMap = {};
   List<int> weeklyOrders = [];
   List<double> weeklySales = [];
-
-  List<String> allProducts = [
-    "Pear",
-    "Watermelon",
-    "Orange",
-    "Peach",
-    "Fruit Basket",
-    "Fresh Fruit Medley"
-  ];
-
-  List<int> productOrderCounts = [
-    15,
-    30,
-    25,
-    10,
-    5,
-    20
-  ]; // Dummy order counts for each product
 
   List<Map<String, dynamic>> popularProducts = [];
 
@@ -39,37 +22,109 @@ class AnalyticsViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    dailyOrders = List.generate(30, (index) => Random().nextInt(50));
-    dailySales =
-        List.generate(30, (index) => (Random().nextDouble() * 500).toDouble());
+    // Initialize Firestore instance
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    totalOrders = dailyOrders.reduce((a, b) => a + b);
-    totalSales = dailySales.reduce((a, b) => a + b);
+    User? user = auth.currentUser;
 
-    // Get the top 3 popular products based on order counts
-    popularProducts = _getTop3PopularProducts();
+    if (user == null) {
+      print('No user is logged in');
+      return;
+    }
 
-    dates = List.generate(29, (index) {
-      DateTime date = DateTime.now().subtract(Duration(days: index));
-      return DateFormat('MM/dd').format(date);
-    }).reversed.toList();
+    String userId = user.uid;
+    Map<String, int> productQuantities = {};
+    DateTime today = DateTime.now();
+    DateTime thirtyDaysAgo = today.subtract(Duration(days: 29));
+
+    for (int i = 0; i < 30; i++) {
+      DateTime date = today.subtract(Duration(days: 29 - i));
+      String formattedDate = DateFormat('MM/dd').format(date);
+      dailyOrdersMap[formattedDate] = 0;
+    }
+
+    for (int i = 0; i < 30; i++) {
+      DateTime date = today.subtract(Duration(days: 29 - i));
+      String formattedDate = DateFormat('MM/dd').format(date);
+      dailySalesMap[formattedDate] = 0.0;
+    }
+
+    try {
+      QuerySnapshot orderSnapshot = await db
+          .collection('orders')
+          .where('sellerId', isEqualTo: userId)
+          .where('createdAt', isGreaterThanOrEqualTo: thirtyDaysAgo)
+          .get();
+
+      QuerySnapshot transactionSnapshot = await db
+          .collection('transactions')
+          .where('sellerId', isEqualTo: userId)
+          .where('date', isGreaterThanOrEqualTo: thirtyDaysAgo)
+          .get();
+
+      // Process each order for product quantities
+      for (var orderDoc in orderSnapshot.docs) {
+        DateTime orderDate = (orderDoc['createdAt'] as Timestamp).toDate();
+        String formattedDate = DateFormat('MM/dd').format(orderDate);
+
+        dailyOrdersMap[formattedDate] = dailyOrdersMap[formattedDate]! + 1;
+        totalOrders += 1;
+
+        List<dynamic> orderItems = orderDoc['orderItems'];
+        for (var item in orderItems) {
+          String productId = item['productId'];
+          int quantity = item['quantity'];
+
+          if (productQuantities.containsKey(productId)) {
+            productQuantities[productId] =
+                productQuantities[productId]! + quantity;
+          } else {
+            productQuantities[productId] = quantity;
+          }
+        }
+      }
+
+      for (var transactionDoc in transactionSnapshot.docs) {
+        DateTime transactionDate =
+            (transactionDoc['date'] as Timestamp).toDate();
+        double sellerEarnings = transactionDoc['sellerEarnings'].toDouble();
+
+        String formattedDate = DateFormat('MM/dd').format(transactionDate);
+        // Check if the key exists
+        if (dailySalesMap.containsKey(formattedDate)) {
+          // If it exists, add sellerEarnings to the current value
+          dailySalesMap[formattedDate] =
+              dailySalesMap[formattedDate]! + sellerEarnings;
+        }
+
+        totalSales += sellerEarnings;
+      }
+
+      // Get the top 3 popular products based on quantity ordered
+      List<Map<String, dynamic>> popularProducts = [];
+      List<MapEntry<String, int>> sortedProducts = productQuantities.entries
+          .toList()
+        ..sort((a, b) =>
+            b.value.compareTo(a.value)); // Sort by quantity in descending order
+
+      for (var entry in sortedProducts.take(3)) {
+        // Fetch product details (like name) from Firestore using productId
+        DocumentSnapshot productDoc =
+            await db.collection('products').doc(entry.key).get();
+        String productName = productDoc['name'];
+
+        popularProducts.add({
+          'productId': entry.key,
+          'productName': productName,
+          'quantityOrdered': entry.value,
+        });
+      }
+    } catch (e) {
+      print("Error fetching analytics data: $e");
+    }
 
     _isLoading = false;
     notifyListeners();
-  }
-
-  List<Map<String, dynamic>> _getTop3PopularProducts() {
-    List<Map<String, dynamic>> productList = [];
-
-    for (int i = 0; i < allProducts.length; i++) {
-      productList.add({
-        'name': allProducts[i],
-        'orders': productOrderCounts[i],
-      });
-    }
-
-    // Sort products by order counts in descending order and take the top 3
-    productList.sort((a, b) => b['orders'].compareTo(a['orders']));
-    return productList.take(3).toList();
   }
 }
