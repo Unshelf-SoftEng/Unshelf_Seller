@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Chart extends StatefulWidget {
-  const Chart({super.key, required this.dataMap});
+  const Chart({
+    super.key,
+    required this.dataMap,
+    required this.maxXValue,
+    required this.maxYValue,
+  });
 
-  final Map<String, dynamic> dataMap;
+  final Map<DateTime, dynamic> dataMap;
+  final double maxXValue;
+  final double maxYValue;
 
   @override
   State<Chart> createState() => _ChartState();
@@ -46,8 +53,21 @@ class _ChartState extends State<Chart> {
       fontSize: screenWidth * 0.0075, // Dynamic font size
     );
 
-    String dateString = DateFormat('MM/dd')
-        .format(DateTime.now().subtract(Duration(days: 29 - value.toInt())));
+    // Get the date from the dataMap based on the value (index)
+    DateTime date = widget.dataMap.keys.elementAt(value.toInt());
+
+    // Format the date based on the maxXValue
+    String dateString;
+    if (widget.maxXValue == 30) {
+      dateString = DateFormat('MM/dd').format(date);
+    } else if (widget.maxXValue == 12) {
+      dateString = DateFormat('MMM yyyy').format(date);
+    } else if (widget.maxXValue == 4) {
+      dateString = DateFormat('MM/dd').format(date);
+    } else {
+      dateString = DateFormat('yyyy').format(date);
+    }
+
     return SideTitleWidget(
       axisSide: meta.axisSide,
       child: Text(dateString, style: style),
@@ -61,7 +81,7 @@ class _ChartState extends State<Chart> {
     );
 
     return Text(
-      value is int ? '$value' : '${value.toStringAsFixed(0)}',
+      value is int ? '$value' : '${value.toStringAsFixed(2)}',
       style: style,
       textAlign: TextAlign.left,
     );
@@ -69,26 +89,22 @@ class _ChartState extends State<Chart> {
 
   LineChartData mainData(double screenWidth) {
     List<FlSpot> spots = [];
+    List<DateTime> keys = widget.dataMap.keys.toList();
 
-    for (int i = 0; i < 30; i++) {
-      DateTime date = DateTime.now().subtract(Duration(days: 29 - i));
-      String formattedDate = DateFormat('MM/dd').format(date);
-      double ordersCount = (widget.dataMap[formattedDate] ?? 0.0) as double;
-      spots.add(FlSpot(i.toDouble(), ordersCount.toDouble()));
+    for (int i = 0; i < keys.length; i++) {
+      DateTime date = keys[i];
+      double value =
+          (widget.dataMap[date] ?? 0.0) as double; // Handle dynamic value
+      spots.add(FlSpot(i.toDouble(), value.toDouble()));
     }
 
-    final maxYValue = widget.dataMap.values
-        .where((value) => value is num)
-        .map((value) => value is int ? value.toDouble() : value)
-        .reduce((a, b) => a > b ? a : b);
-
     // Calculate reserved size based on number of digits in maxYValue
-    int numberOfDigits = maxYValue
+    int numberOfDigits = widget.maxYValue
         .toString()
         .split('.')[0]
         .length; // Count digits before decimal
-    double reservedSize = 10.0 +
-        (numberOfDigits * 5.0); // Adjust the multiplier as neededint number of
+    double reservedSize =
+        10.0 + (numberOfDigits * 5.0); // Adjust the multiplier as needed
 
     return LineChartData(
       gridData: FlGridData(show: true),
@@ -124,9 +140,9 @@ class _ChartState extends State<Chart> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: 29,
+      maxX: widget.maxXValue - 1,
       minY: 0,
-      maxY: maxYValue + 1,
+      maxY: widget.maxYValue,
       lineBarsData: [
         LineChartBarData(
           spots: spots,
