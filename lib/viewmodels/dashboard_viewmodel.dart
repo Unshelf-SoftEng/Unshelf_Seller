@@ -12,7 +12,7 @@ class DashboardViewModel extends ChangeNotifier {
   double totalSales;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  late String monthYear; // Use `late` if initializing later
+  late String monthYear;
 
   DashboardViewModel()
       : today = DateTime.now(),
@@ -21,7 +21,7 @@ class DashboardViewModel extends ChangeNotifier {
         completedOrders = 0,
         totalOrders = 0,
         totalSales = 0.0 {
-    monthYear = getCurrentMonth(); // Initialize here
+    monthYear = getCurrentMonth();
     fetchDashboardData();
   }
 
@@ -37,9 +37,9 @@ class DashboardViewModel extends ChangeNotifier {
 
       final ordersSnapshot = await FirebaseFirestore.instance
           .collection('orders')
-          .where('created_at', isGreaterThanOrEqualTo: startOfDay)
-          .where('created_at', isLessThan: endOfDay)
-          .where('seller_id', isEqualTo: user?.uid)
+          .where('createdAt', isGreaterThanOrEqualTo: startOfDay)
+          .where('createdAt', isLessThan: endOfDay)
+          .where('sellerId', isEqualTo: user?.uid)
           .get();
 
       pendingOrders =
@@ -56,43 +56,33 @@ class DashboardViewModel extends ChangeNotifier {
 
       // Assuming 'total' field exists in each order document for total price
       final startOfMonth = DateTime(now.year, now.month);
-      final endOfMonth =
-          DateTime(now.year, now.month + 1); // Start of next month
 
-      var ordersMonthly = await FirebaseFirestore.instance
+      QuerySnapshot ordersMonthly = await FirebaseFirestore.instance
           .collection('orders')
-          .where('created_at', isGreaterThanOrEqualTo: startOfMonth)
-          .where('created_at', isLessThan: endOfMonth)
-          .where('seller_id', isEqualTo: user?.uid)
+          .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
+          .where('sellerId', isEqualTo: user?.uid)
           .get();
 
       totalSales = 0;
 
-      for (var orderDoc
-          in ordersMonthly.docs.where((doc) => doc['status'] == 'Completed')) {
-        final orderItems = orderDoc['order_items'] as List<dynamic>;
+      QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
+          .collection('transactions')
+          .where('date', isGreaterThanOrEqualTo: startOfMonth)
+          .where('sellerId', isEqualTo: user?.uid)
+          .get();
 
-        for (var item in orderItems) {
-          final productId = item['product_id'] as String;
-          final quantity = (item['quantity'] as num).toDouble();
-          final productDoc = await FirebaseFirestore.instance
-              .collection('products')
-              .doc(productId)
-              .get();
+      double totalEarnings = 0.0;
 
-          final productPrice = (productDoc['price'] as num).toDouble();
-          totalSales += productPrice * quantity;
-        }
+      for (var trans in transactionMonthly.docs) {
+        double amount = trans['sellerEarnings']?.toDouble() ?? 0.0;
+        totalEarnings += amount;
       }
-      print('Total sales: $totalSales');
 
+      totalSales = totalEarnings;
       totalOrders = ordersMonthly.docs.length;
-
-      print('Total orders: $totalOrders');
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      // Handle errors appropriately, e.g., log them or show a user-friendly message
       print('Error fetching dashboard data: $e');
     }
   }
