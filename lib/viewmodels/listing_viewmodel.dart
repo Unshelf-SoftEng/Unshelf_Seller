@@ -18,7 +18,7 @@ class ListingViewModel extends ChangeNotifier {
   List<dynamic> get filteredItems => _filteredItems;
 
   ListingViewModel() {
-    _fetchItems();
+    fetchItems();
   }
 
   void updateSearchQuery(String query) {
@@ -43,7 +43,7 @@ class ListingViewModel extends ChangeNotifier {
     _filterItems();
   }
 
-  Future<void> _fetchItems() async {
+  Future<void> fetchItems() async {
     _isLoading = true;
     notifyListeners();
 
@@ -57,7 +57,6 @@ class ListingViewModel extends ChangeNotifier {
             .where('isListed', isEqualTo: true)
             .get();
 
-        print('Mapping products');
         final products = productSnapshot.docs
             .map((doc) {
               try {
@@ -108,12 +107,12 @@ class ListingViewModel extends ChangeNotifier {
 
   Future<void> addProduct(Map<String, dynamic> productData) async {
     await FirebaseFirestore.instance.collection('products').add(productData);
-    _fetchItems();
+    fetchItems();
   }
 
   Future<void> addBundle(Map<String, dynamic> bundleData) async {
     await FirebaseFirestore.instance.collection('bundles').add(bundleData);
-    _fetchItems();
+    fetchItems();
   }
 
   Future<void> deleteItem(String itemId, bool isProduct) async {
@@ -122,12 +121,12 @@ class ListingViewModel extends ChangeNotifier {
         .collection(collection)
         .doc(itemId)
         .delete();
-    _fetchItems();
+    fetchItems();
   }
 
   void toggleView() {
     _showingProducts = !_showingProducts;
-    _fetchItems();
+    fetchItems();
   }
 
   void clear() {

@@ -10,8 +10,6 @@ import 'package:unshelf_seller/models/product_model.dart';
 class ProductViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
-  final TextEditingController quantityController = TextEditingController();
-  final TextEditingController expiryDateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController discountController = TextEditingController();
   final TextEditingController quantifierController = TextEditingController();
@@ -62,20 +60,18 @@ class ProductViewModel extends ChangeNotifier {
 
         nameController.text = product.name;
         priceController.text = product.price.toString();
-        quantityController.text = product.stock.toString();
-        expiryDateController.text = product.expiryDate.toString();
         descriptionController.text = product.description;
         discountController.text = product.discount.toString();
         quantifierController.text = product.quantifier;
         selectedCategory = product.category;
+        String? _mainImageUrl = product.mainImageUrl;
+        List<String>? _additionalImageUrls = product.additionalImageUrls;
 
-        final mainImageUrl = product.mainImageUrl;
-        final additionalImageUrls = product.additionalImageUrls;
-        await loadImageFromUrl(mainImageUrl, true);
+        await loadImageFromUrl(_mainImageUrl, true);
 
-        for (int i = 0; i < additionalImageUrls!.length; i++) {
-          if (i < _additionalImageDataList!.length) {
-            await loadImageFromUrl(additionalImageUrls[i], false, index: i);
+        for (int i = 0; i < _additionalImageUrls!.length; i++) {
+          if (i < _additionalImageDataList.length) {
+            await loadImageFromUrl(_additionalImageUrls[i], false, index: i);
           }
         }
       }
@@ -177,8 +173,8 @@ class ProductViewModel extends ChangeNotifier {
           .collection('products')
           .doc(productId)
           .update({
-        'main_image_url': mainImageUrl,
-        'additional_image_urls': imageUrls,
+        'mainImageUrl': mainImageUrl,
+        'additionalImageUrls': imageUrls,
       });
     } on FirebaseAuthException catch (e) {
       // Handle authentication error
@@ -202,20 +198,7 @@ class ProductViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectExpiryDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null) {
-      expiryDateController.text = "${picked.toLocal()}".split(' ')[0];
-      notifyListeners();
-    }
-  }
-
-  Future<void> addOrUpdateProduct(BuildContext context) async {
+  Future<void> addProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       _isLoading = true;
       notifyListeners();
@@ -223,40 +206,52 @@ class ProductViewModel extends ChangeNotifier {
         User? user = FirebaseAuth.instance.currentUser;
 
         if (user != null) {
-          if (productId == null) {
-            List<String> images = await uploadImages();
+          List<String> images = await uploadImages();
+          await FirebaseFirestore.instance.collection('products').add({
+            'sellerId': user.uid,
+            'name': nameController.text,
+            'description': descriptionController.text,
+            'category': selectedCategory,
+            'price': double.parse(priceController.text),
+            'quantifier': quantifierController.text,
+            'discount': int.parse(discountController.text),
+            'mainImageUrl': images[0],
+            'additionalImageUrls': images.sublist(1),
+            'isListed': true,
+          });
+        }
+      } catch (e) {
+        print('Error adding product' + e.toString());
+      } finally {
+        _isLoading = false;
+        notifyListeners();
+      }
+    }
+  }
 
-            await FirebaseFirestore.instance.collection('products').add({
-              'sellerId': user.uid,
-              'name': nameController.text,
-              'description': descriptionController.text,
-              'category': selectedCategory,
-              'price': double.parse(priceController.text),
-              'quantifier': quantifierController.text,
-              'stock': int.parse(quantityController.text),
-              'expiryDate': DateTime.parse(expiryDateController.text),
-              'discount': int.parse(discountController.text),
-              'mainImageUrl': images[0],
-              'additionalImageUrls': images.sublist(1),
-              'isListed': true,
-            });
-          } else {
-            await FirebaseFirestore.instance
-                .collection('products')
-                .doc(productId)
-                .update({
-              'name': nameController.text,
-              'description': descriptionController.text,
-              'category': selectedCategory,
-              'price': double.parse(priceController.text),
-              'quantifier': quantifierController.text,
-              'stock': int.parse(quantityController.text),
-              'expiryDate': DateTime.parse(expiryDateController.text),
-              'discount': int.parse(discountController.text),
-              'mainImageUrl': '',
-              'additionalImageUrls': [],
-            });
-          }
+  Future<void> updateProduct(BuildContext context, String productId) async {
+    if (formKey.currentState!.validate()) {
+      _isLoading = true;
+      notifyListeners();
+      try {
+        User? user = FirebaseAuth.instance.currentUser;
+
+        if (user != null) {
+          List<String> images = await uploadImages();
+
+          await FirebaseFirestore.instance
+              .collection('products')
+              .doc(productId)
+              .update({
+            'name': nameController.text,
+            'description': descriptionController.text,
+            'category': selectedCategory,
+            'price': double.parse(priceController.text),
+            'quantifier': quantifierController.text,
+            'discount': int.parse(discountController.text),
+            'mainImageUrl': images[0],
+            'additionalImageUrls': images.sublist(1),
+          });
         } else {}
       } catch (e) {
         // Handle errors
@@ -272,8 +267,6 @@ class ProductViewModel extends ChangeNotifier {
     nameController.dispose();
     descriptionController.dispose();
     priceController.dispose();
-    quantityController.dispose();
-    expiryDateController.dispose();
     discountController.dispose();
     super.dispose();
   }

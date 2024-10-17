@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:unshelf_seller/models/order_model.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 
 class OrderDetailsView extends StatelessWidget {
   final String orderId;
 
-  OrderDetailsView({required this.orderId});
+  const OrderDetailsView({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +20,27 @@ class OrderDetailsView extends StatelessWidget {
         if (order == null) {
           return Scaffold(
             appBar: AppBar(
-              title: Text('Order Details'),
-              backgroundColor: Color(0xFF6A994E),
+              title: const Text('Order Details'),
+              backgroundColor: const Color(0xFF6A994E),
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             body: Center(
               child: viewModel.isLoading
-                  ? CircularProgressIndicator()
-                  : Text('Order not found'),
+                  ? const CircularProgressIndicator()
+                  : const Text('Order not found'),
             ),
           );
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('Order Details'),
-            backgroundColor: Color(0xFF6A994E),
+            title: const Text('Order Details'),
+            backgroundColor: const Color(0xFF6A994E),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -63,7 +62,7 @@ class OrderDetailsView extends StatelessWidget {
                       children: [
                         Text(
                           'Order ID: ${order.orderId}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -81,7 +80,7 @@ class OrderDetailsView extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 const Text(
                   'Products',
                   style: TextStyle(
@@ -127,7 +126,7 @@ class OrderDetailsView extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.vertical(
+                                  borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(10)),
                                   child: Image.network(
                                     product.mainImageUrl,
@@ -146,7 +145,7 @@ class OrderDetailsView extends StatelessWidget {
                                       children: [
                                         Text(
                                           product.name,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.black87,
@@ -155,7 +154,7 @@ class OrderDetailsView extends StatelessWidget {
                                           textAlign: TextAlign
                                               .center, // Center the text
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 4),
                                         Text(
                                           '${order.items[index].quantity} ${order.products[index].quantifier}',
                                           style: TextStyle(
@@ -183,7 +182,7 @@ class OrderDetailsView extends StatelessWidget {
           bottomNavigationBar: Card(
             elevation: 8,
             margin: EdgeInsets.zero, // Make the card stick to the edges
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Padding(
@@ -192,8 +191,8 @@ class OrderDetailsView extends StatelessWidget {
                 mainAxisSize: MainAxisSize
                     .min, // Ensures the card takes up minimal height
                 children: [
-                  if (order.status == OrderStatus.pending)
-                    Container(
+                  if (order.status == 'Pending')
+                    SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
@@ -202,8 +201,8 @@ class OrderDetailsView extends StatelessWidget {
                             context: context,
                             builder: (BuildContext context) {
                               return AlertDialog(
-                                title: Text('Confirm Fulfillment'),
-                                content: Text(
+                                title: const Text('Confirm Fulfillment'),
+                                content: const Text(
                                     'Are you sure you want to fulfill this order?'),
                                 actions: <Widget>[
                                   TextButton(
@@ -211,16 +210,14 @@ class OrderDetailsView extends StatelessWidget {
                                       Navigator.of(context)
                                           .pop(); // Close the dialog
                                     },
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      viewModel
-                                          .fulfillOrder(); // Fulfill the order
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
+                                      viewModel.fulfillOrder();
+                                      Navigator.of(context).pop();
                                     },
-                                    child: Text('Fulfill'),
+                                    child: const Text('Fulfill'),
                                   ),
                                 ],
                               );
@@ -228,22 +225,22 @@ class OrderDetailsView extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFA7C957),
+                          backgroundColor: const Color(0xFFA7C957),
                           foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text('Fulfill Order'),
+                        child: const Text('Fulfill Order'),
                       ),
                     )
-                  else if (order.status == OrderStatus.ready)
+                  else if (order.status == 'Ready')
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Ready for Pickup',
                           style: TextStyle(
                             fontSize: 18,
@@ -251,7 +248,7 @@ class OrderDetailsView extends StatelessWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           'Pickup Code: ${order.pickUpCode}',
                           style: TextStyle(
@@ -259,12 +256,24 @@ class OrderDetailsView extends StatelessWidget {
                             color: Colors.grey[600],
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        // Check if the order has been paid
+                        if (!order
+                            .isPaid) // Assuming there's an `isPaid` flag in your order model
+                          Text(
+                            'Amount to be paid at pickup: ₱ ${order.totalPrice.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                       ],
                     )
-                  else if (order.status == OrderStatus.completed)
+                  else if (order.status == 'Completed')
                     Text(
                       'Completed on: ${DateFormat('yyyy-MM-dd').format(order.completionDate!.toDate())}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,

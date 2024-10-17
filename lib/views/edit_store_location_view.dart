@@ -5,13 +5,6 @@ import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
-import 'package:unshelf_seller/models/store_model.dart';
-
 class EditStoreLocationView extends StatefulWidget {
   final StoreModel storeDetails;
 
@@ -55,15 +48,15 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Choose a Location'),
+        title: const Text('Choose a Location'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: () async {
               try {
                 await viewModel.saveLocation();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Location saved successfully!')),
+                  const SnackBar(content: Text('Location saved successfully!')),
                 );
                 Navigator.pop(context, true);
               } catch (e) {
@@ -83,7 +76,7 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
                   storeDetails.storeLatitude!,
                   storeDetails.storeLongitude!,
                 )
-              : LatLng(1.3521, 103.8198),
+              : const LatLng(1.3521, 103.8198),
           zoom: 15,
         ),
         onMapCreated: viewModel.setMapController,
@@ -92,7 +85,7 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
         },
         markers: {
           Marker(
-            markerId: MarkerId('chosen_location'),
+            markerId: const MarkerId('chosen_location'),
             position: LatLng(
               storeDetails.storeLatitude ?? 1.3521,
               storeDetails.storeLongitude ?? 103.8198,

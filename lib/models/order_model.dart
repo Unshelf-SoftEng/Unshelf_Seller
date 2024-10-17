@@ -1,28 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 
-enum OrderStatus { all, pending, ready, completed }
-
-OrderStatus orderStatusFromString(String status) {
-  switch (status) {
-    case 'Pending':
-      return OrderStatus.pending;
-    case 'Completed':
-      return OrderStatus.completed;
-    case 'Ready':
-      return OrderStatus.ready;
-    default:
-      throw Exception('Unknown order status: $status');
-  }
-}
-
 class OrderModel {
   final String id;
   final String orderId;
   final String buyerId;
   final List<OrderItem> items;
-  OrderStatus status;
+  String status;
   final Timestamp createdAt;
+  final bool isPaid;
   List<ProductModel> products = [];
   double totalPrice;
   String buyerName;
@@ -36,6 +22,7 @@ class OrderModel {
     required this.items,
     required this.status,
     required this.createdAt,
+    required this.isPaid,
     this.totalPrice = 0,
     this.products = const [],
     this.buyerName = '',
@@ -49,7 +36,7 @@ class OrderModel {
     return OrderModel(
       id: doc.id,
       orderId: data['order_id'],
-      status: orderStatusFromString(data['status'] as String),
+      status: data['status'],
       createdAt: data['created_at'] as Timestamp,
       completionDate: data['completion_date'] as Timestamp?,
       pickUpCode: data['pick_up_code'] as String?,
@@ -57,6 +44,8 @@ class OrderModel {
       items: List<OrderItem>.from(
         data['order_items'].map((item) => OrderItem.fromMap(item)),
       ),
+      totalPrice: data['totalPrice'],
+      isPaid: data['isPaid'],
       products: [],
     );
   }
@@ -67,7 +56,7 @@ class OrderModel {
     final orderModel = OrderModel(
       id: doc.id,
       orderId: data['orderId'],
-      status: orderStatusFromString(data['status'] as String),
+      status: data['status'],
       createdAt: data['createdAt'] as Timestamp,
       buyerId: data['buyerId'],
       items: List<OrderItem>.from(
@@ -76,6 +65,8 @@ class OrderModel {
       products: [],
       completionDate: data['completedAt'] as Timestamp?,
       pickUpCode: data['pickupCode'] as String?,
+      totalPrice: data['totalPrice'],
+      isPaid: data['isPaid'],
     );
 
     List<String> productIds =
@@ -118,6 +109,7 @@ class OrderModel {
       buyerName: orderModel.buyerName,
       completionDate: orderModel.completionDate,
       pickUpCode: orderModel.pickUpCode,
+      isPaid: orderModel.isPaid,
     );
   }
 }

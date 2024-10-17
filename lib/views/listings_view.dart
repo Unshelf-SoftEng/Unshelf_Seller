@@ -40,7 +40,7 @@ class _ListingsViewState extends State<ListingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Consumer<ListingViewModel>(
           builder: (context, viewModel, child) {
             return AppBar(
@@ -48,7 +48,7 @@ class _ListingsViewState extends State<ListingsView> {
                   ? TextField(
                       controller: _searchController,
                       autofocus: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Search...',
                         border: InputBorder.none,
                       ),
@@ -105,7 +105,7 @@ class _ListingsViewState extends State<ListingsView> {
 
           if (viewModel.items.isEmpty) {
             if (viewModel.showingProducts) {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -117,7 +117,7 @@ class _ListingsViewState extends State<ListingsView> {
                 ),
               );
             } else {
-              return Center(
+              return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -177,16 +177,30 @@ class _ListingsViewState extends State<ListingsView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      AddProductView(productId: itemId),
+                                  builder: (context) => AddProductView(
+                                    productId: itemId,
+                                    onProductAdded: () {
+                                      // Refresh the product listings
+                                      Provider.of<ListingViewModel>(context,
+                                              listen: false)
+                                          .refreshItems();
+                                    },
+                                  ),
                                 ),
                               );
                             } else if (item is BundleModel) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      AddBundleView(bundleId: itemId),
+                                  builder: (context) => AddBundleView(
+                                    bundleId: itemId,
+                                    onBundleAdded: () {
+                                      // Refresh the bundle listings
+                                      Provider.of<ListingViewModel>(context,
+                                              listen: false)
+                                          .refreshItems();
+                                    },
+                                  ),
                                 ),
                               );
                             }
@@ -213,29 +227,29 @@ class _ListingsViewState extends State<ListingsView> {
           return FloatingActionButton(
             onPressed: () async {
               if (viewModel.showingProducts) {
-                final result = await Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddProductView(),
-                  ),
-                );
-                if (result == true) {
-                  Provider.of<ListingViewModel>(context, listen: false)
-                      .refreshItems();
-                }
-              } else {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddBundleView(
-                      fromSuggestions: true,
+                    builder: (context) => AddProductView(
+                      onProductAdded: () {
+                        Provider.of<ListingViewModel>(context, listen: false)
+                            .fetchItems();
+                      },
                     ),
                   ),
                 );
-                if (result == true) {
-                  Provider.of<ListingViewModel>(context, listen: false)
-                      .refreshItems();
-                }
+              } else {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddBundleView(
+                      onBundleAdded: () {
+                        Provider.of<ListingViewModel>(context, listen: false)
+                            .fetchItems();
+                      },
+                    ),
+                  ),
+                );
               }
             },
             child: Icon(Icons.add),

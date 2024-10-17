@@ -59,7 +59,7 @@ class BundleModel implements ItemModel {
 
     return BundleModel(
       bundleId: '',
-      name: json['bundle_name'] ?? '',
+      name: json['bundleName'] ?? '',
       products: productList,
       productIds: productIdList,
       price: 0.0,

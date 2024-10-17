@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
-import 'package:unshelf_seller/models/order_model.dart';
 import 'package:unshelf_seller/views/order_details_view.dart';
 
 class OrdersView extends StatefulWidget {
@@ -32,7 +31,7 @@ class _OrdersViewState extends State<OrdersView> {
         actions: [
           DropdownButton<String>(
             value: _selectedStatus,
-            hint: Text('Filter by Status'),
+            hint: const Text('Filter by Status'),
             items: <String>['All', 'Pending', 'Completed', 'Ready']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -53,26 +52,25 @@ class _OrdersViewState extends State<OrdersView> {
         future: ordersViewModel.fetchOrdersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             return Consumer<OrderViewModel>(
               builder: (context, ordersViewModel, child) {
-                // Apply filter if needed
                 final filteredOrders = ordersViewModel.filteredOrders;
 
                 if (filteredOrders.isEmpty) {
-                  if (ordersViewModel.currentStatus == OrderStatus.pending) {
-                    return Center(child: Text('No pending orders found.'));
-                  } else if (ordersViewModel.currentStatus ==
-                      OrderStatus.completed) {
-                    return Center(child: Text('No completed orders found.'));
-                  } else if (ordersViewModel.currentStatus ==
-                      OrderStatus.ready) {
-                    return Center(child: Text('No ready orders found.'));
+                  if (ordersViewModel.currentStatus == 'Pending') {
+                    return const Center(
+                        child: Text('No pending orders found.'));
+                  } else if (ordersViewModel.currentStatus == 'Completed') {
+                    return const Center(
+                        child: Text('No completed orders found.'));
+                  } else if (ordersViewModel.currentStatus == 'Ready') {
+                    return const Center(child: Text('No ready orders found.'));
                   } else {
-                    return Center(child: Text('No orders found.'));
+                    return const Center(child: Text('No orders found.'));
                   }
                 }
 
@@ -131,19 +129,19 @@ class _OrdersViewState extends State<OrdersView> {
                                               ? order.products[0]
                                                   .name // Assuming the product has a name field
                                               : 'No Product Name',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        SizedBox(height: 4.0),
+                                        const SizedBox(height: 4.0),
                                         Text(
                                           'Order ID: ${order.orderId}',
                                           style: TextStyle(
                                               fontSize: 12.0,
                                               color: Colors.grey[600]),
                                         ),
-                                        SizedBox(height: 4.0),
+                                        const SizedBox(height: 4.0),
                                         Text(
                                           'Created At: ${order.createdAt.toDate().toLocal().toString().split(' ')[0]}', // Format the date as needed
                                           style: TextStyle(
@@ -161,47 +159,108 @@ class _OrdersViewState extends State<OrdersView> {
                           Expanded(
                             flex: 1,
                             child: Container(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   // Price
                                   Container(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 8.0,
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.05,
+                                    ),
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                            color: Colors.grey[300]!,
-                                            width:
-                                                1.0), // Border to separate from status
+                                          color: Colors.grey[300]!,
+                                          width: 1.0,
+                                        ),
                                       ),
                                     ),
                                     child: Text(
-                                      '₱ ${order.totalPrice.toStringAsFixed(2)}', // Assuming the order has a totalPrice field
+                                      '₱ ${order.totalPrice.toStringAsFixed(2)}',
                                       style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
                                     ),
                                   ),
-                                  SizedBox(height: 8.0),
-                                  // Status
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 12.0, vertical: 6.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      border: Border.all(
-                                          color: Colors.grey,
-                                          width: 1), // Border for status
-                                    ),
-                                    child: Text(
-                                      order.status.toString().split('.').last,
-                                      style: TextStyle(
-                                          fontSize: 14.0,
-                                          color: Colors.black87),
-                                    ),
+                                  const SizedBox(height: 8.0),
+                                  Row(
+                                    children: [
+                                      // Status
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03, // Responsive horizontal padding
+                                            vertical: 6.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            order.status,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.015,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      // Payment Status (Paid/Not Paid)
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                            vertical: 6.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: order.isPaid
+                                                ? Colors.green[300]
+                                                : Colors.red[300],
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            order.isPaid ? 'Paid' : 'Not Paid',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: (MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.015),
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

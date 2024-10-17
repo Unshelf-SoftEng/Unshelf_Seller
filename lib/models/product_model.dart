@@ -23,10 +23,10 @@ class ProductModel implements ItemModel {
     required this.category,
     required this.price,
     required this.quantifier,
-    required this.stock,
-    required this.expiryDate,
     required this.discount,
     required this.mainImageUrl,
+    this.stock,
+    this.expiryDate,
     this.additionalImageUrls,
   });
 
@@ -41,7 +41,9 @@ class ProductModel implements ItemModel {
       price: (data['price'] ?? 0.0).toDouble(),
       quantifier: data['quantifier'] ?? '',
       stock: data['stock'] ?? 0,
-      expiryDate: (data['expiryDate'] as Timestamp).toDate(),
+      expiryDate: data['expiryDate'] != null
+          ? (data['expiryDate'] as Timestamp).toDate()
+          : null,
       discount: data['discount'] ?? 0,
       mainImageUrl: data['mainImageUrl'] ?? '',
       additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)

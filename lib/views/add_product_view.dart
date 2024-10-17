@@ -5,9 +5,11 @@ import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 
 class AddProductView extends StatelessWidget {
+  final VoidCallback onProductAdded;
   final String? productId;
 
-  AddProductView({this.productId});
+  const AddProductView({Key? key, required this.onProductAdded, this.productId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -158,12 +160,12 @@ class AddProductView extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                SizedBox(height: 10.0),
+                                const SizedBox(height: 10.0),
                                 if (imageList.length >= 4)
                                   Center(
                                     child: Container(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10.0),
                                       child: Text(
                                         'Max images have been added',
                                         style: TextStyle(
@@ -389,13 +391,9 @@ class AddProductView extends StatelessWidget {
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
                                         vertical: 12.0, horizontal: 12.0),
-                                    labelText: 'Enter Quantifier',
                                     labelStyle:
                                         const TextStyle(color: Colors.black),
                                   ),
-                                  onChanged: (value) {
-                                    viewModel.quantifierController.text = value;
-                                  },
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter a quantifier';
@@ -404,7 +402,7 @@ class AddProductView extends StatelessWidget {
                                   },
                                   style: const TextStyle(
                                       fontSize: 12, color: Colors.black),
-                                ),
+                                )
                               ],
                             ),
                           ),
@@ -457,20 +455,28 @@ class AddProductView extends StatelessWidget {
                                 height: 30,
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    await viewModel.addOrUpdateProduct(context);
+                                    if (productId == null) {
+                                      await viewModel.addProduct(context);
+                                    } else {
+                                      await viewModel.updateProduct(
+                                          context, productId!);
+                                    }
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content:
                                             Text('Product added successfully!'),
                                       ),
                                     );
+                                    onProductAdded();
                                     Navigator.pop(context, true);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF6A994E),
                                     foregroundColor: Colors.white,
                                   ),
-                                  child: const Text('Add Product'),
+                                  child: Text(productId != null
+                                      ? 'Update Product'
+                                      : 'Add Product'),
                                 ),
                               ),
                       ),

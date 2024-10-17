@@ -6,11 +6,11 @@ import 'package:nanoid/nanoid.dart';
 
 class OrderViewModel extends ChangeNotifier {
   List<OrderModel> _orders = [];
-  OrderStatus _currentStatus = OrderStatus.all;
+  String _currentStatus = 'All';
   OrderModel? _selectedOrder;
   OrderModel? get selectedOrder => _selectedOrder;
   List<OrderModel> get orders => _orders;
-  OrderStatus get currentStatus => _currentStatus;
+  String get currentStatus => _currentStatus;
 
   bool get isLoading => _isLoading;
   bool _isLoading = false;
@@ -22,7 +22,7 @@ class OrderViewModel extends ChangeNotifier {
   }
 
   List<OrderModel> get filteredOrders {
-    if (_currentStatus == OrderStatus.all) {
+    if (_currentStatus == 'All') {
       return _orders;
     }
     return _orders.where((order) => order.status == _currentStatus).toList();
@@ -65,21 +65,12 @@ class OrderViewModel extends ChangeNotifier {
   }
 
   void filterOrdersByStatus(String? status) {
-    if (status == null || status == 'All') {
-      _currentStatus = OrderStatus.all;
-    } else if (status == 'Pending') {
-      // Filter orders based on status
-      _currentStatus = OrderStatus.pending;
-    } else if (status == 'Completed') {
-      _currentStatus = OrderStatus.completed;
-    } else if (status == 'Ready') {
-      _currentStatus = OrderStatus.ready;
-    }
+    _currentStatus = status!;
     notifyListeners();
   }
 
   Future<void> fulfillOrder() async {
-    _selectedOrder?.status = OrderStatus.ready;
+    _selectedOrder?.status = 'Ready';
 
     // Update the order status in Firestore
     FirebaseFirestore.instance
@@ -136,7 +127,7 @@ class OrderViewModel extends ChangeNotifier {
   void clear() {
     _orders = [];
     _selectedOrder = null;
-    _currentStatus = OrderStatus.all;
+    _currentStatus = 'All';
     notifyListeners();
   }
 }

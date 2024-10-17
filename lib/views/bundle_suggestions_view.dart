@@ -81,6 +81,7 @@ class BundleSuggestionsView extends StatelessWidget {
                               builder: (context) => AddBundleView(
                                 bundle: suggestion,
                                 fromSuggestions: true,
+                                onBundleAdded: () {},
                               ),
                             ),
                           );

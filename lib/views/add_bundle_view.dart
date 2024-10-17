@@ -11,8 +11,13 @@ class AddBundleView extends StatefulWidget {
   final String? bundleId;
   final BundleModel? bundle;
   final bool fromSuggestions;
+  final VoidCallback onBundleAdded;
 
-  AddBundleView({this.bundleId, this.bundle, this.fromSuggestions = false});
+  AddBundleView(
+      {this.bundleId,
+      this.bundle,
+      this.fromSuggestions = false,
+      required this.onBundleAdded});
 
   @override
   _AddBundleViewState createState() => _AddBundleViewState();
@@ -123,7 +128,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               mainImageUrl: product.mainImageUrl,
                               productId: product.id,
                               name: product.name,
-                              stock: product.stock!,
+                              price: product.price!,
                               isSelected: viewModel.selectedProductIds
                                   .contains(product.id),
                               onTap: () =>
@@ -301,16 +306,17 @@ class _AddBundleViewState extends State<AddBundleView> {
                     ),
                     const SizedBox(height: 40.0),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         final form = viewModel.formKey.currentState;
 
                         if (form != null && form.validate()) {
-                          viewModel.createBundle();
+                          await viewModel.createBundle();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Bundle created successfully'),
                             ),
                           );
+                          widget.onBundleAdded();
                           Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -321,7 +327,9 @@ class _AddBundleViewState extends State<AddBundleView> {
                           );
                         }
                       },
-                      child: Text('Create Bundle'),
+                      child: Text(widget.bundleId != null
+                          ? 'Update Bundle'
+                          : 'Create Bundle'),
                     ),
                   ],
                 ),
@@ -338,7 +346,7 @@ class _ProductListTile extends StatelessWidget {
   final String mainImageUrl;
   final String productId;
   final String name;
-  final int stock;
+  final double price;
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
@@ -347,7 +355,7 @@ class _ProductListTile extends StatelessWidget {
     required this.mainImageUrl,
     required this.productId,
     required this.name,
-    required this.stock,
+    required this.price,
     required this.isSelected,
     required this.onTap,
     required this.onLongPress,
@@ -374,7 +382,7 @@ class _ProductListTile extends StatelessWidget {
             color: isSelected ? Colors.green : Colors.black,
           ),
         ),
-        subtitle: Text('Stock: $stock'),
+        subtitle: Text('Price: $price'),
         tileColor:
             isSelected ? Colors.green.withOpacity(0.1) : Colors.transparent,
         onTap: onTap,
