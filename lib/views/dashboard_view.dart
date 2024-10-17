@@ -12,7 +12,6 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   void initState() {
     super.initState();
-    // Fetch dashboard data when the view is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<DashboardViewModel>(context, listen: false)
           .fetchDashboardData();
@@ -35,9 +34,9 @@ class _DashboardViewState extends State<DashboardView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildDailyAnalyticsCard(viewModel),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 24.0), // Increased spacing
                 _buildStoreInsightsCard(viewModel),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 24.0), // Increased spacing
                 _buildAnalyticsButton(),
               ],
             ),
@@ -50,7 +49,7 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
       color: const Color(0xFF6A994E),
-      elevation: 6.0,
+      elevation: 8.0, // Increased elevation
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -71,16 +70,16 @@ class _DashboardViewState extends State<DashboardView> {
             Center(
               child: Text(
                 'Date: ${viewModel.today.toLocal().toString().split(' ')[0]}',
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
             const SizedBox(height: 16.0),
             _buildAnalyticsRow(
                 'Pending', viewModel.pendingOrders, Icons.hourglass_empty),
+            const SizedBox(height: 12.0), // More space between rows
             _buildAnalyticsRow(
                 'Processed', viewModel.processedOrders, Icons.cached),
+            const SizedBox(height: 12.0), // More space between rows
             _buildAnalyticsRow(
                 'Completed', viewModel.completedOrders, Icons.check_circle),
           ],
@@ -92,7 +91,7 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildStoreInsightsCard(DashboardViewModel viewModel) {
     return Card(
       color: const Color(0xFF6A994E),
-      elevation: 6.0,
+      elevation: 8.0, // Increased elevation
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -100,19 +99,19 @@ class _DashboardViewState extends State<DashboardView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Center(
-                child: Text('Store Insights',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 30.0))),
-            const SizedBox(height: 5.0),
-            Center(
-                child: Text(
-                    'An overview of the shop data for ${viewModel.monthYear}',
-                    style: const TextStyle(
+              child: Text('Store Insights',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontSize: 12.0,
-                    ))),
+                      fontSize: 30.0)),
+            ),
+            const SizedBox(height: 8.0), // Increased space
+            Center(
+              child: Text(
+                'An overview of the shop data for ${viewModel.monthYear}',
+                style: const TextStyle(color: Colors.white, fontSize: 12.0),
+              ),
+            ),
             const SizedBox(height: 16.0),
             _buildInsightsRow('Total Orders', '${viewModel.totalOrders}',
                 Icons.shopping_cart),
@@ -171,87 +170,57 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildInsightsRow(String title, String value, IconData icon) {
     return Center(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const textStyleValue = TextStyle(
-            fontSize: 14.0,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFFFDC5F),
-          );
-
-          const textStyleTitle = TextStyle(
-            fontSize: 14.0,
-            color: Colors.white,
-          );
-
-          // Measure the width of the longest text
-          final valueText = Text(
-                value,
-                style: textStyleValue,
-              ).data?.length ??
-              0;
-
-          final titleText = Text(
-                title,
-                style: textStyleTitle,
-              ).data?.length ??
-              0;
-
-          final maxTextWidth = valueText > titleText ? valueText : titleText;
-
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon Column
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, color: Colors.white, size: 32.0),
-                ],
-              ),
-              const SizedBox(width: 16.0),
-              // Text Column with fixed width
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth:
-                      maxTextWidth * 8.0, // Estimate width based on text length
+              Icon(icon, color: Colors.white, size: 32.0),
+            ],
+          ),
+          const SizedBox(width: 16.0),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFFFDC5F),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      value,
-                      style: textStyleValue,
-                    ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      title,
-                      style: textStyleTitle,
-                    ),
-                  ],
+              ),
+              const SizedBox(height: 4.0),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.white,
                 ),
               ),
             ],
-          );
-        },
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildAnalyticsButton() {
     return Center(
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
+        // Added icon to button
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => AnalyticsView()),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              const Color(0xFF6A994E), // Use the same color as the cards
+          backgroundColor: const Color(0xFF6A994E), // Same color as the cards
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
         ),
-        child: const Text('View Analytics'),
+        icon: const Icon(Icons.bar_chart), // Added an icon
+        label: const Text('View Analytics'),
       ),
     );
   }

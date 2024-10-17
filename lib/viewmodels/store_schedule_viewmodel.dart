@@ -34,7 +34,7 @@ class StoreScheduleViewModel extends ChangeNotifier {
   Future<void> saveProfile(BuildContext context, String userId) async {
     try {
       await _firestore.collection('stores').doc(userId).update({
-        'store_schedule': _storeSchedule,
+        'storeSchedule': _storeSchedule,
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile saved successfully')),

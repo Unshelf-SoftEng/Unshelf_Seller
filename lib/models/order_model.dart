@@ -66,16 +66,16 @@ class OrderModel {
 
     final orderModel = OrderModel(
       id: doc.id,
-      orderId: data['order_id'],
+      orderId: data['orderId'],
       status: orderStatusFromString(data['status'] as String),
-      createdAt: data['created_at'] as Timestamp,
-      buyerId: data['buyer_id'],
+      createdAt: data['createdAt'] as Timestamp,
+      buyerId: data['buyerId'],
       items: List<OrderItem>.from(
-        data['order_items'].map((item) => OrderItem.fromMap(item)),
+        data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
       products: [],
-      completionDate: data['completion_date'] as Timestamp?,
-      pickUpCode: data['pick_up_code'] as String?,
+      completionDate: data['completedAt'] as Timestamp?,
+      pickUpCode: data['pickupCode'] as String?,
     );
 
     List<String> productIds =
@@ -134,7 +134,7 @@ class OrderItem {
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
       quantity: map['quantity'] as int,
-      productId: map['product_id'],
+      productId: map['productId'],
     );
   }
 }

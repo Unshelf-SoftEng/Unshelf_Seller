@@ -10,7 +10,6 @@ class AnalyticsViewModel extends ChangeNotifier {
   int totalPendingOrders = 0;
 
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
 
   Map<DateTime, int> _ordersMap = {};
@@ -34,6 +33,8 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   List<Map<String, dynamic>> topProducts = [];
 
+  User? user = FirebaseAuth.instance.currentUser;
+
   Future<void> fetchAnalyticsData() async {
     _isLoading = true;
     notifyListeners();
@@ -50,19 +51,13 @@ class AnalyticsViewModel extends ChangeNotifier {
   Future<void> getTopProducts() async {
     _isLoading = true;
     notifyListeners();
-
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      throw Exception('User not logged in');
-    }
     // Clear any existing data
     topProducts.clear();
 
     // Fetch all orders
     final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
         .collection('orders')
-        .where('sellerId', isEqualTo: user.uid)
+        .where('sellerId', isEqualTo: user!.uid)
         .where('status', isEqualTo: 'Completed')
         .get();
     // Map to hold product quantities
@@ -120,12 +115,6 @@ class AnalyticsViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
-
       // Reset totals before fetching
       totalOrders = 0;
       totalSales = 0.0;
@@ -136,7 +125,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       // Fetch orders
       final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
           .collection('orders')
-          .where('sellerId', isEqualTo: user.uid) // Filter by seller
+          .where('sellerId', isEqualTo: user!.uid) // Filter by seller
           .get();
 
       // Loop through all orders
@@ -156,7 +145,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       // Fetch transactions
       QuerySnapshot transactionSnapshot = await FirebaseFirestore.instance
           .collection('transactions')
-          .where('sellerId', isEqualTo: user.uid)
+          .where('sellerId', isEqualTo: user!.uid)
           .get();
 
       // Loop through transactions to calculate total sales
@@ -191,15 +180,10 @@ class AnalyticsViewModel extends ChangeNotifier {
 
     try {
       final db = FirebaseFirestore.instance;
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
 
       QuerySnapshot orderSnapshot = await db
           .collection('orders')
-          .where('sellerId', isEqualTo: user.uid)
+          .where('sellerId', isEqualTo: user!.uid)
           .where('createdAt',
               isGreaterThanOrEqualTo: _getStartDate(period, today))
           .get();
@@ -229,15 +213,10 @@ class AnalyticsViewModel extends ChangeNotifier {
 
     try {
       final db = FirebaseFirestore.instance;
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
 
       QuerySnapshot transactionSnapshot = await db
           .collection('transactions')
-          .where('sellerId', isEqualTo: user.uid)
+          .where('sellerId', isEqualTo: user!.uid)
           .where('date', isGreaterThanOrEqualTo: _getStartDate(period, today))
           .get();
 

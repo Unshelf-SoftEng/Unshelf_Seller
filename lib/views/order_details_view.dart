@@ -69,7 +69,7 @@ class OrderDetailsView extends StatelessWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           'Buyer: ${order.buyerName}',
                           style: TextStyle(
@@ -82,7 +82,7 @@ class OrderDetailsView extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text(
+                const Text(
                   'Products',
                   style: TextStyle(
                     fontSize: 18,
@@ -90,64 +90,89 @@ class OrderDetailsView extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Number of columns
-                      crossAxisSpacing: 12.0, // Horizontal space between items
-                      mainAxisSpacing: 12.0, // Vertical space between items
-                      childAspectRatio:
-                          3 / 4, // Aspect ratio of each item (width / height)
-                    ),
-                    itemCount: order.products.length,
-                    itemBuilder: (context, index) {
-                      final product = order.products[index];
-                      return Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      // Set the max width for each product card (e.g., 200.0).
+                      double maxItemWidth = 200.0;
+
+                      // Calculate the number of columns based on the available width and max item width.
+                      int crossAxisCount =
+                          (constraints.maxWidth / maxItemWidth).floor();
+
+                      // Ensure at least 2 items per row if the space is small.
+                      if (crossAxisCount < 2) {
+                        crossAxisCount = 2;
+                      }
+
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:
+                              crossAxisCount, // Dynamically calculated
+                          crossAxisSpacing: 12.0, // Space between columns
+                          mainAxisSpacing: 12.0, // Space between rows
+                          childAspectRatio: 3 /
+                              4, // Aspect ratio of each item (width / height)
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(10)),
-                              child: Image.network(
-                                product.mainImageUrl,
-                                width: double.infinity,
-                                height: 120,
-                                fit: BoxFit.cover,
-                              ),
+                        itemCount: order.products.length,
+                        itemBuilder: (context, index) {
+                          final product = order.products[index];
+                          return Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    product.name,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(10)),
+                                  child: Image.network(
+                                    product.mainImageUrl,
+                                    width: double.infinity,
+                                    height: 120, // Fixed height for images
+                                    fit: BoxFit.cover,
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    '${order.items[index].quantity} ${order.products[index].quantifier}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[600],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    // Center widget added here
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Use minimum space required
+                                      children: [
+                                        Text(
+                                          product.name,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign
+                                              .center, // Center the text
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          '${order.items[index].quantity} ${order.products[index].quantifier}',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                          textAlign: TextAlign
+                                              .center, // Center the text
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     },
                   ),

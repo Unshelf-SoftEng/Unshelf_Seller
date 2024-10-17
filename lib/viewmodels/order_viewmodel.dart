@@ -39,8 +39,8 @@ class OrderViewModel extends ChangeNotifier {
 
       final querySnapshot = await FirebaseFirestore.instance
           .collection('orders')
-          .where('seller_id', isEqualTo: user.uid)
-          .orderBy('created_at', descending: true)
+          .where('sellerId', isEqualTo: user.uid)
+          .orderBy('createdAt', descending: true)
           .get();
 
       _orders = await Future.wait<OrderModel>(querySnapshot.docs
@@ -130,9 +130,7 @@ class OrderViewModel extends ChangeNotifier {
     FirebaseFirestore.instance
         .collection('orders')
         .doc(_selectedOrder?.id)
-        .update({'pick_up_code': code});
-
-    print('Pick up code: $code');
+        .update({'pickupCode': code});
   }
 
   void clear() {

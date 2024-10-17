@@ -74,8 +74,10 @@ class DashboardViewModel extends ChangeNotifier {
       double totalEarnings = 0.0;
 
       for (var trans in transactionMonthly.docs) {
-        double amount = trans['sellerEarnings']?.toDouble() ?? 0.0;
-        totalEarnings += amount;
+        if (trans['type'] == 'Sale') {
+          double amount = trans['sellerEarnings'];
+          totalEarnings += amount;
+        }
       }
 
       totalSales = totalEarnings;

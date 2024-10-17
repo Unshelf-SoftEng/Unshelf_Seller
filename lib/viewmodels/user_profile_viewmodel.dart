@@ -67,7 +67,7 @@ class UserProfileViewModel extends ChangeNotifier {
           .update({
         'name': nameController.text,
         'email': emailController.text,
-        'phone_number': phoneController.text,
+        'phoneNumber': phoneController.text,
       });
 
       _isLoading = false;

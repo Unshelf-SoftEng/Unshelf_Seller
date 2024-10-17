@@ -28,32 +28,8 @@ class WalletViewModel extends ChangeNotifier {
     updateTransactions();
   }
 
-  Future<void> withdrawFunds(double amount) async {
-    if (amount <= 0) {
-      _error = 'Amount must be greater than zero';
-      notifyListeners();
-      return;
-    }
-
-    if (amount > _balance) {
-      _error = 'Insufficient funds';
-      notifyListeners();
-      return;
-    }
-
-    // Deduct the amount from the balance
-    _balance -= amount;
-
-    // Add the withdrawal transaction to the local list
-    _transactions.add(Transaction(
-      type: 'withdraw',
-      amount: amount,
-      date: DateTime.now(),
-    ));
-
-    _error = '';
-    notifyListeners();
-
+  Future<void> withdrawRequest(double amount, String accountName,
+      String bankName, String bankAccount) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -63,19 +39,28 @@ class WalletViewModel extends ChangeNotifier {
     }
 
     try {
-      // Save the withdrawal transaction to Firestore
+      await FirebaseFirestore.instance.collection('withdrawal_requests').add({
+        'sellerId': user.uid,
+        'amount': amount,
+        'date': FieldValue.serverTimestamp(),
+        'bankName'
+            'accountName': accountName,
+        'bankAccount': bankAccount,
+        'isApproved': false,
+      });
+
       await FirebaseFirestore.instance.collection('transactions').add({
         'sellerId': user.uid,
         'amount': amount,
-        'type': 'withdraw', // Ensure the type is 'withdraw'
-        'date': FieldValue
-            .serverTimestamp(), // Use server timestamp for consistency
+        'type': 'Withdraw',
+        'date': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      // Handle Firestore errors here
       _error = 'Error saving transaction: $e';
       notifyListeners();
     }
+
+    _balance -= amount;
   }
 
   // Method to update balance based on the transactions
@@ -89,7 +74,7 @@ class WalletViewModel extends ChangeNotifier {
     // Fetch transactions for the current seller
     final querySnapshot = await FirebaseFirestore.instance
         .collection('transactions') // Your transactions collection
-        .where('sellerId', isEqualTo: user.uid) // Use the actual field name
+        .where('sellerId', isEqualTo: user.uid)
         .orderBy('date', descending: true)
         .get();
 
@@ -99,23 +84,43 @@ class WalletViewModel extends ChangeNotifier {
     double newBalance = 0.0;
 
     for (var doc in querySnapshot.docs) {
-      // Get the required fields from Firestore
-      String orderId = doc['orderId']; // Assuming you'll use this in your app
-      double sellerEarnings =
-          doc['sellerEarnings'].toDouble(); // Ensure it is a double
-      DateTime date =
-          (doc['date'] as Timestamp).toDate(); // Convert Timestamp to DateTime
+      DateTime date = (doc['date'] as Timestamp).toDate();
 
-      print('Order Id' + orderId);
+      if (doc['type'] == 'Withdraw') {
+        double amount = doc['amount'].toDouble();
 
-      print('Seller Earnings' + sellerEarnings.toString());
+        _transactions.add(Transaction(
+            type: 'Withdraw',
+            amount: amount,
+            date: date,
+            orderId: 'XXXXXX-XXX'));
+        newBalance -= amount;
+      } else {
+        String orderId = doc['orderId'];
 
-      // Add the sale transaction to the list
-      _transactions.add(Transaction(
-          type: 'sale', amount: sellerEarnings, date: date, orderId: orderId));
+        if (doc['isPaid']) {
+          double sellerEarnings = doc['sellerEarnings'].toDouble();
 
-      // Update the balance
-      newBalance += sellerEarnings; // Increase balance with seller earnings
+          _transactions.add(Transaction(
+              type: 'Sale',
+              amount: sellerEarnings,
+              date: date,
+              orderId: orderId));
+
+          // Update the balance
+          newBalance += sellerEarnings;
+        } else {
+          double transactionFee = doc['transactionFee'].toDouble();
+          _transactions.add(Transaction(
+              type: 'Commission Fee',
+              amount: transactionFee,
+              date: date,
+              orderId: orderId));
+
+          // Update the balance
+          newBalance -= transactionFee;
+        }
+      }
     }
 
     // Fetch withdrawal transactions and update balance
@@ -140,9 +145,7 @@ class WalletViewModel extends ChangeNotifier {
       ));
     }
 
-    // Update the balance after fetching transactions
-    _balance =
-        newBalance; // Final balance after considering both earnings and withdrawals
+    _balance = newBalance;
     notifyListeners();
   }
 }
