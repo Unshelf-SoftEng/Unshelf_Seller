@@ -25,6 +25,7 @@ class _StoreViewState extends State<StoreView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = Provider.of<StoreViewModel>(context, listen: false);
       viewModel.fetchStoreDetails();
+      viewModel.fetchUserProfile();
     });
   }
 
@@ -42,7 +43,7 @@ class _StoreViewState extends State<StoreView> {
   }
 
   Widget _buildLoading() {
-    return Center(child: CircularProgressIndicator());
+    return const Center(child: CircularProgressIndicator());
   }
 
   Widget _buildError(StoreViewModel viewModel) {
@@ -66,6 +67,19 @@ class _StoreViewState extends State<StoreView> {
   }
 
   Widget _buildContent(BuildContext context, StoreViewModel viewModel) {
+    if (viewModel.isLoading) {
+      return _buildLoading();
+    }
+
+    if (viewModel.errorMessage != null) {
+      return _buildError(viewModel);
+    }
+
+    // Ensure storeDetails and userProfile are initialized properly
+    if (viewModel.storeDetails == null || viewModel.userProfile == null) {
+      return Center(child: Text('Loading data...')); // Loading state
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(16.0),
@@ -77,7 +91,7 @@ class _StoreViewState extends State<StoreView> {
             _buildSectionTitle('Store Information'),
             _buildDetailsAndActionsSection(context, viewModel),
             SizedBox(height: 20),
-            _buildSectionTitle('Management & Settings'),
+            _buildSectionTitle('General'),
             _buildGeneralActions(context),
           ],
         ),
@@ -112,10 +126,9 @@ class _StoreViewState extends State<StoreView> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Followers: ${viewModel.storeDetails?.storeFollowers ?? 0}'),
             Text(
-                'Followers: ${viewModel.storeDetails?.storeFollowers ?? 'N/A'}'),
-            Text(
-                'Rating: ${viewModel.storeDetails?.storeRating?.toString() ?? 'N/A'}'),
+                'Rating: ${viewModel.storeDetails?.storeRating?.toString() ?? 0.0}'),
           ],
         ),
         trailing: IconButton(
@@ -171,8 +184,8 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
-            title: Text('Store Inventory'),
-            subtitle: Text('View and edit your store inventory'),
+            title: const Text('Store Inventory'),
+            subtitle: const Text('View and edit your store inventory'),
             leading: Icon(Icons.inventory),
             onTap: () async {
               final result = await Navigator.push(
@@ -190,7 +203,7 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
-            title: Text('Store Hours'),
+            title: const Text('Store Hours'),
             subtitle: Text('View and edit your store hours'),
             leading: Icon(Icons.access_time),
             onTap: () {

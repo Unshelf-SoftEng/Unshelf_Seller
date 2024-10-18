@@ -60,6 +60,9 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
+                            color: isSelected
+                                ? Colors.green[50]
+                                : Colors.white, // Highlight selected
                             child: ListTile(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -93,13 +96,11 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 size: 30,
                               ),
                               onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    viewModel.removeSelectedProduct(product);
-                                  } else {
-                                    viewModel.addSelectedProduct(product);
-                                  }
-                                });
+                                // Prevent re-selection of already selected products
+                                if (!isSelected) {
+                                  viewModel.addSelectedProduct(product);
+                                  setState(() {});
+                                }
                               },
                             ),
                           );

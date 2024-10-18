@@ -11,12 +11,10 @@ class StoreViewModel extends ChangeNotifier {
   bool isLoading = true;
   String? errorMessage;
 
-  StoreViewModel() {
-    fetchStoreDetails();
-    fetchUserProfile();
-  }
-
   Future<void> fetchUserProfile() async {
+    isLoading = true;
+    notifyListeners();
+
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -26,8 +24,6 @@ class StoreViewModel extends ChangeNotifier {
       return;
     }
 
-    isLoading = true;
-    notifyListeners();
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
@@ -51,13 +47,10 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchStoreDetails() async {
-    // Check if the user is logged in
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       errorMessage = "User is not logged in";
-      isLoading = false;
-      notifyListeners();
       return;
     }
 
@@ -85,10 +78,10 @@ class StoreViewModel extends ChangeNotifier {
     } catch (e) {
       errorMessage = "Error fetching store details: ${e.toString()}";
       storeDetails = null;
-    } finally {
-      isLoading = false;
-      notifyListeners();
     }
+
+    isLoading = false;
+    notifyListeners();
   }
 
   Future<int> fetchStoreFollowers() async {

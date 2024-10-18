@@ -7,6 +7,7 @@ import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
 import 'package:unshelf_seller/views/wallet_view.dart';
+import 'package:unshelf_seller/views/notifications_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -110,8 +111,16 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-            PopupMenuButton<int>(
-              icon: Stack(
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationsView(),
+                  ),
+                );
+              },
+              child: Stack(
                 children: [
                   const Icon(Icons.notifications, size: 30),
                   if (_notifications.any((n) => !n['seen']))
@@ -141,86 +150,6 @@ class _HomeViewState extends State<HomeView> {
                     ),
                 ],
               ),
-              onSelected: (value) {
-                // Handle notification menu selection
-                // e.g., navigate to a notifications screen
-              },
-              itemBuilder: (BuildContext context) {
-                return _notifications.isNotEmpty
-                    ? _notifications
-                        .asMap()
-                        .map((index, notification) => MapEntry(
-                              index,
-                              PopupMenuItem<int>(
-                                value: index,
-                                child: InkWell(
-                                  onTap: () {
-                                    _markNotificationAsRead(index);
-                                    Navigator.pop(context);
-                                  },
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        notification['seen']
-                                            ? Icons.check_circle
-                                            : Icons.notifications,
-                                        color: notification['seen']
-                                            ? Colors.green
-                                            : Colors.blue,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              notification['title'],
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: notification['seen']
-                                                    ? Colors.grey
-                                                    : Colors.black87,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              notification['text'],
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: notification['seen']
-                                                    ? Colors.grey
-                                                    : Colors.black54,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ))
-                        .values
-                        .toList()
-                    : [
-                        const PopupMenuItem<int>(
-                          value: 0,
-                          child: ListTile(
-                            leading: Icon(Icons.notifications_off,
-                                color: Colors.grey),
-                            title: Text(
-                              'No notifications',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ),
-                      ];
-              },
             ),
           ],
         ),
