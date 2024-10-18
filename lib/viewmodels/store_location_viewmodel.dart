@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,14 +7,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:unshelf_seller/services/permission_service.dart';
 
 class StoreLocationViewModel extends ChangeNotifier {
-  GoogleMapController? _mapController;
   LatLng _chosenLocation = LatLng(10.3157, 123.8854);
 
   LatLng get chosenLocation => _chosenLocation;
-
-  void setMapController(GoogleMapController controller) {
-    _mapController = controller;
-  }
 
   void updateLocation(LatLng location) {
     _chosenLocation = location;

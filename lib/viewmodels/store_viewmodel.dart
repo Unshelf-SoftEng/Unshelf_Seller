@@ -80,11 +80,6 @@ class StoreViewModel extends ChangeNotifier {
         storeDetails = null;
       } else {
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
-        print(storeDetails!.storeName);
-        print(storeDetails!.storeImageUrl);
-        print(storeDetails!.storeSchedule);
-        storeDetails!.storeFollowers = await fetchStoreFollowers();
-
         notifyListeners();
       }
     } catch (e) {

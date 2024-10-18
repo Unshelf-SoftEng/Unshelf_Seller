@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/store_model.dart';
@@ -68,34 +69,42 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
           ),
         ],
       ),
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: storeDetails.storeLatitude != null &&
-                  storeDetails.storeLongitude != null
-              ? LatLng(
-                  storeDetails.storeLatitude!,
-                  storeDetails.storeLongitude!,
-                )
-              : const LatLng(1.3521, 103.8198),
-          zoom: 15,
-        ),
-        onMapCreated: viewModel.setMapController,
-        onTap: (LatLng location) {
-          viewModel.updateLocation(location);
-        },
-        markers: {
-          Marker(
-            markerId: const MarkerId('chosen_location'),
-            position: LatLng(
-              storeDetails.storeLatitude ?? 1.3521,
-              storeDetails.storeLongitude ?? 103.8198,
-            ),
-            draggable: true,
-            onDragEnd: (LatLng newPosition) {
-              viewModel.updateLocation(newPosition);
-            },
+      body: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(
+            storeDetails.storeLatitude ?? 1.3521,
+            storeDetails.storeLongitude ?? 103.8198,
           ),
-        },
+          initialZoom: 15.0,
+          onTap: (tapPosition, point) {
+            viewModel.updateLocation(point);
+            setState(() {
+              storeDetails.storeLatitude = point.latitude;
+              storeDetails.storeLongitude = point.longitude;
+            });
+          },
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(
+                  storeDetails.storeLatitude ?? 1.3521,
+                  storeDetails.storeLongitude ?? 103.8198,
+                ),
+                child: Icon(
+                  Icons.location_pin,
+                  color: Colors.red,
+                  size: 40.0,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

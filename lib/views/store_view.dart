@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/views/restock_selection_view.dart';
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
@@ -10,9 +9,9 @@ import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 import 'package:unshelf_seller/views/login_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/user_profile_view.dart';
-import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
-import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/models/user_model.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' as lat_lng2;
 
 class StoreView extends StatefulWidget {
   @override
@@ -226,35 +225,39 @@ class _StoreViewState extends State<StoreView> {
           ),
           Container(
             height: 100.0,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: viewModel.storeDetails?.storeLatitude != null
-                    ? LatLng(viewModel.storeDetails!.storeLatitude!,
-                        viewModel.storeDetails!.storeLongitude!)
-                    : const LatLng(37.7749, -122.4194),
-                zoom: 16.0,
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: lat_lng2.LatLng(
+                    viewModel.storeDetails!.storeLatitude!,
+                    viewModel.storeDetails!.storeLongitude!),
+                initialZoom: 15.0,
               ),
-              markers: viewModel.storeDetails?.storeLatitude != null
-                  ? {
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                if (viewModel.storeDetails?.storeLatitude != null)
+                  MarkerLayer(
+                    markers: [
                       Marker(
-                        markerId: MarkerId('storeLocation'),
-                        position: LatLng(
+                        point: lat_lng2.LatLng(
                           viewModel.storeDetails!.storeLatitude!,
                           viewModel.storeDetails!.storeLongitude!,
                         ),
+                        child: Container(
+                          child: Icon(
+                            Icons.location_pin,
+                            color: Colors.red,
+                            size: 40.0,
+                          ),
+                        ),
                       ),
-                    }
-                  : {},
-              onMapCreated: (GoogleMapController controller) {
-                // Optionally, you can store the controller if needed
-              },
-              myLocationEnabled: false,
-              zoomControlsEnabled: false,
-              scrollGesturesEnabled: false,
-              tiltGesturesEnabled: false,
-              rotateGesturesEnabled: false,
+                    ],
+                  ),
+              ],
             ),
-          ),
+          )
         ],
       ),
     );
@@ -277,14 +280,25 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
+            title: Text('Help Center'),
+            leading: Icon(Icons.help_outline),
+            onTap: () {},
+          ),
+          ListTile(
+            title: Text('Customer Support'),
+            leading: Icon(Icons.support_agent),
+            onTap: () {},
+          ),
+          ListTile(
+            title: Text('Privacy Notice'),
+            leading: Icon(Icons.privacy_tip),
+            onTap: () {},
+          ),
+          ListTile(
             title: Text('Log Out'),
             leading: Icon(Icons.logout),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
-              Provider.of<StoreViewModel>(context, listen: false).clear();
-              Provider.of<ListingViewModel>(context, listen: false).clear();
-              Provider.of<OrderViewModel>(context, listen: false).clear();
-
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (context) => LoginView(),
