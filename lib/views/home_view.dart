@@ -50,8 +50,6 @@ class _HomeViewState extends State<HomeView> {
         .orderBy('created_at', descending: true) // Optional: Order by timestamp
         .get();
 
-    print('Fetched ${snapshot.docs.length} notifications');
-
     final notifications = snapshot.docs.map((doc) {
       return {
         'id': doc.id,

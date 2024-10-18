@@ -12,8 +12,9 @@ class OrderModel {
   List<ProductModel> products = [];
   double totalPrice;
   String buyerName;
-  Timestamp? completionDate;
-  String? pickUpCode;
+  Timestamp? completedAt;
+  String? pickupCode;
+  String? pickupTime;
 
   OrderModel({
     required this.id,
@@ -26,8 +27,9 @@ class OrderModel {
     this.totalPrice = 0,
     this.products = const [],
     this.buyerName = '',
-    this.completionDate,
-    this.pickUpCode = '',
+    this.completedAt,
+    this.pickupCode = '',
+    this.pickupTime = '',
   });
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
@@ -35,14 +37,15 @@ class OrderModel {
 
     return OrderModel(
       id: doc.id,
-      orderId: data['order_id'],
+      orderId: data['orderId'],
       status: data['status'],
-      createdAt: data['created_at'] as Timestamp,
-      completionDate: data['completion_date'] as Timestamp?,
-      pickUpCode: data['pick_up_code'] as String?,
+      createdAt: data['createdAt'] as Timestamp,
+      completedAt: data['completetedAt'] as Timestamp?,
+      pickupCode: data['pickupCode'] as String?,
+      pickupTime: data['pickupTime'],
       buyerId: data['buyer_id'],
       items: List<OrderItem>.from(
-        data['order_items'].map((item) => OrderItem.fromMap(item)),
+        data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
       totalPrice: data['totalPrice'],
       isPaid: data['isPaid'],
@@ -63,9 +66,10 @@ class OrderModel {
         data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
       products: [],
-      completionDate: data['completedAt'] as Timestamp?,
-      pickUpCode: data['pickupCode'] as String?,
-      totalPrice: data['totalPrice'],
+      completedAt: data['completedAt'] as Timestamp?,
+      pickupCode: data['pickupCode'] as String?,
+      pickupTime: data['pickupTime'] as String?,
+      totalPrice: data['totalPrice'] ?? 0,
       isPaid: data['isPaid'],
     );
 
@@ -102,14 +106,12 @@ class OrderModel {
       buyerId: orderModel.buyerId,
       items: orderModel.items,
       products: products,
-      totalPrice: products.fold<double>(
-        0,
-        (previousValue, element) => previousValue + element.price,
-      ),
+      totalPrice: orderModel.totalPrice,
       buyerName: orderModel.buyerName,
-      completionDate: orderModel.completionDate,
-      pickUpCode: orderModel.pickUpCode,
+      completedAt: orderModel.completedAt,
+      pickupCode: orderModel.pickupCode,
       isPaid: orderModel.isPaid,
+      pickupTime: orderModel.pickupTime,
     );
   }
 }

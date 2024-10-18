@@ -50,10 +50,6 @@ class DashboardViewModel extends ChangeNotifier {
           .where((doc) => doc['status'] == 'Completed')
           .length;
 
-      print('Pending orders: $pendingOrders');
-      print('Processed orders: $processedOrders');
-      print('Completed orders: $completedOrders');
-
       // Assuming 'total' field exists in each order document for total price
       final startOfMonth = DateTime(now.year, now.month);
 
