@@ -43,7 +43,7 @@ class ProductModel implements ItemModel {
       stock: data['stock'] ?? 0,
       expiryDate: data['expiryDate'] != null
           ? (data['expiryDate'] as Timestamp).toDate()
-          : null,
+          : DateTime.now(),
       discount: data['discount'] ?? 0,
       mainImageUrl: data['mainImageUrl'] ?? '',
       additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)

@@ -60,8 +60,6 @@ class BundleViewModel extends ChangeNotifier {
       _products = productSnapshot.docs
           .map((doc) => ProductModel.fromSnapshot(doc))
           .toList();
-
-      print('Products: $_products');
       notifyListeners();
     }
   }
@@ -167,8 +165,11 @@ class BundleViewModel extends ChangeNotifier {
     const url = 'https://productbundlerapi.onrender.com/api/recommend-bundles/';
 
     final headers = {'Content-Type': 'application/json'};
+
+    _fetchProducts();
+
     final body = json.encode(
-      products.map((product) => product.toJson()).toList(),
+      _products.map((product) => product.toJson()).toList(),
     );
 
     try {
@@ -182,6 +183,8 @@ class BundleViewModel extends ChangeNotifier {
         _suggestions = (data['bundles'] as List)
             .map<BundleModel>((bundle) => BundleModel.fromJson(bundle))
             .toList();
+
+        for (var suggestion in _suggestions) print(suggestion.name);
 
         notifyListeners();
       } else {

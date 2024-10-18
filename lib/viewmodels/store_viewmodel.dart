@@ -126,7 +126,7 @@ class StoreViewModel extends ChangeNotifier {
       // Example path to fetch ratings from the Firestore database
       DocumentSnapshot ratingsSnapshot = await FirebaseFirestore.instance
           .collection('stores')
-          .doc(user!.uid)
+          .doc(user.uid)
           .collection('ratings')
           .doc('average')
           .get();

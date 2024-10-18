@@ -37,7 +37,6 @@ class BundleSuggestionsView extends StatelessWidget {
                   itemCount: suggestions.length,
                   itemBuilder: (context, index) {
                     final suggestion = suggestions[index];
-
                     // Create a string of product names
                     final productNames = suggestion.products
                         ?.map((product) => product.name)

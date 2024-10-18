@@ -56,6 +56,10 @@ class RestockViewModel extends ChangeNotifier {
   }
 
   void addSelectedProduct(ProductModel product) {
+    if (contain(product)) {
+      return;
+    }
+
     var addedProduct = ProductModel(
       productId: product.productId,
       name: product.name,
@@ -72,6 +76,16 @@ class RestockViewModel extends ChangeNotifier {
 
     _selectedProducts.add(addedProduct);
     notifyListeners();
+  }
+
+  bool contain(ProductModel product) {
+    for (var prod in _selectedProducts) {
+      if (product.productId == prod.productId) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   void removeSelectedProduct(ProductModel product) {

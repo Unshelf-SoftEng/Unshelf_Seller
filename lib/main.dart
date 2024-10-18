@@ -25,8 +25,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
-    options: FirebaseOptions(
-      apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyCmzJYL0RqnGHP7OCu-8TyNVqWsSdATGf0",
       appId: "1:733152787617:android:3c3e7b87d0cb7c59f544e0",
       messagingSenderId: "733152787617",
       projectId: "unshelf-d4567",

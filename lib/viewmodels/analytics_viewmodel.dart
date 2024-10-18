@@ -150,8 +150,10 @@ class AnalyticsViewModel extends ChangeNotifier {
 
       // Loop through transactions to calculate total sales
       for (var transDoc in transactionSnapshot.docs) {
-        double transAmount = (transDoc['sellerEarnings'] ?? 0.0);
-        totalSales += transAmount; // Accumulate total sales
+        if (transDoc['type'] == 'Sale') {
+          double transAmount = (transDoc['sellerEarnings'] ?? 0.0);
+          totalSales += transAmount;
+        }
       }
 
       // Log totals for debugging
@@ -221,10 +223,12 @@ class AnalyticsViewModel extends ChangeNotifier {
           .get();
 
       for (var transDoc in transactionSnapshot.docs) {
-        DateTime transDate = (transDoc['date'] as Timestamp).toDate();
-        double transAmount =
-            transDoc['sellerEarnings'] ?? 0.0; // Assuming 'amount' field exists
-        _updateSalesMap(period, transDate, transAmount);
+        if (transDoc['type'] == 'Sale') {
+          DateTime transDate = (transDoc['date'] as Timestamp).toDate();
+          double transAmount = transDoc['sellerEarnings'] ??
+              0.0; // Assuming 'amount' field exists
+          _updateSalesMap(period, transDate, transAmount);
+        }
       }
     } catch (e) {
       print("Error fetching sales data: $e");

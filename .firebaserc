@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "unshelf-d4567"
-  }
+  },
+  "targets": {
+    "unshelf-d4567": {
+      "hosting": {
+        "seller": [
+          "unshelf-seller"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

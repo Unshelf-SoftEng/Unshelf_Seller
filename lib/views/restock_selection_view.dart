@@ -51,8 +51,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                         itemCount: viewModel.products.length,
                         itemBuilder: (context, index) {
                           final product = viewModel.products[index];
-                          final isSelected =
-                              viewModel.selectedProducts.contains(product);
+                          bool isSelected = viewModel.contain(product);
 
                           return Card(
                             elevation: 3,
@@ -61,8 +60,9 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             color: isSelected
-                                ? Colors.green[50]
-                                : Colors.white, // Highlight selected
+                                ? Color(0xFF6A994E) // Very green when selected
+                                : Colors
+                                    .white, // Default white when not selected
                             child: ListTile(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -73,13 +73,20 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors
+                                          .black, // White text when selected
                                 ),
                               ),
                               subtitle: Text(
                                 'Current Quantity: ${product.stock ?? 0}',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[700],
+                                  color: isSelected
+                                      ? Colors.white70
+                                      : Colors.grey[
+                                          700], // Lighter text when selected
                                 ),
                               ),
                               leading: CircleAvatar(
@@ -92,15 +99,20 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 isSelected
                                     ? Icons.check_circle
                                     : Icons.check_circle_outline,
-                                color: isSelected ? Colors.green : Colors.grey,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey, // White icon when selected
                                 size: 30,
                               ),
                               onTap: () {
-                                // Prevent re-selection of already selected products
-                                if (!isSelected) {
+                                setState(() {
                                   viewModel.addSelectedProduct(product);
-                                  setState(() {});
-                                }
+                                });
+                              },
+                              onLongPress: () {
+                                setState(() {
+                                  viewModel.removeSelectedProduct(product);
+                                });
                               },
                             ),
                           );
