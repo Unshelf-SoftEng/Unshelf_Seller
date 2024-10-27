@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/product_model.dart';
+import 'package:unshelf_seller/services/product_service.dart';
 
 class ProductSummaryViewModel extends ChangeNotifier {
+  final ProductService _productService = ProductService();
   ProductModel? _product;
   ProductModel? get product => _product;
 
@@ -14,13 +15,10 @@ class ProductSummaryViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .get();
+      final product = await _productService.getProduct(productId);
 
-      if (doc.exists) {
-        _product = ProductModel.fromSnapshot(doc);
+      if (product != null) {
+        _product = product;
       }
     } catch (e) {
       // Handle errors
