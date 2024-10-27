@@ -34,6 +34,7 @@ class _RegisterViewState extends State<RegisterView> {
         'isBanned': false,
       });
 
+      // Initialization of the store data
       await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
         'storeSchedule': {
           'Monday': {'open': 'Closed', 'close': 'Closed'},

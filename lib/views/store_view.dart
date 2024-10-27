@@ -52,14 +52,14 @@ class _StoreViewState extends State<StoreView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(viewModel.errorMessage!),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               final viewModel =
                   Provider.of<StoreViewModel>(context, listen: false);
               viewModel.fetchStoreDetails();
             },
-            child: Text('Retry'),
+            child: const Text('Retry'),
           ),
         ],
       ),
@@ -77,20 +77,20 @@ class _StoreViewState extends State<StoreView> {
 
     // Ensure storeDetails and userProfile are initialized properly
     if (viewModel.storeDetails == null || viewModel.userProfile == null) {
-      return Center(child: Text('Loading data...')); // Loading state
+      return const Center(child: Text('Loading data...')); // Loading state
     }
 
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildStoreCard(viewModel, context),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Store Information'),
             _buildDetailsAndActionsSection(context, viewModel),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildSectionTitle('General'),
             _buildGeneralActions(context),
           ],
@@ -104,7 +104,7 @@ class _StoreViewState extends State<StoreView> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.bold,
         ),

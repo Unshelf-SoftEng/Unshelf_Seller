@@ -19,10 +19,7 @@ class AnalyticsViewModel extends ChangeNotifier {
   double _maxXSales = 0;
   double _maxYSales = 0;
 
-  // Getter for orders map
   Map<DateTime, int> get ordersMap => _ordersMap;
-
-  // Getter for sales map
   Map<DateTime, double> get salesMap => _salesMap;
 
   // Max X value for orders
@@ -125,7 +122,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       // Fetch orders
       final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
           .collection('orders')
-          .where('sellerId', isEqualTo: user!.uid) // Filter by seller
+          .where('sellerId', isEqualTo: user!.uid)
           .get();
 
       // Loop through all orders
@@ -155,13 +152,6 @@ class AnalyticsViewModel extends ChangeNotifier {
           totalSales += transAmount;
         }
       }
-
-      // Log totals for debugging
-      print('Total Orders: $totalOrders');
-      print('Total Sales: ₱${totalSales.toStringAsFixed(2)}');
-      print('Total Completed Orders: $totalCompletedOrders');
-      print('Total Ready Orders: $totalReadyOrders');
-      print('Total Pending Orders: $totalPendingOrders');
     } catch (e) {
       // Handle errors
       print('Error fetching totals: $e');
@@ -303,7 +293,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         for (int i = 0; i < 4; i++) {
           DateTime weekStartDate =
               lastMonday.subtract(Duration(days: 21 - (i * 7)));
-          _ordersMap[weekStartDate] = 0;
+          _salesMap[weekStartDate] = 0;
         }
         _maxXSales = 4;
         break;
@@ -312,7 +302,6 @@ class AnalyticsViewModel extends ChangeNotifier {
           int year = today.year;
           int month = today.month - i;
 
-          // Adjust the year if the month goes below 1 (for previous year months)
           if (month <= 0) {
             month += 12;
             year--;
@@ -331,9 +320,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         }
         _maxXSales = 3;
         break;
-
       default:
-        print('Invalid time period');
         break;
     }
   }
@@ -355,10 +342,9 @@ class AnalyticsViewModel extends ChangeNotifier {
         key = DateTime(orderDate.year, 1, 1);
         break;
       default:
-        return; // Skip if invalid period
+        return;
     }
     if (_ordersMap.containsKey(key)) {
-      print('updating orders for a certain day');
       _ordersMap[key] = (_ordersMap[key] ?? 0) + 1;
     }
   }

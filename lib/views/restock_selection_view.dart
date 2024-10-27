@@ -22,11 +22,11 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Products to Restock'),
-        backgroundColor: Color(0xFF6A994E),
+        title: const Text('Select Products to Restock'),
+        backgroundColor: const Color(0xFF6A994E),
       ),
       body: viewModel.isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -60,11 +60,12 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             color: isSelected
-                                ? Color(0xFF6A994E) // Very green when selected
+                                ? const Color(
+                                    0xFF6A994E) // Very green when selected
                                 : Colors
                                     .white, // Default white when not selected
                             child: ListTile(
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
                                 horizontal: 16.0,
                               ),
@@ -119,7 +120,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                         },
                       ),
                     ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -134,15 +135,15 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         backgroundColor: viewModel.selectedProducts.isNotEmpty
-                            ? Color(0xFF6A994E)
+                            ? const Color(0xFF6A994E)
                             : Colors.grey, // Disabled state color
                       ),
-                      child: Text(
+                      child: const Text(
                         'Next',
                         style: TextStyle(fontSize: 18),
                       ),

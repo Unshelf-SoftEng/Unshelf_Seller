@@ -71,9 +71,9 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                         Center(
                           child: Column(
                             children: [
-                              Text(
+                              const Text(
                                 'Total Orders',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -201,8 +201,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                   ),
                   const SizedBox(height: 15),
                   DropdownButton<String>(
-                    value:
-                        selectedOrdersValue, // Use the state variable for the value
+                    value: selectedOrdersValue,
                     onChanged: (String? newValue) {
                       if (newValue != null && newValue != selectedOrdersValue) {
                         setState(() {
@@ -235,8 +234,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                   const SizedBox(height: 15),
 
                   DropdownButton<String>(
-                    value:
-                        selectedSalesValue, // Use the state variable for the value
+                    value: selectedSalesValue,
                     onChanged: (String? newValue) {
                       if (newValue != null && newValue != selectedSalesValue) {
                         setState(() {

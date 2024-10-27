@@ -15,8 +15,8 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Enter Restock Details'),
-        backgroundColor: Color(0xFF6A994E),
+        title: const Text('Enter Restock Details'),
+        backgroundColor: const Color(0xFF6A994E),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -42,12 +42,12 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                         children: [
                           Text(
                             product.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           TextField(
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
@@ -56,14 +56,14 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 12),
+                                  const EdgeInsets.symmetric(horizontal: 12),
                             ),
                             onChanged: (value) {
                               final quantity = int.tryParse(value) ?? 0;
                               product.stock = quantity;
                             },
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           GestureDetector(
                             onTap: () async {
                               final DateTime? pickedDate = await showDatePicker(
@@ -77,7 +77,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                               }
                             },
                             child: Container(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.grey[200],
@@ -87,7 +87,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                                 children: [
                                   Icon(Icons.calendar_today,
                                       color: Colors.grey[600]),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       product.expiryDate != null
@@ -111,7 +111,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
                 // Check if all products have a quantity > 0 and expiry date selected
@@ -140,7 +140,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                backgroundColor: Color(0xFF6A994E),
+                backgroundColor: const Color(0xFF6A994E),
               ),
               child: const Text(
                 'Submit Restock',
@@ -152,7 +152,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
                   'Error: ${viewModel.error}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.red,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

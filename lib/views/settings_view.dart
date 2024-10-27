@@ -7,15 +7,15 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: Consumer<SettingsViewModel>(
         builder: (context, viewModel, child) {
           return ListView(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             children: [
               SwitchListTile(
-                title: Text('Enable Notifications'),
+                title: const Text('Enable Notifications'),
                 value: viewModel.settings.notificationsEnabled,
                 onChanged: (bool value) {
                   viewModel.toggleNotifications(value);
@@ -23,7 +23,7 @@ class SettingsView extends StatelessWidget {
               ),
               ListTile(
                 leading: Icon(Icons.help),
-                title: Text('Help & Feedback'),
+                title: const Text('Help & Feedback'),
                 onTap: () {
                   // Navigate to Help & Feedback
                 },
