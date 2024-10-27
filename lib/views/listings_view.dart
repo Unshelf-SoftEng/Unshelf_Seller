@@ -7,6 +7,7 @@ import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/views/product_summary_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/add_bundle_view.dart';
+import 'package:unshelf_seller/views/update_product_view.dart';
 
 class ListingsView extends StatefulWidget {
   @override
@@ -52,7 +53,7 @@ class _ListingsViewState extends State<ListingsView> {
                         hintText: 'Search...',
                         border: InputBorder.none,
                       ),
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       onSubmitted: (value) {
                         _onSearchChanged();
                       },
@@ -177,7 +178,7 @@ class _ListingsViewState extends State<ListingsView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddProductView(
+                                  builder: (context) => UpdateProductView(
                                     productId: itemId,
                                     onProductAdded: () {
                                       // Refresh the product listings
@@ -252,9 +253,9 @@ class _ListingsViewState extends State<ListingsView> {
                 );
               }
             },
-            child: Icon(Icons.add),
             tooltip: viewModel.showingProducts ? 'Add Product' : 'Add Bundle',
             backgroundColor: Colors.green,
+            child: const Icon(Icons.add),
           );
         },
       ),

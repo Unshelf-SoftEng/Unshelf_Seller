@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/views/register_view.dart';
+import 'package:unshelf_seller/views/forgot_password_view.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -56,25 +57,31 @@ class _LoginViewState extends State<LoginView> {
       );
     }
   }
-  
+
   Future<void> _Login() async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
 
         // Fetch user role from Firestore
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
-        
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
         if (userDoc.exists) {
           // Check if the user is banned
-           bool banned= userDoc['isBanned'];
+          bool banned = userDoc['isBanned'];
           if (banned == true) {
             await FirebaseAuth.instance.signOut(); // Sign out the banned user
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Your account is banned. Please contact support.')),
+              const SnackBar(
+                  content:
+                      Text('Your account is banned. Please contact support.')),
             );
             return;
           }
@@ -101,7 +108,6 @@ class _LoginViewState extends State<LoginView> {
             const SnackBar(content: Text('User not found in database.')),
           );
         }
-        
       } on FirebaseAuthException catch (e) {
         String message;
         if (e.code == 'user-not-found') {
@@ -157,6 +163,14 @@ class _LoginViewState extends State<LoginView> {
                     return null;
                   },
                   onFieldSubmitted: (value) => _Login(),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ForgotPasswordView(),
+                    ));
+                  },
+                  child: const Text('Forgot Password?'),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(

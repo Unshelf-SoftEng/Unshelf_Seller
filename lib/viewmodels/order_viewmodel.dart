@@ -43,10 +43,6 @@ class OrderViewModel extends ChangeNotifier {
           .orderBy('createdAt', descending: true)
           .get();
 
-      _orders = await Future.wait<OrderModel>(querySnapshot.docs
-          .map((doc) => OrderModel.fetchOrderWithProducts(doc))
-          .toList());
-
       _isLoading = false;
       notifyListeners();
     } catch (e) {

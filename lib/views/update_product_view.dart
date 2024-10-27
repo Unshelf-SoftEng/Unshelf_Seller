@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 
-class AddProductView extends StatelessWidget {
+class UpdateProductView extends StatelessWidget {
   final VoidCallback onProductAdded;
   final String? productId;
 
-  const AddProductView({Key? key, required this.onProductAdded, this.productId})
+  const UpdateProductView(
+      {Key? key, required this.onProductAdded, this.productId})
       : super(key: key);
 
   @override
@@ -343,7 +343,7 @@ class AddProductView extends StatelessWidget {
                                     backgroundColor: const Color(0xFF6A994E),
                                     foregroundColor: Colors.white,
                                   ),
-                                  child: const Text('Add Product'),
+                                  child: const Text('Update Product'),
                                 ),
                               ),
                       ),

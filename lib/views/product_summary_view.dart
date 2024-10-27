@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
-import 'package:intl/intl.dart';
 
 class ProductSummaryView extends StatefulWidget {
   final String? productId;
@@ -29,6 +28,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Product Summary'),
+        backgroundColor: const Color(0xFF6A994E),
         elevation: 1.0,
       ),
       body: Consumer<ProductSummaryViewModel>(
@@ -41,137 +41,28 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
             return Center(child: Text('No product data available.'));
           }
 
+          final mainImageUrl = viewModel.product!.mainImageUrl;
+          final additionalImages = viewModel.product!.additionalImageUrls;
+
+          // Create a list of images to display
+          final images = [mainImageUrl]..addAll(additionalImages ?? []);
+
           return SingleChildScrollView(
             padding: EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Header Section
-                Card(
-                  elevation: 2.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.green.withOpacity(0.2),
-                          child: Icon(
-                            Icons.shopping_bag,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                        ),
-                        SizedBox(width: 16.0),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Product Summary',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 4.0),
-                            Text(
-                              'View the product details',
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Image Gallery
+                _buildImageGallery(images, viewModel),
                 const SizedBox(height: 16.0),
-
-                // Main Image
-                GestureDetector(
-                  onTap: () => _showFullImage(viewModel.product!.mainImageUrl),
-                  child: Container(
-                    width: double.infinity,
-                    height: 250,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF386641),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Image.network(
-                        viewModel.product!.mainImageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-
-                // Additional Images
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ...List.generate(4, (index) {
-                      if (viewModel.product!.additionalImageUrls != null &&
-                          viewModel.product!.additionalImageUrls!.length >
-                              index) {
-                        return Container(
-                          margin: EdgeInsets.only(right: 8.0),
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(
-                                color: Colors.white, width: 2.0), // Add border
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8.0),
-                            child: Image.network(
-                              viewModel.product!.additionalImageUrls![index],
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(
-                                color: Colors.grey,
-                                width: 2.0), // Placeholder border
-                          ),
-                          child: Icon(Icons.image_not_supported,
-                              color: Colors.grey),
-                        );
-                      }
-                    }),
-                  ],
-                ),
-
-                const SizedBox(height: 30),
-
                 // Product Details
                 _buildProductDetail('Name', viewModel.product!.name),
                 _buildProductDetail(
                     'Description', viewModel.product!.description),
                 _buildProductDetail('Category', viewModel.product!.category),
-                _buildProductDetail('Price', '₱ ${viewModel.product!.price}'),
-                _buildProductDetail(
-                    'Quantifier', viewModel.product!.quantifier!),
-                _buildProductDetail(
-                    'Stock', '${viewModel.product!.stock} units'),
-                _buildProductDetail(
-                  'Expiry Date',
-                  DateFormat('yyyy-MM-dd')
-                      .format(viewModel.product!.expiryDate!.toLocal()),
-                ),
-                _buildProductDetail(
-                    'Discount', '${viewModel.product!.discount}% off'),
+                const SizedBox(height: 16.0),
+                // Batches Section
+                _buildBatchesSection(viewModel),
               ],
             ),
           );
@@ -180,7 +71,58 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
     );
   }
 
-  // Helper method to build product detail row
+  // Method to build the image gallery
+  Widget _buildImageGallery(
+      List<String> images, ProductSummaryViewModel viewModel) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          height: 250,
+          decoration: BoxDecoration(
+            color: const Color(0xFF386641),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: PageView.builder(
+            controller: viewModel.pageController,
+            itemCount: images.length,
+            onPageChanged: viewModel.onPageChanged,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => _showFullImage(images[index]),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: Image.network(
+                    images[index],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        // Dots indicator
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(images.length, (index) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+              width: 8.0,
+              height: 8.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    viewModel.currentPage == index ? Colors.black : Colors.grey,
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  // Method to build product detail row
   Widget _buildProductDetail(String title, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -205,6 +147,65 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
         ],
       ),
     );
+  }
+
+  // Method to build batches section
+  Widget _buildBatchesSection(ProductSummaryViewModel viewModel) {
+    final batches = viewModel.batches;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Batches:',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+        ),
+        const SizedBox(height: 8.0),
+        if (batches != null && batches.isNotEmpty)
+          ListView.builder(
+            itemCount: batches.length,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              final batch = batches[index];
+              return Card(
+                elevation: 2.0,
+                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                child: ListTile(
+                  title: Text('Batch ${index + 1}: ${batch.batchNumber}'),
+                  subtitle: Text('Quantity: ${batch.stock}'),
+                ),
+              );
+            },
+          )
+        else
+          GestureDetector(
+            onTap: () {
+              // Navigate to Add Batch screen
+              _navigateToAddBatchScreen();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Center(
+                child: Text(
+                  'No batches available. Tap to add a batch.',
+                  style: TextStyle(color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // Method to navigate to Add Batch screen
+  void _navigateToAddBatchScreen() {
+    // Your logic to navigate to Add Batch screen
   }
 
   // Method to show full image on tap

@@ -3,11 +3,6 @@ import 'package:unshelf_seller/models/item_model.dart';
 
 class ProductModel extends ItemModel {
   String description;
-  double? price;
-  String? quantifier;
-  int? stock;
-  DateTime? expiryDate;
-  int? discount;
   List<String>? additionalImageUrls;
 
   ProductModel({
@@ -16,11 +11,6 @@ class ProductModel extends ItemModel {
     required super.mainImageUrl,
     required super.category,
     required this.description,
-    this.price,
-    this.quantifier,
-    this.discount,
-    this.stock,
-    this.expiryDate,
     this.additionalImageUrls,
   });
 
@@ -31,13 +21,6 @@ class ProductModel extends ItemModel {
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       category: data['category'] ?? '',
-      price: (data['price'] ?? 0.0).toDouble(),
-      quantifier: data['quantifier'] ?? '',
-      stock: data['stock'] ?? 0,
-      expiryDate: data['expiryDate'] != null
-          ? (data['expiryDate'] as Timestamp).toDate()
-          : DateTime.now(),
-      discount: data['discount'] ?? 0,
       mainImageUrl: data['mainImageUrl'] ?? '',
       additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -51,10 +34,9 @@ class ProductModel extends ItemModel {
       'productId': id,
       'name': name,
       'description': description,
-      'price': price,
-      'stock': stock,
-      'expiryDate': expiryDate!.toIso8601String(),
-      'discount': discount,
+      'category': category,
+      'mainImageUrl': mainImageUrl,
+      'additionalImageUrls': additionalImageUrls,
     };
   }
 
@@ -64,14 +46,10 @@ class ProductModel extends ItemModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
-      price: json['price'] ?? 0.0,
-      quantifier: json['quantifier'] ?? '',
-      stock: json['stock'] ?? 0,
-      expiryDate: json['expiryDate'] != null
-          ? DateTime.parse(json['expiryDate'])
-          : DateTime.now(),
-      discount: json['discount'] ?? 0,
       mainImageUrl: json['mainImageUrl'] ?? '',
+      additionalImageUrls: (json['additionalImageUrls'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
   }
 }
