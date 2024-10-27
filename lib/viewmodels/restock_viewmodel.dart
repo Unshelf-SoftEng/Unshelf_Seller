@@ -61,7 +61,7 @@ class RestockViewModel extends ChangeNotifier {
     }
 
     var addedProduct = ProductModel(
-      productId: product.productId,
+      id: product.id,
       name: product.name,
       price: product.price,
       stock: 0,
@@ -79,8 +79,8 @@ class RestockViewModel extends ChangeNotifier {
   }
 
   bool contain(ProductModel product) {
-    for (var prod in _selectedProducts) {
-      if (product.productId == prod.productId) {
+    for (var selected in _selectedProducts) {
+      if (product.id == selected.id) {
         return true;
       }
     }
@@ -89,7 +89,7 @@ class RestockViewModel extends ChangeNotifier {
   }
 
   void removeSelectedProduct(ProductModel product) {
-    _selectedProducts.removeWhere((p) => p.productId == product.productId);
+    _selectedProducts.removeWhere((p) => p.id == product.id);
     notifyListeners();
   }
 
@@ -100,9 +100,8 @@ class RestockViewModel extends ChangeNotifier {
     try {
       final batch = FirebaseFirestore.instance.batch();
       for (var product in productsToRestock) {
-        final docRef = FirebaseFirestore.instance
-            .collection('products')
-            .doc(product.productId);
+        final docRef =
+            FirebaseFirestore.instance.collection('products').doc(product.id);
 
         // Retrieve the current stock
         final snapshot = await docRef.get();
@@ -127,6 +126,6 @@ class RestockViewModel extends ChangeNotifier {
 
   void updateExpiryDate(ProductModel product, DateTime newDate) {
     product.expiryDate = newDate;
-    notifyListeners(); // This will notify the UI to update
+    notifyListeners();
   }
 }

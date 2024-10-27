@@ -1,7 +1,13 @@
-// models/item_model.dart
 abstract class ItemModel {
-  String get id;
-  String get name;
-  String get mainImageUrl;
-  double get price;
+  final String id;
+  String name;
+  String mainImageUrl;
+  String category;
+
+  ItemModel({
+    required this.id,
+    required this.name,
+    required this.mainImageUrl,
+    required this.category,
+  });
 }

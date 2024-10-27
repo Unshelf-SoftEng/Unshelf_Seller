@@ -6,13 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:unshelf_seller/models/product_model.dart';
+import 'package:unshelf_seller/services/product_service.dart';
 
 class ProductViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController discountController = TextEditingController();
-  final TextEditingController quantifierController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
@@ -33,13 +32,15 @@ class ProductViewModel extends ChangeNotifier {
   bool _errorFound = false;
   bool get errorFound => _errorFound;
 
-  String? selectedCategory;
+  String selectedCategory = '';
   List<String> categories = [
     'Grocery',
     'Fruits',
     'Vegetables',
     'Baked Goods',
   ];
+
+  final ProductService _productService = ProductService();
 
   ProductViewModel({required this.productId}) {
     if (productId != null) fetchProductData();
@@ -50,28 +51,23 @@ class ProductViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final productDoc = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .get();
+      final product = await _productService.getProduct(productId!);
 
-      if (productDoc.exists) {
-        final product = ProductModel.fromSnapshot(productDoc);
-
+      if (product != null) {
         nameController.text = product.name;
-        priceController.text = product.price.toString();
         descriptionController.text = product.description;
-        discountController.text = product.discount.toString();
-        quantifierController.text = product.quantifier;
         selectedCategory = product.category;
         String? _mainImageUrl = product.mainImageUrl;
         List<String>? _additionalImageUrls = product.additionalImageUrls;
 
         await loadImageFromUrl(_mainImageUrl, true);
 
-        for (int i = 0; i < _additionalImageUrls!.length; i++) {
-          if (i < _additionalImageDataList.length) {
-            await loadImageFromUrl(_additionalImageUrls[i], false, index: i);
+        // Load additional images if available
+        if (_additionalImageUrls != null) {
+          for (int i = 0; i < _additionalImageUrls.length; i++) {
+            if (i < _additionalImageDataList.length) {
+              await loadImageFromUrl(_additionalImageUrls[i], false, index: i);
+            }
           }
         }
       }
@@ -207,18 +203,17 @@ class ProductViewModel extends ChangeNotifier {
 
         if (user != null) {
           List<String> images = await uploadImages();
-          await FirebaseFirestore.instance.collection('products').add({
-            'sellerId': user.uid,
-            'name': nameController.text,
-            'description': descriptionController.text,
-            'category': selectedCategory,
-            'price': double.parse(priceController.text),
-            'quantifier': quantifierController.text,
-            'discount': int.parse(discountController.text),
-            'mainImageUrl': images[0],
-            'additionalImageUrls': images.sublist(1),
-            'isListed': true,
-          });
+
+          ProductModel product = ProductModel(
+            id: '',
+            name: nameController.text,
+            description: descriptionController.text,
+            category: selectedCategory,
+            mainImageUrl: images[0],
+            additionalImageUrls: images.sublist(1),
+          );
+
+          await _productService.addProduct(product);
         }
       } catch (e) {
         print('Error adding product' + e.toString());
@@ -246,8 +241,6 @@ class ProductViewModel extends ChangeNotifier {
             'name': nameController.text,
             'description': descriptionController.text,
             'category': selectedCategory,
-            'price': double.parse(priceController.text),
-            'quantifier': quantifierController.text,
             'discount': int.parse(discountController.text),
             'mainImageUrl': images[0],
             'additionalImageUrls': images.sublist(1),
@@ -266,7 +259,6 @@ class ProductViewModel extends ChangeNotifier {
   void dispose() {
     nameController.dispose();
     descriptionController.dispose();
-    priceController.dispose();
     discountController.dispose();
     super.dispose();
   }

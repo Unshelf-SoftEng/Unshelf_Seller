@@ -1,40 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/item_model.dart';
 
-class ProductModel implements ItemModel {
-  @override
-  String get id => productId;
-  final String productId;
-  String name;
+class ProductModel extends ItemModel {
   String description;
-  String category;
-  double price;
-  String quantifier;
+  double? price;
+  String? quantifier;
   int? stock;
   DateTime? expiryDate;
-  int discount;
-  String mainImageUrl;
+  int? discount;
   List<String>? additionalImageUrls;
 
   ProductModel({
-    required this.productId,
-    required this.name,
+    required super.id,
+    required super.name,
+    required super.mainImageUrl,
+    required super.category,
     required this.description,
-    required this.category,
-    required this.price,
-    required this.quantifier,
-    required this.discount,
-    required this.mainImageUrl,
+    this.price,
+    this.quantifier,
+    this.discount,
     this.stock,
     this.expiryDate,
     this.additionalImageUrls,
   });
 
-  // Factory method to create StoreModel from Firebase document snapshot
   factory ProductModel.fromSnapshot(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return ProductModel(
-      productId: doc.id,
+      id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       category: data['category'] ?? '',
@@ -55,7 +48,7 @@ class ProductModel implements ItemModel {
   // Method to convert StoreModel to Json
   Map<String, dynamic> toJson() {
     return {
-      'productId': productId,
+      'productId': id,
       'name': name,
       'description': description,
       'price': price,
@@ -67,7 +60,7 @@ class ProductModel implements ItemModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      productId: json['id'] ?? '',
+      id: json['id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       category: json['category'] ?? '',
