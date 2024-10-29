@@ -36,24 +36,26 @@ class BatchService {
     required DateTime expiryDate,
     required int discount,
   }) async {
-    var docs = _firestore
-        .collection('batches')
-        .where('productId', isEqualTo: productId)
-        .where('dateCreated', isEqualTo: Timestamp.now())
-        .get();
-
     final datePart = DateFormat('yyyyMMdd').format(DateTime.now());
-
     final snapshot = await _firestore
         .collection('batches') // Replace 'batches' with your collection name
         .where('batchNumber', isGreaterThanOrEqualTo: datePart)
-        .where('batchNumber',
-            isLessThan:
-                '$datePart\uf8ff') // Ensures we only get today's batches
+        .where('batchNumber', isLessThan: '$datePart\uf8ff')
+        .orderBy('batchNumber', descending: true)
+        .limit(1)
         .get();
 
-    // Get the count of documents in the snapshot
-    var batchCount = snapshot.docs.length + 1;
+    int batchCount = 1;
+
+    if (snapshot.docs.isNotEmpty) {
+      // Get the last two characters of the latest batch number
+      final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
+      final latestSuffix = int.tryParse(
+              latestBatchNumber.substring(latestBatchNumber.length - 2)) ??
+          0;
+      batchCount = latestSuffix + 1;
+    }
+
     final suffix = batchCount.toString().padLeft(2, '0');
 
     final generatedBatchNumber = batchNumber ?? '$datePart-$suffix';
@@ -70,5 +72,9 @@ class BatchService {
       'isListed': true,
       'dateCreated': Timestamp.now(),
     });
+  }
+
+  Future<void> deleteBatch(String batchNumber) async {
+    await _firestore.collection('batches').doc(batchNumber).delete();
   }
 }

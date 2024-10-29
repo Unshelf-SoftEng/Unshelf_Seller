@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/views/add_batch_view.dart';
+import 'package:unshelf_seller/views/edit_batch_view.dart';
 
 class ProductSummaryView extends StatefulWidget {
   final String? productId;
@@ -155,26 +157,98 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
     final batches = viewModel.batches;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Batches:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+        // Title for the batch list
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            'Batches',
+            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          ),
         ),
-        const SizedBox(height: 8.0),
+        // ListView for batches or a prompt to add a batch
         if (batches != null && batches.isNotEmpty)
           ListView.builder(
             itemCount: batches.length,
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               final batch = batches[index];
               return Card(
                 elevation: 2.0,
                 margin: const EdgeInsets.symmetric(vertical: 4.0),
-                child: ListTile(
-                  title: Text('Batch ${index + 1}: ${batch.batchNumber}'),
-                  subtitle: Text('Quantity: ${batch.stock}'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Display batch number directly
+                      Text(
+                        batch.batchNumber,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text('Quantity: ${batch.stock}'),
+                      Text(
+                          'Price: \$${batch.price.toStringAsFixed(2)}'), // Display price with 2 decimal points
+                      Text(
+                          'Expiry Date: ${DateFormat('MM-dd-yyyy').format(batch.expiryDate)}'), // Formatted expiry date
+                      const SizedBox(height: 8.0),
+                      // Buttons for editing and deleting
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              // Implement edit functionality
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditBatchView(
+                                      productId: viewModel.product!.id),
+                                ),
+                              );
+                            },
+                            child: const Text('Edit',
+                                style: TextStyle(color: Colors.blue)),
+                          ),
+                          const SizedBox(width: 8.0),
+                          TextButton(
+                            onPressed: () {
+                              // Implement delete functionality
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text('Delete Batch'),
+                                  content: Text(
+                                      'Are you sure you want to delete this batch?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        viewModel
+                                            .deleteBatch(batch.batchNumber);
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: const Text('Delete',
+                                style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -183,24 +257,54 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
           GestureDetector(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddBatchView(productId: widget.productId!)));
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AddBatchView(productId: viewModel.product!.id),
+                ),
+              );
             },
             child: Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(8.0),
+                color: Colors.grey[100],
               ),
-              child: Center(
-                child: Text(
-                  'No batches available. Tap to add a batch.',
-                  style: TextStyle(color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    size: 40,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    'No batches available. Tap to add a batch.',
+                    style: TextStyle(color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
+            ),
+          ),
+        // Button to add a batch below the ListView
+        if (batches != null && batches.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddBatchView(productId: viewModel.product!.id),
+                  ),
+                );
+              },
+              icon: Icon(Icons.add),
+              label: Text('Add Product Batch'),
             ),
           ),
       ],

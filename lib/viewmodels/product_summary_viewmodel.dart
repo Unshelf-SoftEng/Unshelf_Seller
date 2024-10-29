@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/services/product_service.dart';
+import 'package:unshelf_seller/services/batch_service.dart';
 
 class ProductSummaryViewModel extends ChangeNotifier {
   final ProductService _productService = ProductService();
+  final BatchService _batchService = BatchService();
   ProductModel? _product;
   ProductModel? get product => _product;
   List<BatchModel>? _batches;
@@ -13,7 +15,7 @@ class ProductSummaryViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   PageController get pageController => _pageController;
   int _currentPage = 0;
   int get currentPage => _currentPage;
@@ -36,6 +38,12 @@ class ProductSummaryViewModel extends ChangeNotifier {
 
   void onPageChanged(int index) {
     _currentPage = index;
+    notifyListeners();
+  }
+
+  Future<void> deleteBatch(String batchNumber) async {
+    await _batchService.deleteBatch(batchNumber);
+    _batches!.removeWhere((batch) => batch.batchNumber == batchNumber);
     notifyListeners();
   }
 }

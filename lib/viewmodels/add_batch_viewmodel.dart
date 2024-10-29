@@ -38,4 +38,19 @@ class AddBatchViewModel extends ChangeNotifier {
     );
     setLoading(false);
   }
+
+  Future<void> fetchBatch(String batchId) async {
+    setLoading(true);
+    final batch = await _batchService.getBatchById(batchId);
+
+    if (batch != null) {
+      batchNumber = batch.batchNumber;
+      expiryDate = batch.expiryDate;
+      price = batch.price;
+      stock = batch.stock;
+      quantifier = batch.quantifier;
+      discount = batch.discount;
+    }
+    setLoading(false);
+  }
 }
