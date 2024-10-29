@@ -3,6 +3,7 @@ import 'package:unshelf_seller/models/product_model.dart';
 
 class BatchModel {
   String batchNumber;
+  String productId;
   ProductModel? product;
   double price;
   int stock;
@@ -12,6 +13,7 @@ class BatchModel {
 
   BatchModel({
     required this.batchNumber,
+    required this.productId,
     required this.product,
     required this.price,
     required this.stock,
@@ -25,6 +27,7 @@ class BatchModel {
 
     return BatchModel(
       batchNumber: doc.id,
+      productId: data['productId'],
       product: product,
       price: data['price'] ?? 0.0,
       stock: data['stock'] ?? 0,

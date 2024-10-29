@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
+import 'package:unshelf_seller/views/add_batch_view.dart';
 
 class ProductSummaryView extends StatefulWidget {
   final String? productId;
@@ -181,8 +182,11 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
         else
           GestureDetector(
             onTap: () {
-              // Navigate to Add Batch screen
-              _navigateToAddBatchScreen();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          AddBatchView(productId: widget.productId!)));
             },
             child: Container(
               padding: const EdgeInsets.all(16.0),
@@ -201,11 +205,6 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
           ),
       ],
     );
-  }
-
-  // Method to navigate to Add Batch screen
-  void _navigateToAddBatchScreen() {
-    // Your logic to navigate to Add Batch screen
   }
 
   // Method to show full image on tap

@@ -20,6 +20,7 @@ import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/notification_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/add_batch_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => WalletViewModel()),
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(create: (_) => AddBatchViewModel()),
       ],
       child: const MyApp(),
     ),
