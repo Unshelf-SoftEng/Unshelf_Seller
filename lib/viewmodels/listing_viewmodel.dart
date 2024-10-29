@@ -1,4 +1,3 @@
-// viewmodels/item_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,7 +53,6 @@ class ListingViewModel extends ChangeNotifier {
         final productSnapshot = await FirebaseFirestore.instance
             .collection('products')
             .where('sellerId', isEqualTo: user.uid)
-            .where('isListed', isEqualTo: true)
             .get();
 
         final products = productSnapshot.docs
@@ -70,26 +68,27 @@ class ListingViewModel extends ChangeNotifier {
             .cast<ItemModel>()
             .toList();
 
-        final bundleSnapshot = await FirebaseFirestore.instance
-            .collection('bundles')
-            .where('sellerId', isEqualTo: user.uid)
-            .where('isListed', isEqualTo: true)
-            .get();
+        // final bundleSnapshot = await FirebaseFirestore.instance
+        //     .collection('bundles')
+        //     .where('sellerId', isEqualTo: user.uid)
+        //     .get();
 
-        final bundles = bundleSnapshot.docs
-            .map((doc) {
-              try {
-                return BundleModel.fromSnapshot(doc) as ItemModel?;
-              } catch (e) {
-                print('Error mapping bundle: $e');
-                return null;
-              }
-            })
-            .where((bundle) => bundle != null)
-            .cast<ItemModel>()
-            .toList();
+        // final bundles = bundleSnapshot.docs
+        //     .map((doc) {
+        //       try {
+        //         return BundleModel.fromSnapshot(doc) as ItemModel?;
+        //       } catch (e) {
+        //         print('Error mapping bundle: $e');
+        //         return null;
+        //       }
+        //     })
+        //     .where((bundle) => bundle != null)
+        //     .cast<ItemModel>()
+        //     .toList();
 
-        _items = showingProducts ? products : bundles;
+        final bundles = [];
+
+        _items = showingProducts ? products : bundles.cast<ItemModel>();
         _filteredItems = _items;
       } catch (e) {
         print('Error fetching items: $e');

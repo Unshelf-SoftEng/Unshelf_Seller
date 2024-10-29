@@ -3,7 +3,7 @@ import 'package:unshelf_seller/models/product_model.dart';
 
 class BatchModel {
   String batchNumber;
-  ProductModel product;
+  ProductModel? product;
   double price;
   int stock;
   String quantifier;
@@ -20,7 +20,7 @@ class BatchModel {
     required this.discount,
   });
 
-  factory BatchModel.fromSnapshot(DocumentSnapshot doc, ProductModel product) {
+  factory BatchModel.fromSnapshot(DocumentSnapshot doc, ProductModel? product) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
     return BatchModel(

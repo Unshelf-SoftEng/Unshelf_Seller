@@ -107,14 +107,13 @@ class _OrdersViewState extends State<OrdersView> {
                                     height: 60,
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: NetworkImage(
-                                            order.products[0].mainImageUrl),
+                                        image: NetworkImage(order
+                                            .products[0].product!.mainImageUrl),
                                         fit: BoxFit.cover,
                                       ),
                                       borderRadius: BorderRadius.circular(8.0),
                                       border: Border.all(
-                                          color: Colors.grey,
-                                          width: 1), // Border for image
+                                          color: Colors.grey, width: 1),
                                     ),
                                   ),
                                   SizedBox(width: 8.0),
@@ -126,8 +125,7 @@ class _OrdersViewState extends State<OrdersView> {
                                       children: [
                                         Text(
                                           order.products.isNotEmpty
-                                              ? order.products[0]
-                                                  .name // Assuming the product has a name field
+                                              ? order.products[0].product!.name
                                               : 'No Product Name',
                                           style: const TextStyle(
                                               fontSize: 16.0,

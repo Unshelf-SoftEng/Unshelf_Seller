@@ -138,7 +138,6 @@ class _ListingsViewState extends State<ListingsView> {
               final item = viewModel.filteredItems[index];
               final itemId = item.id;
               final itemName = item.name;
-              final itemPrice = item.price;
 
               return InkWell(
                 onTap: () {
@@ -167,7 +166,6 @@ class _ListingsViewState extends State<ListingsView> {
                     ),
                     title: Text(itemName,
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('₱ ${itemPrice.toStringAsFixed(2)}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[

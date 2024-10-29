@@ -56,17 +56,20 @@ class OrderModel {
 
 class OrderItem {
   final int quantity;
-  final String batchId;
+  final String batchNumber;
+  String? name;
 
   OrderItem({
-    required this.batchId,
+    required this.batchNumber,
     required this.quantity,
+    this.name,
   });
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
       quantity: map['quantity'] as int,
-      batchId: map['productId'],
+      batchNumber: map['batchNumber'],
+      name: map['name'],
     );
   }
 }

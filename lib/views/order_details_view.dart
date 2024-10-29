@@ -137,7 +137,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(10)),
                                 child: Image.network(
-                                  product.mainImageUrl,
+                                  product.product!.mainImageUrl,
                                   width: double.infinity,
                                   height: 120, // Fixed height for images
                                   fit: BoxFit.cover,
@@ -150,7 +150,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        product.name,
+                                        product.product!.name,
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,

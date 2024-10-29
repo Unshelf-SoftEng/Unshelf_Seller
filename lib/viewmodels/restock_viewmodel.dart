@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RestockViewModel extends ChangeNotifier {
-  List<ProductModel> _products = [];
-  List<ProductModel> _selectedProducts = [];
+  List<BatchModel> _products = [];
+  List<BatchModel> _selectedProducts = [];
   List<BundleModel> _bundles = [];
   List<BundleModel> _selectedBundles = [];
 
@@ -14,8 +15,8 @@ class RestockViewModel extends ChangeNotifier {
 
   String _error = '';
 
-  List<ProductModel> get products => _products;
-  List<ProductModel> get selectedProducts => _selectedProducts;
+  List<BatchModel> get products => _products;
+  List<BatchModel> get selectedProducts => _selectedProducts;
   List<BundleModel> get bundles => _bundles;
   List<BundleModel> get selectedBundles => _selectedBundles;
 
@@ -42,8 +43,9 @@ class RestockViewModel extends ChangeNotifier {
           .where('sellerId', isEqualTo: sellerId)
           .get();
 
-      _products =
-          snapshot.docs.map((doc) => ProductModel.fromSnapshot(doc)).toList();
+      _products = snapshot.docs
+          .map((doc) => BatchModel.fromSnapshot(doc, null))
+          .toList();
 
       _bundles =
           snapshot.docs.map((doc) => BundleModel.fromSnapshot(doc)).toList();
@@ -55,32 +57,17 @@ class RestockViewModel extends ChangeNotifier {
     }
   }
 
-  void addSelectedProduct(ProductModel product) {
+  void addSelectedProduct(BatchModel product) {
     if (contain(product)) {
       return;
     }
-
-    var addedProduct = ProductModel(
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      stock: 0,
-      expiryDate: null,
-      description: product.description,
-      category: product.category,
-      quantifier: product.quantifier,
-      discount: product.discount,
-      mainImageUrl: product.mainImageUrl,
-      additionalImageUrls: product.additionalImageUrls,
-    );
-
-    _selectedProducts.add(addedProduct);
+    _selectedProducts.add(product);
     notifyListeners();
   }
 
-  bool contain(ProductModel product) {
+  bool contain(BatchModel product) {
     for (var selected in _selectedProducts) {
-      if (product.id == selected.id) {
+      if (product.batchNumber == selected.batchNumber) {
         return true;
       }
     }
@@ -88,34 +75,34 @@ class RestockViewModel extends ChangeNotifier {
     return false;
   }
 
-  void removeSelectedProduct(ProductModel product) {
-    _selectedProducts.removeWhere((p) => p.id == product.id);
+  void removeSelectedProduct(BatchModel product) {
+    _selectedProducts.removeWhere((p) => p.batchNumber == product.batchNumber);
     notifyListeners();
   }
 
-  Future<void> batchRestock(List<ProductModel> productsToRestock) async {
+  Future<void> batchRestock(List<BatchModel> productsToRestock) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final batch = FirebaseFirestore.instance.batch();
-      for (var product in productsToRestock) {
-        final docRef =
-            FirebaseFirestore.instance.collection('products').doc(product.id);
+      // final batch = FirebaseFirestore.instance.batch();
+      // for (var product in productsToRestock) {
+      //   final docRef =
+      //       FirebaseFirestore.instance.collection('products').doc(product.id);
 
-        // Retrieve the current stock
-        final snapshot = await docRef.get();
-        final currentQuantity = snapshot.data()?['stock'] ?? 0;
+      //   // Retrieve the current stock
+      //   final snapshot = await docRef.get();
+      //   final currentQuantity = snapshot.data()?['stock'] ?? 0;
 
-        // Add the new stock to the existing quantity
-        final newQuantity = currentQuantity + product.stock;
+      //   // Add the new stock to the existing quantity
+      //   //final newQuantity = currentQuantity + product.stock;
 
-        batch.update(docRef, {'stock': newQuantity});
-      }
-      await batch.commit();
-      await fetchProducts();
-      _selectedBundles.clear();
-      _selectedProducts.clear();
+      //   batch.update(docRef, {'stock': newQuantity});
+      // }
+      // await batch.commit();
+      // await fetchProducts();
+      // _selectedBundles.clear();
+      // _selectedProducts.clear();
     } catch (e) {
       _error = 'Failed to restock products: $e';
     } finally {
@@ -124,7 +111,7 @@ class RestockViewModel extends ChangeNotifier {
     }
   }
 
-  void updateExpiryDate(ProductModel product, DateTime newDate) {
+  void updateExpiryDate(BatchModel product, DateTime newDate) {
     product.expiryDate = newDate;
     notifyListeners();
   }

@@ -18,6 +18,23 @@ class ProductService extends ChangeNotifier {
     return null;
   }
 
+  Future<List<ProductModel>> getProducts() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    final productDocs = await FirebaseFirestore.instance
+        .collection('products')
+        .where('sellerId', isEqualTo: user!.uid)
+        .get();
+
+    if (productDocs.docs.isNotEmpty) {
+      return productDocs.docs
+          .map((doc) => ProductModel.fromSnapshot(doc))
+          .toList();
+    }
+
+    return [];
+  }
+
   Future<List<BatchModel>?> getProductBatches(ProductModel product) async {
     final batchDocs = await FirebaseFirestore.instance
         .collection('batches')
@@ -44,6 +61,7 @@ class ProductService extends ChangeNotifier {
         'mainImageUrl': product.mainImageUrl,
         'additionalImageUrls': product.additionalImageUrls,
         'sellerId': user!.uid,
+        'isListed': true,
       });
     } catch (e) {
       print('Error adding product to Firestore: $e');

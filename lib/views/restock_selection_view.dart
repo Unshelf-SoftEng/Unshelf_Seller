@@ -70,7 +70,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 horizontal: 16.0,
                               ),
                               title: Text(
-                                product.name,
+                                product.product!.name,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -92,7 +92,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                               ),
                               leading: CircleAvatar(
                                 backgroundImage:
-                                    NetworkImage(product.mainImageUrl),
+                                    NetworkImage(product.product!.mainImageUrl),
                                 radius: 30,
                                 backgroundColor: Colors.grey[200],
                               ),

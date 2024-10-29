@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/order_model.dart';
+import 'package:unshelf_seller/services/order_service.dart';
 import 'package:nanoid/nanoid.dart';
 
 class OrderViewModel extends ChangeNotifier {
@@ -16,6 +16,7 @@ class OrderViewModel extends ChangeNotifier {
   bool _isLoading = false;
 
   late Future<void> fetchOrdersFuture;
+  final OrderService _orderService = OrderService();
 
   OrderViewModel() {
     fetchOrdersFuture = fetchOrders();
@@ -30,24 +31,9 @@ class OrderViewModel extends ChangeNotifier {
 
   Future<void> fetchOrders() async {
     _isLoading = true;
-    notifyListeners();
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw Exception('User not logged in');
-      }
-
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('sellerId', isEqualTo: user.uid)
-          .orderBy('createdAt', descending: true)
-          .get();
-
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      print('Failed to fetch orders: $e');
-    }
+    var orders = await _orderService.getOrders();
+    _orders = orders;
+    _isLoading = false;
   }
 
   OrderModel? selectOrder(String orderId) {
@@ -73,12 +59,13 @@ class OrderViewModel extends ChangeNotifier {
         .update({'status': 'Ready'});
 
     _selectedOrder?.items.forEach((item) async {
-      final productRef =
-          FirebaseFirestore.instance.collection('products').doc(item.productId);
+      final batchRef = FirebaseFirestore.instance
+          .collection('batches')
+          .doc(item.batchNumber);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        DocumentSnapshot productDoc = await transaction.get(productRef);
-        double currentStock = productDoc['stock']; // Get the latest stock value
+        DocumentSnapshot productDoc = await transaction.get(batchRef);
+        double currentStock = productDoc['stock'];
         int quantity = item.quantity;
         double newStockValue = currentStock - quantity;
         DocumentReference orderRef = FirebaseFirestore.instance
@@ -87,14 +74,14 @@ class OrderViewModel extends ChangeNotifier {
 
         if (newStockValue < 0) {
           print("Insufficient stock. Cannot complete order.");
-          return; // Abort the operation
+          return;
         }
 
         transaction.update(orderRef, {'status': 'Completed'});
         transaction
             .update(orderRef, {'completedAt': FieldValue.serverTimestamp()});
-        transaction.update(productRef, {'stock': newStockValue});
-        transaction.update(productRef, {'isListed': newStockValue > 0});
+        transaction.update(batchRef, {'stock': newStockValue});
+        transaction.update(batchRef, {'isListed': newStockValue > 0});
       });
     });
 

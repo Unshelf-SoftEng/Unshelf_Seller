@@ -39,7 +39,7 @@ class BundleSuggestionsView extends StatelessWidget {
                     final suggestion = suggestions[index];
                     // Create a string of product names
                     final productNames = suggestion.products
-                        ?.map((product) => product.name)
+                        ?.map((product) => product.productName)
                         .join(', ');
 
                     return Card(
