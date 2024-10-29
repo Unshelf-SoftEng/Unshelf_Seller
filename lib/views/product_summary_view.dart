@@ -188,62 +188,78 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8.0),
-                      Text('Quantity: ${batch.stock}'),
-                      Text(
-                          'Price: \$${batch.price.toStringAsFixed(2)}'), // Display price with 2 decimal points
-                      Text(
-                          'Expiry Date: ${DateFormat('MM-dd-yyyy').format(batch.expiryDate)}'), // Formatted expiry date
-                      const SizedBox(height: 8.0),
-                      // Buttons for editing and deleting
+                      // Row for quantity, price, and expiry date
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment
+                            .spaceBetween, // Spread text and buttons
                         children: [
-                          TextButton(
-                            onPressed: () {
-                              // Implement edit functionality
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditBatchView(
-                                      productId: viewModel.product!.id),
-                                ),
-                              );
-                            },
-                            child: const Text('Edit',
-                                style: TextStyle(color: Colors.blue)),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Quantity: ${batch.stock}'),
+                                Text(
+                                    'Price: ₱${batch.price.toStringAsFixed(2)}'), // Display price with 2 decimal points
+                                Text(
+                                    'Expiry Date: ${DateFormat('MM-dd-yyyy').format(batch.expiryDate)}'), // Formatted expiry date
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 8.0),
-                          TextButton(
-                            onPressed: () {
-                              // Implement delete functionality
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text('Delete Batch'),
-                                  content: Text(
-                                      'Are you sure you want to delete this batch?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        viewModel
-                                            .deleteBatch(batch.batchNumber);
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                      },
-                                      child: Text('Yes'),
+                          // Icons for editing and deleting
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit,
+                                    color: const Color(0xFF6A994E)),
+                                onPressed: () async {
+                                  final editResult = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditBatchView(
+                                        batchNumber: batch.batchNumber,
+                                      ),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('No'),
+                                  );
+
+                                  if (editResult == true) {
+                                    viewModel
+                                        .fetchProductData(widget.productId!);
+                                  }
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  // Implement delete functionality
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Delete Batch'),
+                                      content: const Text(
+                                          'Are you sure you want to delete this batch?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            viewModel
+                                                .deleteBatch(batch.batchNumber);
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: const Text('No'),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
-                            child: const Text('Delete',
-                                style: TextStyle(color: Colors.red)),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -294,17 +310,22 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
                         AddBatchView(productId: viewModel.product!.id),
                   ),
                 );
+
+                if (result == true) {
+                  // Refresh data
+                  viewModel.fetchProductData(widget.productId!);
+                }
               },
-              icon: Icon(Icons.add),
-              label: Text('Add Product Batch'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Product Batch'),
             ),
           ),
       ],

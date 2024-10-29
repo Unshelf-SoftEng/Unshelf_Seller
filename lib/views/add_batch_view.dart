@@ -49,7 +49,7 @@ class AddBatchView extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             TextFormField(
-              decoration: const InputDecoration(labelText: 'Price'),
+              decoration: const InputDecoration(labelText: 'Price (₱)'),
               keyboardType: TextInputType.number,
               onChanged: (value) => viewModel.price = double.tryParse(value),
             ),
@@ -66,7 +66,7 @@ class AddBatchView extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             TextFormField(
-              decoration: const InputDecoration(labelText: 'Discount'),
+              decoration: const InputDecoration(labelText: 'Discount (%)'),
               keyboardType: TextInputType.number,
               onChanged: (value) => viewModel.discount = int.tryParse(value),
             ),
@@ -75,7 +75,7 @@ class AddBatchView extends StatelessWidget {
               onPressed: () async {
                 await viewModel.addBatch(productId);
                 if (!viewModel.isLoading) {
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                 }
               },
               child: viewModel.isLoading

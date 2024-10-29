@@ -7,9 +7,12 @@ class BatchService {
 
   Future<BatchModel?> getBatchById(String batchId) async {
     var doc = await _firestore.collection('batches').doc(batchId).get();
+
+    print('Was here');
     if (doc.exists) {
-      var productDoc =
-          await _firestore.collection('products').doc(doc['sellerId']).get();
+      print(doc.data());
+
+      print('Was here');
 
       return BatchModel.fromSnapshot(doc, null);
     }
@@ -48,7 +51,6 @@ class BatchService {
     int batchCount = 1;
 
     if (snapshot.docs.isNotEmpty) {
-      // Get the last two characters of the latest batch number
       final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
       final latestSuffix = int.tryParse(
               latestBatchNumber.substring(latestBatchNumber.length - 2)) ??
@@ -71,6 +73,22 @@ class BatchService {
       'discount': discount,
       'isListed': true,
       'dateCreated': Timestamp.now(),
+    });
+  }
+
+  Future<void> updateBatch(String batchNumber, double price, int stock,
+      String quantifier, DateTime expiryDate, int discount) async {
+    print('Updating batch');
+    print(expiryDate);
+    var formattedDate = Timestamp.fromDate(expiryDate);
+    print(formattedDate);
+
+    await _firestore.collection('batches').doc(batchNumber).update({
+      'price': price,
+      'stock': stock,
+      'quantifier': quantifier,
+      'expiryDate': Timestamp.fromDate(expiryDate),
+      'discount': discount,
     });
   }
 
