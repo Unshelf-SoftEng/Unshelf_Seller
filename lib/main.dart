@@ -14,13 +14,14 @@ import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
-import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/notification_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/add_batch_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/select_products_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => StoreViewModel()),
         ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
         ChangeNotifierProvider(create: (_) => RestockViewModel()),
-        ChangeNotifierProvider(create: (_) => BundleViewModel()),
+        ChangeNotifierProvider(create: (_) => AddBundleViewModel()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(
             create: (_) => UserProfileViewModel(userProfile: null)),
@@ -55,6 +56,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
         ChangeNotifierProvider(create: (_) => AddBatchViewModel()),
+        ChangeNotifierProvider(create: (_) => SelectProductsViewModel()),
       ],
       child: const MyApp(),
     ),

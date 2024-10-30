@@ -61,7 +61,6 @@ class ProductService extends ChangeNotifier {
         'mainImageUrl': product.mainImageUrl,
         'additionalImageUrls': product.additionalImageUrls,
         'sellerId': user!.uid,
-        'isListed': true,
       });
     } catch (e) {
       print('Error adding product to Firestore: $e');

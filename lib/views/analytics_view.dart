@@ -29,7 +29,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Analytics'),
-        backgroundColor: const Color(0xFF6A994E),
+        backgroundColor: const Color(0xFF6A994D),
       ),
       body: analyticsViewModel.isLoading
           ? const Center(child: CircularProgressIndicator())

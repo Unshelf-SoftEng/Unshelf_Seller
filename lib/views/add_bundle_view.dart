@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
@@ -11,13 +11,13 @@ class AddBundleView extends StatefulWidget {
   final String? bundleId;
   final BundleModel? bundle;
   final bool fromSuggestions;
-  final VoidCallback onBundleAdded;
+  final List<String>? selectedProductIds;
 
   AddBundleView(
       {this.bundleId,
       this.bundle,
       this.fromSuggestions = false,
-      required this.onBundleAdded});
+      this.selectedProductIds});
 
   @override
   _AddBundleViewState createState() => _AddBundleViewState();
@@ -27,7 +27,7 @@ class _AddBundleViewState extends State<AddBundleView> {
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<BundleViewModel>(context, listen: false);
+    final viewModel = Provider.of<AddBundleViewModel>(context, listen: false);
     if (widget.bundle != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initializeControllers(widget.bundle!);
@@ -37,7 +37,7 @@ class _AddBundleViewState extends State<AddBundleView> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<BundleViewModel>(context, listen: false);
+    final viewModel = Provider.of<AddBundleViewModel>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -70,7 +70,7 @@ class _AddBundleViewState extends State<AddBundleView> {
           ),
         ],
       ),
-      body: Consumer<BundleViewModel>(
+      body: Consumer<AddBundleViewModel>(
         builder: (context, viewModel, child) {
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -316,7 +316,6 @@ class _AddBundleViewState extends State<AddBundleView> {
                               content: Text('Bundle created successfully'),
                             ),
                           );
-                          widget.onBundleAdded();
                           Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

@@ -6,24 +6,23 @@ import 'package:unshelf_seller/views/add_batch_view.dart';
 import 'package:unshelf_seller/views/edit_batch_view.dart';
 
 class ProductSummaryView extends StatefulWidget {
-  final String? productId;
+  final String productId;
 
-  ProductSummaryView({this.productId});
+  ProductSummaryView({required this.productId});
 
   @override
   _ProductSummaryViewState createState() => _ProductSummaryViewState();
 }
 
 class _ProductSummaryViewState extends State<ProductSummaryView> {
-  late ProductSummaryViewModel viewModel;
-
   @override
   void initState() {
     super.initState();
-    viewModel = Provider.of<ProductSummaryViewModel>(context, listen: false);
-    if (widget.productId != null) {
-      viewModel.fetchProductData(widget.productId!);
-    }
+    final viewModel =
+        Provider.of<ProductSummaryViewModel>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.fetchProductData(widget.productId);
+    });
   }
 
   @override
@@ -184,11 +183,10 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                     children: [
                       // Display batch number directly
                       Text(
-                        batch.batchNumber,
-                        style: Theme.of(context).textTheme.titleLarge,
+                        'Batch Number: ${batch.batchNumber}',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8.0),
-                      // Row for quantity, price, and expiry date
                       Row(
                         mainAxisAlignment: MainAxisAlignment
                             .spaceBetween, // Spread text and buttons
@@ -209,8 +207,8 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                           Row(
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit,
-                                    color: const Color(0xFF6A994E)),
+                                icon: const Icon(Icons.edit,
+                                    color: Color(0xFF6A994E)),
                                 onPressed: () async {
                                   final editResult = await Navigator.push(
                                     context,
@@ -228,7 +226,8 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                                 },
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () {
                                   // Implement delete functionality
                                   showDialog(
@@ -271,37 +270,53 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
           )
         else
           GestureDetector(
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final editResult = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      AddBatchView(productId: viewModel.product!.id),
+                  builder: (context) => AddBatchView(
+                    productId: widget.productId,
+                  ),
                 ),
               );
+
+              if (editResult == true) {
+                viewModel.fetchProductData(widget.productId);
+              }
             },
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.grey[100],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.add_circle_outline,
-                    size: 40,
-                    color: Colors.grey[600],
+            child: SizedBox(
+              width: double.infinity, // Makes the Card take full screen width
+              child: Card(
+                elevation: 2.0,
+                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center, // Center the icon and text horizontally
+                    children: [
+                      Icon(
+                        Icons.add_circle_outline,
+                        size: 40,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        'No batches available. Tap to add a batch.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: Colors.grey[600]),
+                        textAlign:
+                            TextAlign.center, // Centers text within the column
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'No batches available. Tap to add a batch.',
-                    style: TextStyle(color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -337,9 +352,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
     showDialog(
       context: context,
       builder: (_) => Dialog(
-        child: Container(
-          child: Image.network(imageUrl, fit: BoxFit.cover),
-        ),
+        child: Image.network(imageUrl, fit: BoxFit.cover),
       ),
     );
   }

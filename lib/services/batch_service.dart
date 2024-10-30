@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:intl/intl.dart';
 
@@ -7,13 +8,7 @@ class BatchService {
 
   Future<BatchModel?> getBatchById(String batchId) async {
     var doc = await _firestore.collection('batches').doc(batchId).get();
-
-    print('Was here');
     if (doc.exists) {
-      print(doc.data());
-
-      print('Was here');
-
       return BatchModel.fromSnapshot(doc, null);
     }
     return null;
@@ -30,6 +25,18 @@ class BatchService {
         .toList();
   }
 
+  Future<List<BatchModel>> getAllBatches() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    var snapshot = await _firestore
+        .collection('batches')
+        .where('sellerId', isEqualTo: user!.uid)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => BatchModel.fromSnapshot(doc, null))
+        .toList();
+  }
+
   Future<void> addBatch({
     required String productId,
     String? batchNumber,
@@ -39,29 +46,34 @@ class BatchService {
     required DateTime expiryDate,
     required int discount,
   }) async {
-    final datePart = DateFormat('yyyyMMdd').format(DateTime.now());
-    final snapshot = await _firestore
-        .collection('batches') // Replace 'batches' with your collection name
-        .where('batchNumber', isGreaterThanOrEqualTo: datePart)
-        .where('batchNumber', isLessThan: '$datePart\uf8ff')
-        .orderBy('batchNumber', descending: true)
-        .limit(1)
-        .get();
+    User user = FirebaseAuth.instance.currentUser!;
+    final String generatedBatchNumber;
+    if (batchNumber == null) {
+      final datePart = DateFormat('yyyyMMdd').format(DateTime.now());
+      final snapshot = await _firestore
+          .collection('batches')
+          .where('productId', isEqualTo: productId)
+          .where('batchNumber', isGreaterThanOrEqualTo: datePart)
+          .where('batchNumber', isLessThan: '$datePart\uf7ff')
+          .orderBy('batchNumber', descending: true)
+          .limit(1)
+          .get();
 
-    int batchCount = 1;
+      int batchCount = 0;
 
-    if (snapshot.docs.isNotEmpty) {
-      final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
-      final latestSuffix = int.tryParse(
-              latestBatchNumber.substring(latestBatchNumber.length - 2)) ??
-          0;
-      batchCount = latestSuffix + 1;
+      if (snapshot.docs.isNotEmpty) {
+        final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
+        final latestSuffix = int.tryParse(
+                latestBatchNumber.substring(latestBatchNumber.length - 1)) ??
+            -1;
+        batchCount = latestSuffix + 1;
+      }
+
+      final suffix = batchCount.toString().padLeft(1, '0');
+      generatedBatchNumber = '$datePart-$suffix';
+    } else {
+      generatedBatchNumber = batchNumber;
     }
-
-    final suffix = batchCount.toString().padLeft(2, '0');
-
-    final generatedBatchNumber = batchNumber ?? '$datePart-$suffix';
-
     // Save the batch to Firestore
     await _firestore.collection('batches').doc(generatedBatchNumber).set({
       'batchNumber': generatedBatchNumber,
@@ -73,6 +85,7 @@ class BatchService {
       'discount': discount,
       'isListed': true,
       'dateCreated': Timestamp.now(),
+      'sellerId': FirebaseAuth.instance.currentUser!.uid,
     });
   }
 
