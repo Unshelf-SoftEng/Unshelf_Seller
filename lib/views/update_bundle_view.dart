@@ -4,25 +4,30 @@ import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
-import 'package:unshelf_seller/models/batch_model.dart';
 
-class AddBundleView extends StatefulWidget {
-  final List<BatchModel> products;
+class UpdateBundleView extends StatefulWidget {
+  final String bundleId;
 
-  AddBundleView({required this.products});
+  UpdateBundleView({required this.bundleId});
 
   @override
-  _AddBundleViewState createState() => _AddBundleViewState();
+  _UpdateBundleViewState createState() => _UpdateBundleViewState();
 }
 
-class _AddBundleViewState extends State<AddBundleView> {
+class _UpdateBundleViewState extends State<UpdateBundleView> {
   @override
   void initState() {
     super.initState();
+    final viewModel = Provider.of<AddBundleViewModel>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.getBundleDetails(widget.bundleId);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<AddBundleViewModel>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Product Bundle'),
@@ -34,7 +39,7 @@ class _AddBundleViewState extends State<AddBundleView> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.autorenew),
+            icon: Icon(Icons.autorenew), // Icon for AI suggestions
             onPressed: () async {
               Navigator.pushReplacement(
                 context,
@@ -278,7 +283,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                           );
                         }
                       },
-                      child: Text('Create Bundle'),
+                      child: Text('Update Bundle'),
                     ),
                   ],
                 ),

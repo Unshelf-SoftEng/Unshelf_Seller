@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
-import 'package:unshelf_seller/services/product_service.dart';
+import 'package:unshelf_seller/services/bundle_service.dart';
 
 class AddBundleViewModel extends ChangeNotifier {
   final TextEditingController bundleNameController = TextEditingController();
@@ -30,12 +30,9 @@ class AddBundleViewModel extends ChangeNotifier {
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
 
-  List<BundleModel> _suggestions = [];
-  List<BundleModel> get suggestions => _suggestions;
-
-  Future<void>? _fetchSuggestionsFuture;
-
-  final ProductService _productService = ProductService();
+  final BundleService _bundleService = BundleService();
+  BundleModel? _bundle;
+  BundleModel? get bundle => _bundle;
 
   void initializeControllers(BundleModel bundle) {
     bundleNameController.text = bundle.name;
@@ -103,9 +100,7 @@ class AddBundleViewModel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      // Handle errors appropriately
       print('Failed to create bundle: $e');
-      // Optionally, you can show a user-friendly message using a dialog or a snackbar
     }
   }
 
@@ -137,54 +132,12 @@ class AddBundleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchSuggestions() async {
-    const url = 'https://productbundlerapi.onrender.com/api/recommend-bundles/';
+  Future<void> getBundleDetails(String bundleId) async {
+    // Fetch bundle details
+    _bundle = await _bundleService.getBundle(bundleId);
+    notifyListeners();
 
-    final headers = {'Content-Type': 'application/json'};
-
-    _products = await _productService.getProducts();
-
-    final body = json.encode(
-      _products.map((product) => product.toJson()).toList(),
-    );
-
-    try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print('Suggestions: $data');
-
-        _suggestions = (data['bundles'] as List)
-            .map<BundleModel>((bundle) => BundleModel.fromJson(bundle))
-            .toList();
-
-        for (var suggestion in _suggestions) print(suggestion.name);
-
-        notifyListeners();
-      } else {
-        print('Error: ${response.reasonPhrase}');
-      }
-    } catch (e) {
-      print('Exception: $e');
-    }
-  }
-
-  Future<void> getSuggestions() {
-    if (_fetchSuggestionsFuture != null) {
-      return _fetchSuggestionsFuture!;
-    }
-
-    _fetchSuggestionsFuture = fetchSuggestions();
-    return _fetchSuggestionsFuture!;
-  }
-
-  @override
-  void dispose() {
-    bundleNameController.dispose();
-    bundleStockController.dispose();
-    bundlePriceController.dispose();
-    super.dispose();
+    // Load main image
+    await loadImageFromUrl(_bundle!.mainImageUrl);
   }
 }

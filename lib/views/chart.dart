@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' as math;
 
 class Chart extends StatefulWidget {
   const Chart({
@@ -26,22 +27,17 @@ class _ChartState extends State<Chart> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen size
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final height = screenHeight * 0.5;
 
     return SizedBox(
-      height: height < 300 ? 300 : height,
+      height: screenHeight * 0.25, // Dynamically adjust height
       child: Padding(
-        padding: EdgeInsets.only(
-          right: screenWidth * 0.05, // 5% of screen width
-          left: screenWidth * 0.03, // 3% of screen width
-          top: screenHeight * 0.05, // 5% of screen height
-          bottom: screenHeight * 0.02, // 2% of screen height
+        padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.02,
         ),
         child: LineChart(
-          mainData(screenWidth), // Pass the screen width to adjust titles
+          mainData(screenWidth),
         ),
       ),
     );
@@ -50,18 +46,15 @@ class _ChartState extends State<Chart> {
   Widget bottomTitleWidgets(double value, TitleMeta meta, double screenWidth) {
     final style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: screenWidth * 0.0075, // Dynamic font size
+      fontSize: screenWidth * 0.02, // Slightly larger font for readability
     );
 
-    // Get the date from the dataMap based on the value (index)
     DateTime date = widget.dataMap.keys.elementAt(value.toInt());
-
-    // Format the date based on the maxXValue
     String dateString;
-    if (widget.maxXValue == 30) {
+    if (widget.maxXValue == 15) {
       dateString = DateFormat('MM/dd').format(date);
-    } else if (widget.maxXValue == 12) {
-      dateString = DateFormat('MMM yyyy').format(date);
+    } else if (widget.maxXValue == 6) {
+      dateString = DateFormat('MMM yy').format(date);
     } else if (widget.maxXValue == 4) {
       dateString = DateFormat('MM/dd').format(date);
     } else {
@@ -77,11 +70,11 @@ class _ChartState extends State<Chart> {
   Widget leftTitleWidgets(dynamic value, TitleMeta meta, double screenWidth) {
     final style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: screenWidth * 0.0075,
+      fontSize: screenWidth * 0.03,
     );
 
     return Text(
-      value is int ? '$value' : '${value.toStringAsFixed(2)}',
+      value is int ? '$value' : '${value.ceil()}',
       style: style,
       textAlign: TextAlign.left,
     );
@@ -93,21 +86,21 @@ class _ChartState extends State<Chart> {
 
     for (int i = 0; i < keys.length; i++) {
       DateTime date = keys[i];
-      double value =
-          (widget.dataMap[date] ?? 0.0) as double; // Handle dynamic value
+      double value = (widget.dataMap[date] ?? 0.0) as double;
       spots.add(FlSpot(i.toDouble(), value.toDouble()));
     }
 
-    // Calculate reserved size based on number of digits in maxYValue
-    int numberOfDigits = widget.maxYValue
-        .toString()
-        .split('.')[0]
-        .length; // Count digits before decimal
-    double reservedSize =
-        10.0 + (numberOfDigits * 5.0); // Adjust the multiplier as needed
+    int numberOfDigits = widget.maxYValue.toString().split('.')[0].length;
+    double reservedSize = 10.0 + (numberOfDigits * 5.0);
 
     return LineChartData(
-      gridData: FlGridData(show: true),
+      gridData: FlGridData(
+        show: true,
+        horizontalInterval: widget.maxYValue > 0
+            ? widget.maxYValue / 5
+            : 1.0, // Limit horizontal grid lines
+        drawVerticalLine: false,
+      ),
       titlesData: FlTitlesData(
         show: true,
         bottomTitles: AxisTitles(
@@ -122,7 +115,9 @@ class _ChartState extends State<Chart> {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 300,
+            interval: widget.maxYValue > 0
+                ? widget.maxYValue / 4
+                : 1.0, // Limit vertical labels
             getTitlesWidget: (value, meta) =>
                 leftTitleWidgets(value, meta, screenWidth),
             reservedSize: reservedSize,
@@ -146,11 +141,11 @@ class _ChartState extends State<Chart> {
       lineBarsData: [
         LineChartBarData(
           spots: spots,
-          isCurved: false,
+          isCurved: true,
           gradient: LinearGradient(colors: gradientColors),
-          barWidth: screenWidth * 0.01, // Dynamic bar width
+          barWidth: screenWidth * 0.005,
           isStrokeCapRound: true,
-          dotData: const FlDotData(show: false),
+          dotData: FlDotData(show: true),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(

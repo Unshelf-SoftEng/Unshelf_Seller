@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/bundle_suggestion_viewmodel.dart';
-import 'package:unshelf_seller/views/add_bundle_view.dart';
 
 class BundleSuggestionsView extends StatelessWidget {
   @override
@@ -74,15 +73,13 @@ class BundleSuggestionsView extends StatelessWidget {
                           color: Theme.of(context).primaryColor,
                         ),
                         onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddBundleView(
-                                bundle: suggestion,
-                                fromSuggestions: true,
-                              ),
-                            ),
-                          );
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => AddBundleView(
+                          //     ),
+                          //   ),
+                          // );
                         },
                       ),
                     );

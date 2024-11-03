@@ -40,10 +40,8 @@ class _SelectProductsViewState extends State<SelectProductsView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddBundleView(
-                    fromSuggestions: false,
-                    selectedProductIds: viewModel.selectedProductIds.toList(),
-                  ),
+                  builder: (context) =>
+                      AddBundleView(products: viewModel.products),
                 ),
               );
             },

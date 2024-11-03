@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/views/chart.dart';
-import 'package:unshelf_seller/views/product_analytics_view.dart';
 
-class AnalyticsView extends StatefulWidget {
+class ProductAnalyticsView extends StatefulWidget {
   @override
-  _AnalyticsViewState createState() => _AnalyticsViewState();
+  _ProductAnalyticsViewState createState() => _ProductAnalyticsViewState();
 }
 
-class _AnalyticsViewState extends State<AnalyticsView> {
+class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
   String selectedSalesValue = 'Daily';
   String selectedOrdersValue = 'Daily';
 
@@ -234,7 +233,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                   else if (selectedOrdersValue == 'Monthly')
                     Chart(
                       dataMap: analyticsViewModel.monthlyOrdersMap,
-                      maxXValue: 6,
+                      maxXValue: 12,
                       maxYValue: analyticsViewModel.monthlyMaxYOrder,
                     )
                   else
@@ -284,7 +283,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                   else if (selectedSalesValue == 'Monthly')
                     Chart(
                       dataMap: analyticsViewModel.monthlySalesMap,
-                      maxXValue: 6,
+                      maxXValue: 12,
                       maxYValue: analyticsViewModel.monthlyMaxYSales,
                     )
                   else
@@ -362,19 +361,6 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                               ))
                           .toList(),
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProductAnalyticsView(),
-                        ),
-                      );
-                    },
-                    child: const Text('View Sales by Product'),
                   ),
                 ],
               ),

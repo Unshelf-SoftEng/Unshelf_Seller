@@ -12,21 +12,41 @@ class AnalyticsViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  Map<DateTime, int> _ordersMap = {};
-  Map<DateTime, double> _salesMap = {};
-  double _maxXOrder = 0;
-  double _maxYOrder = 0;
-  double _maxXSales = 0;
-  double _maxYSales = 0;
+  Map<DateTime, int> _dailyOrdersMap = {};
+  Map<DateTime, int> get dailyOrdersMap => _dailyOrdersMap;
+  Map<DateTime, int> _weeklyOrdersMap = {};
+  Map<DateTime, int> get weeklyOrdersMap => _weeklyOrdersMap;
+  Map<DateTime, int> _monthlyOrdersMap = {};
+  Map<DateTime, int> get monthlyOrdersMap => _monthlyOrdersMap;
+  Map<DateTime, int> _annualOrdersMap = {};
+  Map<DateTime, int> get annualOrdersMap => _annualOrdersMap;
 
-  Map<DateTime, int> get ordersMap => _ordersMap;
-  Map<DateTime, double> get salesMap => _salesMap;
+  double _dailyMaxYOrder = 0.0;
+  double get dailyMaxYOrder => _dailyMaxYOrder;
+  double _weeklyMaxYOrder = 0.0;
+  double get weeklyMaxYOrder => _weeklyMaxYOrder;
+  double _monthlyMaxYOrder = 0.0;
+  double get monthlyMaxYOrder => _monthlyMaxYOrder;
+  double _annualMaxYOrder = 0.0;
+  double get annualMaxYOrder => _annualMaxYOrder;
 
-  // Max X value for orders
-  double get maxXOrder => _maxXOrder;
-  double get maxYOrder => _maxYOrder;
-  double get maxXSales => _maxXSales;
-  double get maxYSales => _maxYSales;
+  Map<DateTime, double> _dailySalesMap = {};
+  Map<DateTime, double> get dailySalesMap => _dailySalesMap;
+  Map<DateTime, double> _weeklySalesMap = {};
+  Map<DateTime, double> get weeklySalesMap => _weeklySalesMap;
+  Map<DateTime, double> _monthlySalesMap = {};
+  Map<DateTime, double> get monthlySalesMap => _monthlySalesMap;
+  Map<DateTime, double> _annualSalesMap = {};
+  Map<DateTime, double> get annualSalesMap => _annualSalesMap;
+
+  double _dailyMaxYSales = 0.0;
+  double get dailyMaxYSales => _dailyMaxYSales;
+  double _weeklyMaxYSales = 0.0;
+  double get weeklyMaxYSales => _weeklyMaxYSales;
+  double _monthlyMaxYSales = 0.0;
+  double get monthlyMaxYSales => _monthlyMaxYSales;
+  double _annualMaxYSales = 0.0;
+  double get annualMaxYSales => _annualMaxYSales;
 
   List<Map<String, dynamic>> topProducts = [];
 
@@ -37,12 +57,23 @@ class AnalyticsViewModel extends ChangeNotifier {
     notifyListeners();
 
     await getTotals();
-    await getOrdersMap('Daily');
-    await getSalesMap('Daily');
+    await getOrdersandSalesData();
     await getTopProducts();
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> getOrdersandSalesData() async {
+    await getOrdersMap('Daily');
+    await getOrdersMap('Weekly');
+    await getOrdersMap('Monthly');
+    await getOrdersMap('Annual');
+
+    await getSalesMap('Daily');
+    await getSalesMap('Weekly');
+    await getSalesMap('Monthly');
+    await getSalesMap('Annual');
   }
 
   Future<void> getTopProducts() async {
@@ -165,8 +196,6 @@ class AnalyticsViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _ordersMap.clear();
-
     DateTime today = DateTime.now();
     _initializeOrdersMap(period, today);
 
@@ -188,7 +217,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       print("Error fetching orders data: $e");
     }
 
-    _calculateMaxYOrder();
+    _calculateMaxYOrder(period);
 
     _isLoading = false;
     notifyListeners();
@@ -197,8 +226,6 @@ class AnalyticsViewModel extends ChangeNotifier {
   Future<void> getSalesMap(String period) async {
     _isLoading = true;
     notifyListeners();
-
-    _salesMap.clear();
 
     DateTime today = DateTime.now();
     _initializeSalesMap(period, today);
@@ -224,7 +251,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       print("Error fetching sales data: $e");
     }
 
-    _calculateMaxYSales();
+    _calculateMaxYSales(period);
 
     _isLoading = false;
     notifyListeners();
@@ -233,24 +260,22 @@ class AnalyticsViewModel extends ChangeNotifier {
   void _initializeOrdersMap(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 15; i++) {
           DateTime date = today.subtract(Duration(days: 29 - i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
-          _ordersMap[saveDate] = 0;
+          _dailyOrdersMap[saveDate] = 0;
         }
-        _maxXOrder = 30;
         break;
       case 'Weekly':
         DateTime lastMonday = today.subtract(Duration(days: today.weekday - 1));
         for (int i = 0; i < 4; i++) {
           DateTime weekStartDate =
               lastMonday.subtract(Duration(days: 21 - (i * 7)));
-          _ordersMap[weekStartDate] = 0;
+          _weeklyOrdersMap[weekStartDate] = 0;
         }
-        _maxXOrder = 4;
         break;
       case 'Monthly':
-        for (int i = 11; i >= 0; i--) {
+        for (int i = 5; i >= 0; i--) {
           int year = today.year;
           int month = today.month - i;
 
@@ -260,16 +285,14 @@ class AnalyticsViewModel extends ChangeNotifier {
           }
 
           DateTime monthDate = DateTime(year, month, 1);
-          _ordersMap[monthDate] = 0;
+          _monthlyOrdersMap[monthDate] = 0;
         }
-        _maxXOrder = 12;
         break;
       case 'Annual':
         for (int i = 2; i >= 0; i--) {
           DateTime yearDate = DateTime(today.year - i, 1, 1);
-          _ordersMap[yearDate] = 0;
+          _annualOrdersMap[yearDate] = 0;
         }
-        _maxXOrder = 3;
         break;
 
       default:
@@ -281,24 +304,22 @@ class AnalyticsViewModel extends ChangeNotifier {
   void _initializeSalesMap(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 15; i++) {
           DateTime date = today.subtract(Duration(days: 29 - i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
-          _salesMap[saveDate] = 0.0;
+          _dailySalesMap[saveDate] = 0.0;
         }
-        _maxXSales = 30;
         break;
       case 'Weekly':
         DateTime lastMonday = today.subtract(Duration(days: today.weekday - 1));
         for (int i = 0; i < 4; i++) {
           DateTime weekStartDate =
               lastMonday.subtract(Duration(days: 21 - (i * 7)));
-          _salesMap[weekStartDate] = 0;
+          _weeklySalesMap[weekStartDate] = 0;
         }
-        _maxXSales = 4;
         break;
       case 'Monthly':
-        for (int i = 11; i >= 0; i--) {
+        for (int i = 5; i >= 0; i--) {
           int year = today.year;
           int month = today.month - i;
 
@@ -308,17 +329,15 @@ class AnalyticsViewModel extends ChangeNotifier {
           }
 
           DateTime monthDate = DateTime(year, month, 1);
-          _salesMap[monthDate] = 0.0;
+          _monthlySalesMap[monthDate] = 0.0;
         }
-        _maxXSales = 12;
         break;
       case 'Annual':
         for (int i = 2; i >= 0; i--) {
           // Start from the oldest year and move forward
           DateTime yearDate = DateTime(today.year - i, 1, 1);
-          _salesMap[yearDate] = 0.0; // Initialize sales as 0.0
+          _annualSalesMap[yearDate] = 0.0; // Initialize sales as 0.0
         }
-        _maxXSales = 3;
         break;
       default:
         break;
@@ -331,21 +350,38 @@ class AnalyticsViewModel extends ChangeNotifier {
     switch (period) {
       case 'Daily':
         key = DateTime(orderDate.year, orderDate.month, orderDate.day);
+
+        if (_dailyOrdersMap.containsKey(key)) {
+          _dailyOrdersMap[key] = (_dailyOrdersMap[key] ?? 0) + 1;
+        }
+
         break;
       case 'Weekly':
         key = orderDate.subtract(Duration(days: orderDate.weekday - 1));
+
+        if (_weeklyOrdersMap.containsKey(key)) {
+          _weeklyOrdersMap[key] = (_weeklyOrdersMap[key] ?? 0) + 1;
+        }
+
         break;
       case 'Monthly':
         key = DateTime(orderDate.year, orderDate.month, 1);
+
+        if (_monthlyOrdersMap.containsKey(key)) {
+          _monthlyOrdersMap[key] = (_monthlyOrdersMap[key] ?? 0) + 1;
+        }
+
         break;
       case 'Annual':
         key = DateTime(orderDate.year, 1, 1);
+
+        if (_annualOrdersMap.containsKey(key)) {
+          _annualOrdersMap[key] = (_annualOrdersMap[key] ?? 0) + 1;
+        }
+
         break;
       default:
         return;
-    }
-    if (_ordersMap.containsKey(key)) {
-      _ordersMap[key] = (_ordersMap[key] ?? 0) + 1;
     }
   }
 
@@ -355,47 +391,130 @@ class AnalyticsViewModel extends ChangeNotifier {
     switch (period) {
       case 'Daily':
         key = DateTime(saleDate.year, saleDate.month, saleDate.day);
+
+        if (_dailySalesMap.containsKey(key)) {
+          _dailySalesMap[key] = (_dailySalesMap[key] ?? 0.0) + saleAmount;
+        }
+
         break;
       case 'Weekly':
         key = saleDate.subtract(Duration(days: saleDate.weekday - 1));
+
+        if (_weeklySalesMap.containsKey(key)) {
+          _weeklySalesMap[key] = (_weeklySalesMap[key] ?? 0.0) + saleAmount;
+        }
+
         break;
       case 'Monthly':
         key = DateTime(saleDate.year, saleDate.month, 1);
+
+        if (_monthlySalesMap.containsKey(key)) {
+          _monthlySalesMap[key] = (_monthlySalesMap[key] ?? 0.0) + saleAmount;
+        }
+
         break;
       case 'Annual':
         key = DateTime(saleDate.year, 1, 1);
+
+        if (_annualSalesMap.containsKey(key)) {
+          _annualSalesMap[key] = (_annualSalesMap[key] ?? 0.0) + saleAmount;
+        }
+
         break;
       default:
         return;
     }
+  }
 
-    if (_salesMap.containsKey(key)) {
-      _salesMap[key] = (_salesMap[key] ?? 0.0) + saleAmount;
+  void _calculateMaxYOrder(String period) {
+    switch (period) {
+      case 'Daily':
+        if (_dailyOrdersMap.isEmpty) {
+          _dailyMaxYOrder = 0.0;
+        } else {
+          int maxOrderCount =
+              _dailyOrdersMap.values.reduce((a, b) => a > b ? a : b);
+          _dailyMaxYOrder = maxOrderCount.toDouble();
+        }
+        break;
+
+      case 'Weekly':
+        if (_weeklyOrdersMap.isEmpty) {
+          _weeklyMaxYOrder = 0.0;
+        } else {
+          int maxOrderCount =
+              _weeklyOrdersMap.values.reduce((a, b) => a > b ? a : b);
+          _weeklyMaxYOrder = maxOrderCount.toDouble();
+        }
+        break;
+
+      case 'Monthly':
+        if (_monthlyOrdersMap.isEmpty) {
+          _monthlyMaxYOrder = 0.0;
+        } else {
+          int maxOrderCount =
+              _monthlyOrdersMap.values.reduce((a, b) => a > b ? a : b);
+          _monthlyMaxYOrder = maxOrderCount.toDouble();
+        }
+        break;
+
+      case 'Annual':
+        if (_annualOrdersMap.isEmpty) {
+          _annualMaxYOrder = 0.0;
+        } else {
+          int maxOrderCount =
+              _annualOrdersMap.values.reduce((a, b) => a > b ? a : b);
+          _annualMaxYOrder = maxOrderCount.toDouble();
+        }
+        break;
     }
   }
 
-  void _calculateMaxYOrder() {
-    if (_ordersMap.isEmpty) {
-      _maxYOrder = -1.0;
-    } else {
-      int maxOrderCount = _ordersMap.values.reduce((a, b) => a > b ? a : b);
-      _maxYOrder = maxOrderCount.toDouble();
-    }
-  }
-
-  void _calculateMaxYSales() {
-    if (_salesMap.isEmpty) {
-      _maxYSales = -1.0;
-    } else {
-      double maxSalesAmount = _salesMap.values.reduce((a, b) => a > b ? a : b);
-      _maxYSales = maxSalesAmount.ceil() as double;
+  void _calculateMaxYSales(String period) {
+    switch (period) {
+      case 'Daily':
+        if (_dailySalesMap.isEmpty) {
+          _dailyMaxYSales = 0.0;
+        } else {
+          double maxSalesAmount =
+              _dailySalesMap.values.reduce((a, b) => a > b ? a : b);
+          _dailyMaxYSales = maxSalesAmount.ceil() as double;
+        }
+        break;
+      case 'Weekly':
+        if (_weeklySalesMap.isEmpty) {
+          _weeklyMaxYSales = 0.0;
+        } else {
+          double maxSalesAmount =
+              _weeklySalesMap.values.reduce((a, b) => a > b ? a : b);
+          _weeklyMaxYSales = maxSalesAmount.ceil() as double;
+        }
+        break;
+      case 'Monthly':
+        if (_monthlySalesMap.isEmpty) {
+          _monthlyMaxYSales = 0.0;
+        } else {
+          double maxSalesAmount =
+              _monthlySalesMap.values.reduce((a, b) => a > b ? a : b);
+          _monthlyMaxYSales = maxSalesAmount.ceil() as double;
+        }
+        break;
+      case 'Annual':
+        if (_annualSalesMap.isEmpty) {
+          _annualMaxYSales = 0.0;
+        } else {
+          double maxSalesAmount =
+              _annualSalesMap.values.reduce((a, b) => a > b ? a : b);
+          _annualMaxYSales = maxSalesAmount.ceil() as double;
+        }
+        break;
     }
   }
 
   DateTime _getStartDate(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        return today.subtract(Duration(days: 30));
+        return today.subtract(Duration(days: 15));
       case 'Weekly':
         DateTime lastMonday = today.subtract(Duration(days: today.weekday - 1));
         return lastMonday.subtract(Duration(days: 21));

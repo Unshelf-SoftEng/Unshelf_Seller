@@ -6,9 +6,9 @@ import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/views/product_summary_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
-import 'package:unshelf_seller/views/add_bundle_view.dart';
 import 'package:unshelf_seller/views/select_products_view.dart';
 import 'package:unshelf_seller/views/update_product_view.dart';
+import 'package:unshelf_seller/views/update_bundle_view.dart';
 
 class ListingsView extends StatefulWidget {
   @override
@@ -192,7 +192,7 @@ class _ListingsViewState extends State<ListingsView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddBundleView(
+                                  builder: (context) => UpdateBundleView(
                                     bundleId: itemId,
                                   ),
                                 ),
