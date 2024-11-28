@@ -4,44 +4,70 @@ import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/services/product_service.dart';
 
 class SelectProductsViewModel extends ChangeNotifier {
-  List<BatchModel> _products = [];
-  List<String> _selectedProductIds = [];
+  Map<String, BatchModel> _selectedProducts = {};
+  Map<String, BatchModel> get selectedProducts => _selectedProducts;
 
+  List<BatchModel> _products = [];
   List<BatchModel> get products => _products;
-  List<String> get selectedProductIds => _selectedProductIds;
 
   final BatchService batchService = BatchService();
   final ProductService productService = ProductService();
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   Future<void> fetchProducts() async {
-    print('Fetching bundless');
+    _isLoading = true;
+    notifyListeners();
     _products = await batchService.getAllBatches();
-
-    print('Fetched ${_products.length} batches');
-
     for (var product in _products) {
-      print(
-          'Fetching product: ${product.productId} for batch: ${product.batchNumber}');
-
       product.product = await productService.getProduct(product.productId);
-
-      print('Product: ${product.product!.name}');
     }
-
+    _filteredItems = _products;
+    _isLoading = false;
     notifyListeners();
   }
 
   // Method to add a product to the bundle
   void addProductToBundle(String productId) {
-    if (!_selectedProductIds.contains(productId)) {
-      _selectedProductIds.add(productId);
-      notifyListeners(); // Notify listeners to update the UI
+    if (!_selectedProducts.keys.contains(productId)) {
+      _selectedProducts[productId] =
+          _products.firstWhere((product) => product.batchNumber == productId);
+      notifyListeners();
     }
   }
 
   // Method to remove a product from the bundle
   void removeProductFromBundle(String productId) {
-    _selectedProductIds.remove(productId);
-    notifyListeners(); // Notify listeners to update the UI
+    _selectedProducts.remove(productId);
+    notifyListeners();
+  }
+
+  String _searchQuery = '';
+  List<BatchModel> get filteredItems => _filteredItems;
+  List<BatchModel> _filteredItems = [];
+
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    _filterItems();
+    notifyListeners();
+  }
+
+  void _filterItems() {
+    if (_searchQuery.isEmpty) {
+      _filteredItems = _products;
+    } else {
+      print("Filtering items");
+
+      _filteredItems = _products.where((item) {
+        print(item.product?.name);
+
+        final name = item.product?.name.toLowerCase();
+        final query = _searchQuery.toLowerCase();
+        return name!.contains(query);
+      }).toList();
+
+      print(_filteredItems);
+    }
   }
 }

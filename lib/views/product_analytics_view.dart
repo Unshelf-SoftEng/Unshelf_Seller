@@ -28,7 +28,7 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: const Text('Product Analytics'),
         backgroundColor: const Color(0xFF6A994D),
       ),
       body: analyticsViewModel.isLoading

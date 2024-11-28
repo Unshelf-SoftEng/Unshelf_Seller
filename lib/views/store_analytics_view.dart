@@ -4,12 +4,12 @@ import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/views/chart.dart';
 import 'package:unshelf_seller/views/product_analytics_view.dart';
 
-class AnalyticsView extends StatefulWidget {
+class StoreAnalyticsView extends StatefulWidget {
   @override
-  _AnalyticsViewState createState() => _AnalyticsViewState();
+  _StoreAnalyticsViewState createState() => _StoreAnalyticsViewState();
 }
 
-class _AnalyticsViewState extends State<AnalyticsView> {
+class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
   String selectedSalesValue = 'Daily';
   String selectedOrdersValue = 'Daily';
 
@@ -29,7 +29,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: const Text('Store Analytics'),
         backgroundColor: const Color(0xFF6A994D),
       ),
       body: analyticsViewModel.isLoading

@@ -7,7 +7,7 @@ import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 
 class AddBundleView extends StatefulWidget {
-  final List<BatchModel> products;
+  final Map<String, BatchModel> products;
 
   AddBundleView({required this.products});
 
@@ -96,7 +96,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: const Text(
-                        'BundleName',
+                        'Bundle Name',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

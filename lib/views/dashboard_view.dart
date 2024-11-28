@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
-import 'package:unshelf_seller/views/analytics_view.dart';
+import 'package:unshelf_seller/views/store_analytics_view.dart';
 
 class DashboardView extends StatefulWidget {
   @override
@@ -34,10 +34,8 @@ class _DashboardViewState extends State<DashboardView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildDailyAnalyticsCard(viewModel),
-                const SizedBox(height: 24.0), // Increased spacing
+                const SizedBox(height: 12.0), // Increased spacing
                 _buildStoreInsightsCard(viewModel),
-                const SizedBox(height: 24.0), // Increased spacing
-                _buildAnalyticsButton(),
               ],
             ),
           );
@@ -120,6 +118,37 @@ class _DashboardViewState extends State<DashboardView> {
                 'Total Sales',
                 '${viewModel.totalSales.toStringAsFixed(2)} Php',
                 Icons.attach_money),
+            const SizedBox(height: 20.0), // Added extra space before the button
+
+            // Elevated Button for better interaction
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => StoreAnalyticsView()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, // Button color
+                  foregroundColor: Color(0xFF6A994E), // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                  elevation: 4.0, // Shadow effect for the button
+                ),
+                child: Text(
+                  'VIEW STORE ANALYTICS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -202,25 +231,6 @@ class _DashboardViewState extends State<DashboardView> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAnalyticsButton() {
-    return Center(
-      child: ElevatedButton.icon(
-        // Added icon to button
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AnalyticsView()),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF6A994E), // Same color as the cards
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-        ),
-        icon: const Icon(Icons.bar_chart), // Added an icon
-        label: const Text('View Analytics'),
       ),
     );
   }
