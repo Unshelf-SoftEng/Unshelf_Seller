@@ -17,7 +17,6 @@ class _SelectProductsViewState extends State<SelectProductsView> {
   @override
   void initState() {
     super.initState();
-    // Fetch products when the view initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SelectProductsViewModel>(context, listen: false)
           .fetchProducts();
@@ -86,14 +85,12 @@ class _SelectProductsViewState extends State<SelectProductsView> {
       body: Consumer<SelectProductsViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            // Show a loading indicator while fetching products
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
           if (viewModel.products.isEmpty) {
-            // Handle case where no products are available
             return const Center(
               child: Text('No products available'),
             );
@@ -125,13 +122,26 @@ class _SelectProductsViewState extends State<SelectProductsView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          if (viewModel.selectedProducts.length < 2) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select at least two products'),
+              ),
+            );
+            return;
+          }
+
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>
                   AddBundleView(products: viewModel.selectedProducts),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              Navigator.pop(context, true);
+            }
+          });
         },
         backgroundColor: const Color(0xFF6A994D),
         child: const Icon(Icons.arrow_forward),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unshelf_seller/models/item_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
+import 'package:unshelf_seller/models/item_model.dart';
 
 class BundleModel extends ItemModel {
   String description;
@@ -8,8 +8,8 @@ class BundleModel extends ItemModel {
   int? stock;
   int? discount;
   List<String>? additionalImageUrls;
-  List<BundleItem> products;
-  List<String>? productIds;
+  List<Map<String, Object>> items;
+  List<ProductModel>? products;
 
   BundleModel({
     required super.id,
@@ -17,12 +17,12 @@ class BundleModel extends ItemModel {
     required super.mainImageUrl,
     required super.category,
     required this.description,
-    required this.products,
+    required this.items,
     this.price,
     this.stock,
     this.discount,
     this.additionalImageUrls,
-    this.productIds,
+    this.products,
   });
 
   // Factory method to create StoreModel from Firebase document snapshot
@@ -35,44 +35,43 @@ class BundleModel extends ItemModel {
         price: (data['price'] ?? 0.0).toDouble(),
         stock: data['stock'] ?? 0,
         discount: data['discount'] ?? 0,
-        productIds: (data['productIds'] as List<dynamic>?)
-                ?.map((e) => e as String)
-                .toList() ??
-            [],
-        products: (data['products'] as List<dynamic>?)
-                ?.map((e) => BundleItem.fromMap(e))
+        items: (data['items'] as List<dynamic>?)
+                ?.map((item) => {
+                      'batchId': item['batchId'] as String,
+                      'quantity': (item['quantity'] as num).toInt(),
+                    })
                 .toList() ??
             [],
         mainImageUrl: data['mainImageUrl'] ?? '',
         additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)
             ?.map((e) => e as String)
             .toList(),
-        category: data['category']);
+        category: '');
   }
 
-  factory BundleModel.fromJson(Map<String, dynamic> json) {
-    List<BundleItem> bundleItems = json['products'] != null
-        ? (json['products'] as List)
-            .map((item) => BundleItem.fromMap(item))
-            .toList()
-        : [];
+  // factory BundleModel.fromJson(Map<String, dynamic> json) {
+  //   List<BundleItem> bundleItems = json['products'] != null
+  //       ? (json['products'] as List)
+  //           .map((item) => BundleItem.fromMap(item))
+  //           .toList()
+  //       : [];
 
-    List<String> productIdList =
-        bundleItems.map((product) => product.productId).toList();
+  //   List<String> productIdList =
+  //       bundleItems.map((product) => product.productId).toList();
 
-    return BundleModel(
-      id: '',
-      name: json['bundle_name'] ?? '',
-      description: json['description'] ?? '',
-      products: bundleItems,
-      productIds: productIdList,
-      category: '',
-      price: 0.0,
-      stock: 0,
-      discount: 0,
-      mainImageUrl: '',
-    );
-  }
+  //   return BundleModel(
+  //     id: '',
+  //     name: json['bundle_name'] ?? '',
+  //     description: json['description'] ?? '',
+  //     products: bundleItems,
+  //     productIds: productIdList,
+  //     category: '',
+  //     price: 0.0,
+  //     stock: 0,
+  //     discount: 0,
+  //     mainImageUrl: '',
+  //   );
+  // }
 }
 
 class BundleItem {

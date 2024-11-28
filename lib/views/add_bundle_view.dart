@@ -16,9 +16,15 @@ class AddBundleView extends StatefulWidget {
 }
 
 class _AddBundleViewState extends State<AddBundleView> {
+  final Map<String, int> productQuantities = {};
+
   @override
   void initState() {
     super.initState();
+
+    widget.products.forEach((productId, product) {
+      productQuantities[productId] = 1;
+    });
   }
 
   @override
@@ -92,6 +98,49 @@ class _AddBundleViewState extends State<AddBundleView> {
                         fontSize: 14.0,
                       ),
                     ),
+                    ...widget.products.entries.map((entry) {
+                      final productId = entry.key;
+                      final product = entry.value;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                product.product!.name,
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 100,
+                              child: TextFormField(
+                                initialValue:
+                                    productQuantities[productId].toString(),
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    productQuantities[productId] =
+                                        int.tryParse(value) ?? 1;
+                                  });
+                                },
+                                validator: (value) {
+                                  final quantity = int.tryParse(value ?? '');
+                                  if (quantity == null || quantity <= 0) {
+                                    return 'Enter a valid quantity';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                     const SizedBox(height: 20.0),
                     const Align(
                       alignment: Alignment.centerLeft,
@@ -128,6 +177,50 @@ class _AddBundleViewState extends State<AddBundleView> {
                         return null;
                       },
                       style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Category',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    DropdownButtonFormField<String>(
+                      value: viewModel.selectedCategory.isEmpty
+                          ? null
+                          : viewModel.selectedCategory,
+                      items: viewModel.categories.map((String category) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color.fromARGB(255, 228, 228, 228),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 12.0),
+                        labelStyle: const TextStyle(color: Colors.black),
+                      ),
+                      onChanged: (String? newValue) {
+                        viewModel.selectedCategory = newValue!;
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select a category';
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
                     const SizedBox(height: 20.0),
                     const Align(
@@ -208,9 +301,9 @@ class _AddBundleViewState extends State<AddBundleView> {
                         if (stock == null || stock <= 0) {
                           return 'Please enter a valid stock number';
                         }
-                        if (stock > viewModel.maxStock) {
-                          return 'Max Stock is ${viewModel.maxStock}. Stock cannot be greater than the lowest stock of the products in the bundle';
-                        }
+                        // if (stock > viewModel.maxStock) {
+                        //   return 'Max Stock is ${viewModel.maxStock}. Stock cannot be greater than the lowest stock of the products in the bundle';
+                        // }
                         return null;
                       },
                       style: const TextStyle(fontSize: 12),
@@ -262,7 +355,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                         final form = viewModel.formKey.currentState;
 
                         if (form != null && form.validate()) {
-                          await viewModel.createBundle();
+                          await viewModel.createBundle(productQuantities);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Bundle created successfully'),

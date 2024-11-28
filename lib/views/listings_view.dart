@@ -180,7 +180,6 @@ class _ListingsViewState extends State<ListingsView> {
                                   builder: (context) => UpdateProductView(
                                     productId: itemId,
                                     onProductAdded: () {
-                                      // Refresh the product listings
                                       Provider.of<ListingViewModel>(context,
                                               listen: false)
                                           .refreshItems();
@@ -238,7 +237,11 @@ class _ListingsViewState extends State<ListingsView> {
                   MaterialPageRoute(
                     builder: (context) => SelectProductsView(),
                   ),
-                );
+                ).then((result) {
+                  if (result == true) {
+                    viewModel.fetchItems();
+                  }
+                });
               }
             },
             tooltip: viewModel.showingProducts ? 'Add Product' : 'Add Bundle',

@@ -34,26 +34,20 @@ class AddBundleViewModel extends ChangeNotifier {
   BundleModel? _bundle;
   BundleModel? get bundle => _bundle;
 
+  String selectedCategory = '';
+  List<String> categories = [
+    'Grocery',
+    'Fruits',
+    'Vegetables',
+    'Baked Goods',
+  ];
+
   void initializeControllers(BundleModel bundle) {
     bundleNameController.text = bundle.name;
     bundlePriceController.text = bundle.price.toString();
     bundleStockController.text = bundle.stock.toString();
     bundleDiscountController.text = bundle.discount.toString();
-
-    _selectedProductIds = bundle.productIds!.toSet();
     _updateBundleStock();
-  }
-
-  void addProductToBundle(String productId) {
-    _selectedProductIds.add(productId);
-    _updateBundleStock();
-    notifyListeners();
-  }
-
-  void removeProductFromBundle(String productId) {
-    _selectedProductIds.remove(productId);
-    _updateBundleStock();
-    notifyListeners();
   }
 
   void _updateBundleStock() {
@@ -63,17 +57,13 @@ class AddBundleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createBundle() async {
+  Future<void> createBundle(Map<String, int> productQuantities) async {
     try {
       final bundleName = bundleNameController.text;
       final bundlePrice = double.tryParse(bundlePriceController.text) ?? 0.0;
       final bundleStock = int.tryParse(bundleStockController.text) ?? 0;
       final bundleDiscount =
           double.tryParse(bundleDiscountController.text) ?? 0.0;
-
-      if (bundleName.isEmpty || _selectedProductIds.isEmpty) {
-        throw Exception('Bundle name or selected products cannot be empty');
-      }
 
       User user = FirebaseAuth.instance.currentUser!;
 
@@ -87,7 +77,13 @@ class AddBundleViewModel extends ChangeNotifier {
 
       final bundleData = {
         'name': bundleName,
-        'productIds': _selectedProductIds.toList(),
+        'category': selectedCategory,
+        'items': productQuantities.entries.map((entry) {
+          return {
+            'batchId': entry.key,
+            'quantity': entry.value,
+          };
+        }).toList(),
         'price': bundlePrice,
         'stock': bundleStock,
         'discount': bundleDiscount,
@@ -98,6 +94,7 @@ class AddBundleViewModel extends ChangeNotifier {
 
       await FirebaseFirestore.instance.collection('bundles').add(bundleData);
 
+      print('Bundle created successfully');
       notifyListeners();
     } catch (e) {
       print('Failed to create bundle: $e');
