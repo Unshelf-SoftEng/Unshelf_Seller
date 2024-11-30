@@ -62,8 +62,8 @@ class _ListingsViewState extends State<ListingsView> {
                     )
                   : Text(
                       Provider.of<ListingViewModel>(context).showingProducts
-                          ? 'Product Listings'
-                          : 'Bundle Listings',
+                          ? 'Products'
+                          : 'Bundles',
                     ),
               actions: [
                 _isSearching
@@ -200,7 +200,7 @@ class _ListingsViewState extends State<ListingsView> {
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(Icons.delete, color: Color(0xFFBC4749)),
                           onPressed: () async {
                             await viewModel.deleteItem(
                                 itemId, item is ProductModel);
@@ -245,7 +245,8 @@ class _ListingsViewState extends State<ListingsView> {
               }
             },
             tooltip: viewModel.showingProducts ? 'Add Product' : 'Add Bundle',
-            backgroundColor: Colors.green,
+            backgroundColor: Color(0xFFA7C957),
+            foregroundColor: Color(0xFFA386641),
             child: const Icon(Icons.add),
           );
         },

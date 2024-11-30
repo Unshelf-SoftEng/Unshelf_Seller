@@ -31,26 +31,29 @@ class _AddBundleViewState extends State<AddBundleView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Product Bundle'),
+        title: Text('Enter Bundle Details'),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.autorenew),
-            onPressed: () async {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BundleSuggestionsView(),
-                ),
-              );
-            },
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
           ),
-        ],
+        ),
       ),
       body: Consumer<AddBundleViewModel>(
         builder: (context, viewModel, child) {
@@ -91,57 +94,6 @@ class _AddBundleViewState extends State<AddBundleView> {
                       ),
                     ),
                     const SizedBox(height: 20.0),
-                    const Text(
-                      'Set Product Quantities',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                    ...widget.products.entries.map((entry) {
-                      final productId = entry.key;
-                      final product = entry.value;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                product.product!.name,
-                                style: TextStyle(fontSize: 16.0),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 100,
-                              child: TextFormField(
-                                initialValue:
-                                    productQuantities[productId].toString(),
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Quantity',
-                                  border: OutlineInputBorder(),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    productQuantities[productId] =
-                                        int.tryParse(value) ?? 1;
-                                  });
-                                },
-                                validator: (value) {
-                                  final quantity = int.tryParse(value ?? '');
-                                  if (quantity == null || quantity <= 0) {
-                                    return 'Enter a valid quantity';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    const SizedBox(height: 20.0),
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: const Text(
@@ -166,7 +118,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                             vertical: 10.0, horizontal: 10.0),
                         labelStyle: const TextStyle(color: Colors.black),
                         errorStyle: const TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFBC4749),
                           fontSize: 10,
                         ),
                       ),
@@ -344,13 +296,76 @@ class _AddBundleViewState extends State<AddBundleView> {
                         return null;
                       },
                       inputFormatters: [
-                        FilteringTextInputFormatter
-                            .digitsOnly, // Allows only digits
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
                       style: TextStyle(fontSize: 12),
                     ),
-                    const SizedBox(height: 40.0),
+                    const SizedBox(height: 15.0),
+                    const Text(
+                      'Enter the quantity of each product in the bundle',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                    ...widget.products.entries.map((entry) {
+                      final productId = entry.key;
+                      final product = entry.value;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                product.product!.name,
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 120,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.remove),
+                                    onPressed: () {
+                                      setState(() {
+                                        if (productQuantities[productId]! > 1) {
+                                          productQuantities[productId] =
+                                              productQuantities[productId]! - 1;
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    productQuantities[productId].toString(),
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      setState(() {
+                                        productQuantities[productId] =
+                                            (productQuantities[productId]! + 1);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 15.0),
                     ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(const Color(0xFFA7C957)),
+                        foregroundColor:
+                            WidgetStatePropertyAll(const Color(0xFF386641)),
+                        alignment: Alignment.center,
+                      ),
                       onPressed: () async {
                         final form = viewModel.formKey.currentState;
 
@@ -361,6 +376,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               content: Text('Bundle created successfully'),
                             ),
                           );
+                          viewModel.clearSelection();
                           Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

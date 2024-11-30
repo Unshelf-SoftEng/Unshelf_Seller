@@ -18,41 +18,63 @@ class AddProductView extends StatelessWidget {
       child: Consumer<ProductViewModel>(builder: (context, viewModel, child) {
         return Scaffold(
           appBar: AppBar(
-              backgroundColor: const Color(0xFF6A994E),
-              title: const Text('Add Product Details')),
+            title: Text('Enter Product Details'),
+            backgroundColor: const Color(0xFF6A994E),
+            foregroundColor: const Color(0xFFFFFFFF),
+            titleTextStyle: TextStyle(
+                color: const Color(0xFFFFFFFF),
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Color(0xFF386641),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(4.0),
+              child: Container(
+                color: Color(0xFFC8DD96),
+                height: 4.0,
+              ),
+            ),
+          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.green, width: 5),
-                          color: Colors.transparent,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 16.0),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Product Details',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold)),
-                      Text(
-                        'Enter product details below',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ],
-                  )
-                ]),
+                // Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                //   Stack(
+                //     alignment: Alignment.center,
+                //     children: [
+                //       Container(
+                //         width: 40,
+                //         height: 40,
+                //         decoration: BoxDecoration(
+                //           shape: BoxShape.circle,
+                //           border: Border.all(color: Colors.green, width: 5),
+                //           color: Colors.transparent,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                //   const SizedBox(width: 16.0),
+                //   const Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Text('Product Details',
+                //           style: TextStyle(
+                //               fontSize: 14, fontWeight: FontWeight.bold)),
+                //       Text(
+                //         'Enter product details below',
+                //         style: TextStyle(fontSize: 12, color: Colors.grey),
+                //       ),
+                //     ],
+                //   )
+                // ]),
                 const SizedBox(height: 30.0),
                 Form(
                   key: viewModel.formKey,
@@ -80,7 +102,7 @@ class AddProductView extends StatelessWidget {
                                       Icon(Icons.add_a_photo,
                                           color: Colors.white),
                                       Text(
-                                        'Add Main Image',
+                                        'Click to Add Main Image',
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     ],
@@ -183,6 +205,8 @@ class AddProductView extends StatelessWidget {
                                           index: imageList.indexOf(null)),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
+                                            const Color(0xFFA7C957),
+                                        foregroundColor:
                                             const Color(0xFF386641),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -191,7 +215,8 @@ class AddProductView extends StatelessWidget {
                                       ),
                                       child: const Text(
                                         'Add Image',
-                                        style: TextStyle(color: Colors.white),
+                                        style:
+                                            TextStyle(color: Color(0xFF386641)),
                                       ),
                                     ),
                                   ),
@@ -205,7 +230,7 @@ class AddProductView extends StatelessWidget {
                           padding: EdgeInsets.only(top: 8.0),
                           child: Text(
                             'Main image is required',
-                            style: TextStyle(color: Colors.red),
+                            style: TextStyle(color: Color(0xBC4749)),
                           ),
                         ),
                       const SizedBox(height: 20),
@@ -340,8 +365,8 @@ class AddProductView extends StatelessWidget {
                                     Navigator.pop(context, true);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF6A994E),
-                                    foregroundColor: Colors.white,
+                                    backgroundColor: const Color(0xFFA7C957),
+                                    foregroundColor: const Color(0xFF386641),
                                   ),
                                   child: const Text('Add Product'),
                                 ),

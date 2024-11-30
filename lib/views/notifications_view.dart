@@ -9,8 +9,29 @@ class NotificationsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text('Notifications'),
         backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
+        ),
       ),
       body: Consumer<NotificationViewModel>(
         builder: (context, model, child) {
@@ -25,7 +46,9 @@ class NotificationsView extends StatelessWidget {
                         notification.seen
                             ? Icons.check_circle
                             : Icons.notifications,
-                        color: notification.seen ? Colors.green : Colors.blue,
+                        color: notification.seen
+                            ? Color(0xFFA7C957)
+                            : Color(0xFF386641),
                       ),
                       title: Text(
                         notification.title,

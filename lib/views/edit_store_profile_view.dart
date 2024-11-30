@@ -16,6 +16,27 @@ class EditStoreProfileView extends StatelessWidget {
         appBar: AppBar(
           title: Text('Edit Store Profile'),
           backgroundColor: const Color(0xFF6A994E),
+          foregroundColor: const Color(0xFFFFFFFF),
+          titleTextStyle: TextStyle(
+              color: const Color(0xFFFFFFFF),
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Color(0xFF386641),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(4.0),
+            child: Container(
+              color: Color(0xFFC8DD96),
+              height: 4.0,
+            ),
+          ),
         ),
         body: Consumer<StoreProfileViewModel>(
           builder: (context, viewModel, child) {
@@ -40,7 +61,7 @@ class EditStoreProfileView extends StatelessWidget {
                               child: Align(
                                 alignment: Alignment.bottomRight,
                                 child: Icon(Icons.camera_alt,
-                                    color: Colors.white, size: 30),
+                                    color: Color(0xFFA7C957), size: 30),
                               ),
                             ),
                           ),
@@ -51,19 +72,30 @@ class EditStoreProfileView extends StatelessWidget {
                           decoration: InputDecoration(labelText: 'Store Name'),
                         ),
                         SizedBox(height: 16.0),
-                        ElevatedButton(
-                          onPressed: viewModel.isLoading
-                              ? null
-                              : () async {
-                                  await viewModel.updateStoreProfile();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            'Store Profile updated successfully!')),
-                                  );
-                                  Navigator.pop(context, true);
-                                },
-                          child: Text('Save Changes'),
+                        Align(
+                          alignment:
+                              Alignment.center, // Center the ElevatedButton
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                  const Color(0xFFA7C957)),
+                              foregroundColor: WidgetStatePropertyAll(
+                                  const Color(0xFF386641)),
+                              alignment: Alignment.center,
+                            ),
+                            onPressed: viewModel.isLoading
+                                ? null
+                                : () async {
+                                    await viewModel.updateStoreProfile();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Store Profile updated successfully!')),
+                                    );
+                                    Navigator.pop(context, true);
+                                  },
+                            child: Text('Save Changes'),
+                          ),
                         ),
                       ],
                     ),

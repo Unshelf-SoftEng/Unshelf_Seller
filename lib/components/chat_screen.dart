@@ -16,14 +16,27 @@ class _ChatScreenState extends State<ChatScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6E9E57), // Green color as in the image
-        elevation: 0,
-        toolbarHeight: 60,
-        title: const Text(
-          "Chat",
-          style: TextStyle(
-            color: Color.fromARGB(
-                255, 255, 255, 255), // Light green color for the text
+        title: Text("Chat"),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
           ),
         ),
       ),
@@ -35,43 +48,76 @@ class _ChatScreenState extends State<ChatScreen>
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Text('Something went wrong');
+            return const Center(child: Text('Something went wrong'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text("Loading");
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           if (snapshot.hasData) {
             return ListView.separated(
               separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(height: 10);
+                return const Divider(
+                  color: Colors.grey, // Line color
+                  height: 1, // Line height
+                  thickness: 1, // Line thickness
+                );
               },
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 var data = snapshot.data!.docs[index];
-                return ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatView(
-                          receiverName: data['name'],
-                          receiverUserID: data.id,
-                        ),
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 6), // Adds space above/below the item
+                  padding:
+                      const EdgeInsets.all(12), // Padding inside the container
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                        10), // Rounded corners for a modern look
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // Shadow position
                       ),
-                    );
-                  },
-                  leading: CircleAvatar(
-                    radius: 24,
-                    backgroundImage: NetworkImage(data['profileImageUrl']),
+                    ],
                   ),
-                  title: Text(data['name']),
+                  child: ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatView(
+                              receiverName: data['name'],
+                              receiverUserID: data.id,
+                            ),
+                          ),
+                        );
+                      },
+                      leading: CircleAvatar(
+                        radius: 30, // Slightly larger avatar
+                        backgroundImage: NetworkImage(data['profileImageUrl']),
+                        backgroundColor: Colors.grey
+                            .shade200, // Background color if image not available
+                      ),
+                      title: Text(
+                        data['name'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      )),
                 );
               },
             );
           } else {
-            return const Text('Ongoing');
+            return const Center(child: Text('Ongoing'));
           }
         },
       ),

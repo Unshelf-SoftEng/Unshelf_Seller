@@ -31,7 +31,27 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
       appBar: AppBar(
         title: Text('Product Summary'),
         backgroundColor: const Color(0xFF6A994E),
-        elevation: 1.0,
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
+        ),
       ),
       body: Consumer<ProductSummaryViewModel>(
         builder: (context, viewModel, child) {
@@ -324,7 +344,14 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
         if (batches != null && batches.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton.icon(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    WidgetStatePropertyAll(const Color(0xFFA7C957)),
+                foregroundColor:
+                    WidgetStatePropertyAll(const Color(0xFF386641)),
+                alignment: Alignment.center,
+              ),
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -339,8 +366,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                   viewModel.fetchProductData(widget.productId!);
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text('Add Product Batch'),
+              child: const Text('Add Batch'),
             ),
           ),
       ],

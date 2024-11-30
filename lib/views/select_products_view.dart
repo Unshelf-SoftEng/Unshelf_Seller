@@ -50,13 +50,32 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                 },
                 textInputAction: TextInputAction.search,
               )
-            : Text('Select Products'),
-        backgroundColor: const Color(0xFF6A994D),
+            : Text('Choose Products for Bundle',
+                style: const TextStyle(
+                    color: const Color(0xFFFFFFFF),
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: const TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: const Color(0xFFC8DD96),
+            height: 4.0,
+          ),
         ),
         actions: [
           _isSearching
@@ -139,12 +158,13 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             ),
           ).then((result) {
             if (result == true) {
+              viewModel.clearSelection();
               Navigator.pop(context, true);
             }
           });
         },
-        backgroundColor: const Color(0xFF6A994D),
-        child: const Icon(Icons.arrow_forward),
+        backgroundColor: const Color(0xFFA7C957),
+        child: const Icon(Icons.arrow_forward, color: Color(0xFF386641)),
       ),
     );
   }
@@ -198,8 +218,9 @@ class _ProductListTile extends StatelessWidget {
             Text("Expiry Date: ${DateFormat('MM-dd-yyyy').format(expiryDate)}"),
           ],
         ),
-        tileColor:
-            isSelected ? Colors.green.withOpacity(0.1) : Colors.transparent,
+        tileColor: isSelected
+            ? Color(0xFF6A994E).withOpacity(0.1)
+            : Colors.transparent,
         onTap: onTap,
         onLongPress: onLongPress,
       ),

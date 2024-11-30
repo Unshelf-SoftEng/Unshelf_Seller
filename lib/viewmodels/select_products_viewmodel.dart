@@ -70,4 +70,9 @@ class SelectProductsViewModel extends ChangeNotifier {
       print(_filteredItems);
     }
   }
+
+  void clearSelection() {
+    _selectedProducts = {};
+    notifyListeners();
+  }
 }

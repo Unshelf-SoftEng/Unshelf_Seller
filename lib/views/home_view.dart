@@ -28,10 +28,10 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   final List<String> _titles = [
-    'DASHBOARD',
-    'ORDERS',
-    'LISTINGS',
-    'PROFILE',
+    'Dashboard',
+    'Orders',
+    'Listings',
+    'Profile',
   ];
 
   @override
@@ -95,61 +95,66 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: Color(0xFF6A994E),
         automaticallyImplyLeading: _buildLeadingIcon() == null,
         leading: _buildLeadingIcon(),
-        title: Row(
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: Text(
-                  _titles[_selectedIndex],
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+        title: null, // Remove the default title
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotificationsView(),
                 ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NotificationsView(),
-                  ),
-                );
-              },
-              child: Stack(
-                children: [
-                  const Icon(Icons.notifications, size: 30),
-                  if (_notifications.any((n) => !n['seen']))
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Center(
-                          child: Text(
-                            _unseenCount.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
+              );
+            },
+            child: Stack(
+              children: [
+                const Icon(Icons.notifications, size: 30),
+                if (_notifications.any((n) => !n['seen']))
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Center(
+                        child: Text(
+                          _unseenCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
                         ),
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
-          ],
+          ),
+        ],
+        flexibleSpace: Align(
+          alignment: Alignment.center, // Center the title within the AppBar
+          child: Text(
+            _titles[_selectedIndex],
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
         ),
       ),
       body: _screens[_selectedIndex],
@@ -173,8 +178,8 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
         currentIndex: _selectedIndex,
-        unselectedItemColor: const Color(0xFF6A994E),
-        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        selectedItemColor: const Color(0xFF6A994E),
         onTap: _onItemTapped,
       ),
     );
@@ -184,7 +189,10 @@ class _HomeViewState extends State<HomeView> {
     switch (_selectedIndex) {
       case 0: // Dashboard
         return IconButton(
-          icon: Icon(Icons.chat),
+          icon: Icon(
+            Icons.chat,
+            size: 30,
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -196,7 +204,7 @@ class _HomeViewState extends State<HomeView> {
         );
       case 3: // Store
         return IconButton(
-          icon: Icon(Icons.account_balance_wallet),
+          icon: Icon(Icons.account_balance_wallet, size: 30),
           onPressed: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => WalletView()));

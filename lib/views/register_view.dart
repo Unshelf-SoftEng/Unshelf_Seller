@@ -157,6 +157,10 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFF386641),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -171,7 +175,15 @@ class _RegisterViewState extends State<RegisterView> {
               ),
               TextFormField(
                 controller: _sellerNameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -179,9 +191,18 @@ class _RegisterViewState extends State<RegisterView> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
@@ -189,9 +210,18 @@ class _RegisterViewState extends State<RegisterView> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -200,10 +230,18 @@ class _RegisterViewState extends State<RegisterView> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration:
-                    const InputDecoration(labelText: 'Confirm Password'),
+                decoration: const InputDecoration(
+                  labelText: 'Password Confirmation',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -214,9 +252,18 @@ class _RegisterViewState extends State<RegisterView> {
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _phoneNumberController,
-                decoration: const InputDecoration(labelText: 'Phone Number'),
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
@@ -231,56 +278,67 @@ class _RegisterViewState extends State<RegisterView> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _register,
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Color(0xFFA7C957)),
+                  foregroundColor: MaterialStatePropertyAll(Color(0xFF386641)),
+                ),
                 child: const Text('Sign Up'),
               ),
               const SizedBox(height: 10),
               const Text(
-                  "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy.",
-                  textAlign: TextAlign.center),
-              const SizedBox(height: 20),
-              // Adding space above the sign-in section
-              const SizedBox(height: 20),
-
-              // Styled separator text
+                "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF6A994E),
+                  fontSize: 11,
+                ),
+              ),
+              const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(child: Divider(color: Colors.grey[400])),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text('or sign up with',
-                        style: TextStyle(color: Colors.grey)),
+                    child: Text('or', style: TextStyle(color: Colors.grey)),
                   ),
                   Expanded(child: Divider(color: Colors.grey[400])),
                 ],
               ),
-
-              const SizedBox(height: 20),
-
-              // Google Sign-In button with icon
+              const SizedBox(height: 15),
               ElevatedButton.icon(
                 onPressed: _registerWithGoogle,
-                label: const Text('Sign up with Google'),
+                label: const Text('Log in with Google'),
                 icon: Image.asset('assets/images/google_logo.png',
-                    width: 24, height: 24),
+                    width: 24, height: 24, fit: BoxFit.contain),
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  backgroundColor: const Color(0xFFA7C957),
+                  foregroundColor: const Color(0xFF386641),
                   padding:
                       const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 ),
               ),
-
-              const SizedBox(height: 40),
-              const Text('Already have an account?'),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => LoginView()));
-                },
-                child: const Text('Sign In'),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Already have an account?'),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginView()),
+                      );
+                    },
+                    child: const Text(
+                      'Sign In',
+                      style: TextStyle(color: Color(0xFF6A994E)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

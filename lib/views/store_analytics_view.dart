@@ -29,8 +29,29 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Store Analytics'),
-        backgroundColor: const Color(0xFF6A994D),
+        title: Text('Store Analytics'),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
+        ),
       ),
       body: analyticsViewModel.isLoading
           ? const Center(child: CircularProgressIndicator())

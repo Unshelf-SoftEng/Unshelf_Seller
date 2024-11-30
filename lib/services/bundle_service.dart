@@ -17,18 +17,23 @@ class BundleService extends ChangeNotifier {
     return null;
   }
 
-  Future<void> addProduct(BundleModel product) async {
-    User? user = FirebaseAuth.instance.currentUser;
+  Future<void> createBundle(BundleModel bundle) async {
+    User user = FirebaseAuth.instance.currentUser!;
 
     try {
-      await FirebaseFirestore.instance.collection('bundles').add({
-        'name': product.name,
-        'description': product.description,
-        'category': product.category,
-        'mainImageUrl': product.mainImageUrl,
-        'additionalImageUrls': product.additionalImageUrls,
-        'sellerId': user!.uid,
-      });
+      final bundleData = {
+        'name': bundle.name,
+        'category': bundle.category,
+        'items': bundle.items,
+        'price': bundle.price,
+        'stock': bundle.stock,
+        'discount': bundle.discount,
+        'mainImageUrl': bundle.mainImageUrl,
+        'sellerId': user.uid,
+        'isListed': true,
+      };
+
+      await FirebaseFirestore.instance.collection('bundles').add(bundleData);
     } catch (e) {
       print('Error adding product to Firestore: $e');
       rethrow;

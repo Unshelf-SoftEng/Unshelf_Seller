@@ -39,22 +39,26 @@ class _ChatViewState extends State<ChatView>
     super.build(context);
     return Scaffold(
       appBar: AppBar(
+        title: Text(widget.receiverName),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle:
+            const TextStyle(color: const Color(0xFFFFFFFF), fontSize: 20),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text(widget.receiverName),
-        toolbarHeight: 80,
-        titleSpacing: 20,
-        backgroundColor: Colors.white,
-        shadowColor: Colors.transparent,
-        titleTextStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
-          color: Colors.black,
-          fontSize: 20,
-          fontFamily: 'Montserrat',
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
         ),
       ),
       body: Column(
@@ -78,7 +82,9 @@ class _ChatViewState extends State<ChatView>
           return Text('Error: ${snapshot.error}');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading...');
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
         return ListView(
           children: snapshot.data!.docs

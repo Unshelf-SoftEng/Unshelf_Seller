@@ -20,11 +20,9 @@ class AddBundleViewModel extends ChangeNotifier {
   final ImagePicker _picker = ImagePicker();
 
   List<ProductModel> _products = [];
-  Set<String> _selectedProductIds = {};
   int _maxStock = 0;
 
   List<ProductModel> get products => _products;
-  Set<String> get selectedProductIds => _selectedProductIds;
   int get maxStock => _maxStock;
 
   Uint8List? _mainImageData;
@@ -51,9 +49,6 @@ class AddBundleViewModel extends ChangeNotifier {
   }
 
   void _updateBundleStock() {
-    if (_selectedProductIds.isEmpty) {
-      _maxStock = 0;
-    } else {}
     notifyListeners();
   }
 
@@ -62,10 +57,7 @@ class AddBundleViewModel extends ChangeNotifier {
       final bundleName = bundleNameController.text;
       final bundlePrice = double.tryParse(bundlePriceController.text) ?? 0.0;
       final bundleStock = int.tryParse(bundleStockController.text) ?? 0;
-      final bundleDiscount =
-          double.tryParse(bundleDiscountController.text) ?? 0.0;
-
-      User user = FirebaseAuth.instance.currentUser!;
+      final bundleDiscount = int.tryParse(bundleDiscountController.text) ?? 0;
 
       final mainImageRef = FirebaseStorage.instance
           .ref()
@@ -75,25 +67,24 @@ class AddBundleViewModel extends ChangeNotifier {
 
       final mainImageUrl = await mainImageRef.getDownloadURL();
 
-      final bundleData = {
-        'name': bundleName,
-        'category': selectedCategory,
-        'items': productQuantities.entries.map((entry) {
-          return {
-            'batchId': entry.key,
-            'quantity': entry.value,
-          };
-        }).toList(),
-        'price': bundlePrice,
-        'stock': bundleStock,
-        'discount': bundleDiscount,
-        'mainImageUrl': mainImageUrl,
-        'sellerId': user.uid,
-        'isListed': true,
-      };
+      BundleModel bundle = new BundleModel(
+        id: '',
+        name: bundleName,
+        mainImageUrl: mainImageUrl,
+        category: selectedCategory,
+        description: '',
+        items: productQuantities.entries
+            .map((entry) => {
+                  'batchId': entry.key,
+                  'quantity': entry.value,
+                })
+            .toList(),
+        price: bundlePrice,
+        stock: bundleStock,
+        discount: bundleDiscount,
+      );
 
-      await FirebaseFirestore.instance.collection('bundles').add(bundleData);
-
+      _bundleService.createBundle(bundle);
       print('Bundle created successfully');
       notifyListeners();
     } catch (e) {
@@ -136,5 +127,15 @@ class AddBundleViewModel extends ChangeNotifier {
 
     // Load main image
     await loadImageFromUrl(_bundle!.mainImageUrl);
+  }
+
+  void clearSelection() {
+    bundleNameController.clear();
+    bundlePriceController.clear();
+    bundleStockController.clear();
+    bundleDiscountController.clear();
+    _mainImageData = null;
+    selectedCategory = '';
+    notifyListeners();
   }
 }

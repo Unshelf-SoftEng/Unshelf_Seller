@@ -128,7 +128,11 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign In'),
+        title: const Text('Log In'),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFF386641),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -140,11 +144,19 @@ class _LoginViewState extends State<LoginView> {
               children: <Widget>[
                 Image.asset(
                   'assets/images/logo.png',
-                  height: 100,
+                  height: 150,
                 ),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    ),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -152,9 +164,18 @@ class _LoginViewState extends State<LoginView> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    ),
+                  ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -164,18 +185,31 @@ class _LoginViewState extends State<LoginView> {
                   },
                   onFieldSubmitted: (value) => _Login(),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ForgotPasswordView(),
-                    ));
-                  },
-                  child: const Text('Forgot Password?'),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ForgotPasswordView(),
+                      ));
+                    },
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: Color(0xFF6A994E)),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(const Color(0xFFA7C957)),
+                    foregroundColor:
+                        MaterialStateProperty.all(const Color(0xFF386641)),
+                    alignment: Alignment.center,
+                  ),
                   onPressed: _Login,
-                  child: const Text('Sign In'),
+                  child: const Text('Log In'),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -184,8 +218,7 @@ class _LoginViewState extends State<LoginView> {
                     Expanded(child: Divider(color: Colors.grey[400])),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text('or sign in with',
-                          style: TextStyle(color: Colors.grey)),
+                      child: Text('or', style: TextStyle(color: Colors.grey)),
                     ),
                     Expanded(child: Divider(color: Colors.grey[400])),
                   ],
@@ -193,24 +226,35 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: _loginWithGoogle,
-                  label: const Text('Sign in with Google'),
+                  label: const Text('Log in with Google'),
                   icon: Image.asset('assets/images/google_logo.png',
-                      width: 24, height: 24),
+                      width: 24, height: 24, fit: BoxFit.contain),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    backgroundColor: const Color(0xFFA7C957),
+                    foregroundColor: const Color(0xFF386641),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 20),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text("Don't have an account?"),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => RegisterView()));
-                  },
-                  child: const Text('Sign Up'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => RegisterView()));
+                      },
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(color: Color(0xFF6A994E)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

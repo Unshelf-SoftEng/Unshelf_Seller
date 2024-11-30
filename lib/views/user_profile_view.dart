@@ -17,8 +17,29 @@ class UserProfileView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
-        backgroundColor: Color(0xFF6A994E),
+        title: Text('Edit User Profile'),
+        backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(
+            color: Color(0xFFC8DD96),
+            height: 4.0,
+          ),
+        ),
       ),
       body: viewModel.isLoading
           ? Center(child: CircularProgressIndicator())
@@ -93,23 +114,32 @@ class UserProfileView extends StatelessWidget {
                         },
                       ),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          viewModel.updateUserProfile();
+                      Align(
+                        alignment: Alignment.center,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                  const Color(0xFFA7C957)),
+                              foregroundColor: WidgetStatePropertyAll(
+                                  const Color(0xFF386641)),
+                              alignment: Alignment.center),
+                          onPressed: () {
+                            viewModel.updateUserProfile();
 
-                          if (viewModel.errorMessage == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Profile updated successfully'),
-                              ),
-                            );
-                          }
+                            if (viewModel.errorMessage == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Profile updated successfully'),
+                                ),
+                              );
+                            }
 
-                          print('Passing ${viewModel.userProfile}');
+                            print('Passing ${viewModel.userProfile}');
 
-                          Navigator.pop(context, viewModel.userProfile);
-                        },
-                        child: Text('Save Changes'),
+                            Navigator.pop(context, viewModel.userProfile);
+                          },
+                          child: Text('Save Changes'),
+                        ),
                       ),
                     ],
                   ),
