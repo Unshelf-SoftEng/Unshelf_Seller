@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
-import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class AddBundleView extends StatefulWidget {
   final Map<String, BatchModel> products;
@@ -16,14 +16,17 @@ class AddBundleView extends StatefulWidget {
 }
 
 class _AddBundleViewState extends State<AddBundleView> {
-  final Map<String, int> productQuantities = {};
+  final Map<String, Map<String, dynamic>> productDetails = {};
 
   @override
   void initState() {
     super.initState();
 
     widget.products.forEach((productId, product) {
-      productQuantities[productId] = 1;
+      productDetails[productId] = {
+        'quantity': 1, // Default quantity
+        'quantifier': product.quantifier,
+      };
     });
   }
 
@@ -97,7 +100,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: const Text(
-                        'Bundle Name',
+                        'Name',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -118,10 +121,48 @@ class _AddBundleViewState extends State<AddBundleView> {
                             vertical: 10.0, horizontal: 10.0),
                         labelStyle: const TextStyle(color: Colors.black),
                         errorStyle: const TextStyle(
+                          color: AppColors.watermelonRed,
+                          fontSize: 10,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter bundle name';
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: const Text(
+                        'Description',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    TextFormField(
+                      controller: viewModel.bundleDescriptionController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color.fromARGB(255, 228, 228, 228),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 10.0),
+                        labelStyle: const TextStyle(color: Colors.black),
+                        errorStyle: const TextStyle(
                           color: Color(0xFFBC4749),
                           fontSize: 10,
                         ),
                       ),
+                      maxLines: 3,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a bundle name';
@@ -330,23 +371,26 @@ class _AddBundleViewState extends State<AddBundleView> {
                                     icon: Icon(Icons.remove),
                                     onPressed: () {
                                       setState(() {
-                                        if (productQuantities[productId]! > 1) {
-                                          productQuantities[productId] =
-                                              productQuantities[productId]! - 1;
+                                        if (productDetails[productId]![
+                                                'quantity'] >
+                                            1) {
+                                          productDetails[productId]![
+                                              'quantity'] -= 1;
                                         }
                                       });
                                     },
                                   ),
                                   Text(
-                                    productQuantities[productId].toString(),
+                                    productDetails[productId]!['quantity']
+                                        .toString(),
                                     style: TextStyle(fontSize: 16.0),
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.add),
                                     onPressed: () {
                                       setState(() {
-                                        productQuantities[productId] =
-                                            (productQuantities[productId]! + 1);
+                                        productDetails[productId]![
+                                            'quantity'] += 1;
                                       });
                                     },
                                   ),
@@ -370,7 +414,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                         final form = viewModel.formKey.currentState;
 
                         if (form != null && form.validate()) {
-                          await viewModel.createBundle(productQuantities);
+                          await viewModel.createBundle(productDetails);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Bundle created successfully'),

@@ -8,7 +8,7 @@ import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 import 'package:unshelf_seller/views/login_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
-import 'package:unshelf_seller/views/user_profile_view.dart';
+import 'package:unshelf_seller/views/edit_user_profile_view.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as lat_lng2;
@@ -244,6 +244,9 @@ class _StoreViewState extends State<StoreView> {
                     viewModel.storeDetails!.storeLatitude!,
                     viewModel.storeDetails!.storeLongitude!),
                 initialZoom: 15.0,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.none,
+                ),
               ),
               children: [
                 TileLayer(
@@ -261,7 +264,7 @@ class _StoreViewState extends State<StoreView> {
                         child: Container(
                           child: Icon(
                             Icons.location_pin,
-                            color: Colors.red,
+                            color: Color(0xFFBC4749),
                             size: 40.0,
                           ),
                         ),

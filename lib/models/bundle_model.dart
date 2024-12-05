@@ -8,7 +8,7 @@ class BundleModel extends ItemModel {
   int? stock;
   int? discount;
   List<String>? additionalImageUrls;
-  List<Map<String, Object>> items;
+  List<Map<String, dynamic>> items;
   List<ProductModel>? products;
 
   BundleModel({
@@ -39,6 +39,7 @@ class BundleModel extends ItemModel {
                 ?.map((item) => {
                       'batchId': item['batchId'] as String,
                       'quantity': (item['quantity'] as num).toInt(),
+                      'quantifier': item['quantifier'] as String,
                     })
                 .toList() ??
             [],

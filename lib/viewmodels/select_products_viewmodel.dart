@@ -4,11 +4,11 @@ import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/services/product_service.dart';
 
 class SelectProductsViewModel extends ChangeNotifier {
-  Map<String, BatchModel> _selectedProducts = {};
-  Map<String, BatchModel> get selectedProducts => _selectedProducts;
+  Map<String, BatchModel> _selectedItems = {};
+  Map<String, BatchModel> get selectedItems => _selectedItems;
 
-  List<BatchModel> _products = [];
-  List<BatchModel> get products => _products;
+  List<BatchModel> _items = [];
+  List<BatchModel> get items => _items;
 
   final BatchService batchService = BatchService();
   final ProductService productService = ProductService();
@@ -19,27 +19,27 @@ class SelectProductsViewModel extends ChangeNotifier {
   Future<void> fetchProducts() async {
     _isLoading = true;
     notifyListeners();
-    _products = await batchService.getAllBatches();
-    for (var product in _products) {
-      product.product = await productService.getProduct(product.productId);
+    _items = await batchService.getAllBatches();
+    for (var item in _items) {
+      item.product = await productService.getProduct(item.productId);
     }
-    _filteredItems = _products;
+    _filteredItems = _items;
     _isLoading = false;
     notifyListeners();
   }
 
   // Method to add a product to the bundle
-  void addProductToBundle(String productId) {
-    if (!_selectedProducts.keys.contains(productId)) {
-      _selectedProducts[productId] =
-          _products.firstWhere((product) => product.batchNumber == productId);
+  void addProductToBundle(String batchNumber) {
+    if (!_selectedItems.keys.contains(batchNumber)) {
+      _selectedItems[batchNumber] =
+          _items.firstWhere((product) => product.batchNumber == batchNumber);
       notifyListeners();
     }
   }
 
   // Method to remove a product from the bundle
-  void removeProductFromBundle(String productId) {
-    _selectedProducts.remove(productId);
+  void removeProductFromBundle(String batchNumber) {
+    _selectedItems.remove(batchNumber);
     notifyListeners();
   }
 
@@ -55,13 +55,11 @@ class SelectProductsViewModel extends ChangeNotifier {
 
   void _filterItems() {
     if (_searchQuery.isEmpty) {
-      _filteredItems = _products;
+      _filteredItems = _items;
     } else {
       print("Filtering items");
 
-      _filteredItems = _products.where((item) {
-        print(item.product?.name);
-
+      _filteredItems = _items.where((item) {
         final name = item.product?.name.toLowerCase();
         final query = _searchQuery.toLowerCase();
         return name!.contains(query);
@@ -72,7 +70,7 @@ class SelectProductsViewModel extends ChangeNotifier {
   }
 
   void clearSelection() {
-    _selectedProducts = {};
+    _selectedItems = {};
     notifyListeners();
   }
 }

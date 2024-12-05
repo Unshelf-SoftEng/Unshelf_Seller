@@ -15,6 +15,8 @@ class ListingViewModel extends ChangeNotifier {
   bool get showingProducts => _showingProducts;
   String _searchQuery = '';
   List<dynamic> get filteredItems => _filteredItems;
+  String _filter = 'All';
+  String get filter => _filter;
 
   ListingViewModel() {
     fetchItems();
@@ -36,6 +38,20 @@ class ListingViewModel extends ChangeNotifier {
         return name.contains(query);
       }).toList();
     }
+
+    if (_filter == 'Bundles') {
+      _filteredItems = _filteredItems.whereType<BundleModel>().toList();
+    }
+
+    if (_filter == 'Products') {
+      _filteredItems = _filteredItems.whereType<ProductModel>().toList();
+    }
+  }
+
+  void setFilter(String filter) {
+    _filter = filter;
+    _filterItems();
+    notifyListeners();
   }
 
   Future<void> refreshItems() async {
@@ -65,7 +81,6 @@ class ListingViewModel extends ChangeNotifier {
               }
             })
             .where((product) => product != null)
-            .cast<ItemModel>()
             .toList();
 
         final bundleSnapshot = await FirebaseFirestore.instance
@@ -83,10 +98,13 @@ class ListingViewModel extends ChangeNotifier {
               }
             })
             .where((bundle) => bundle != null)
-            .cast<ItemModel>()
             .toList();
 
-        _items = showingProducts ? products : bundles.cast<ItemModel>();
+        _items = [
+          ...products.whereType<ItemModel>(),
+          ...bundles.whereType<ItemModel>()
+        ];
+
         _filteredItems = _items;
       } catch (e) {
         print('Error fetching items: $e');
@@ -118,7 +136,9 @@ class ListingViewModel extends ChangeNotifier {
         .collection(collection)
         .doc(itemId)
         .delete();
-    fetchItems();
+
+    _items.removeWhere((item) => item.id == itemId);
+    notifyListeners();
   }
 
   void toggleView() {

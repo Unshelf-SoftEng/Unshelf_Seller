@@ -9,6 +9,7 @@ import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/select_products_view.dart';
 import 'package:unshelf_seller/views/update_product_view.dart';
 import 'package:unshelf_seller/views/update_bundle_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class ListingsView extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class ListingsView extends StatefulWidget {
 }
 
 class _ListingsViewState extends State<ListingsView> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
 
   @override
@@ -38,219 +39,269 @@ class _ListingsViewState extends State<ListingsView> {
         .updateSearchQuery(searchQuery);
   }
 
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) _searchController.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Consumer<ListingViewModel>(
-          builder: (context, viewModel, child) {
-            return AppBar(
-              title: _isSearching
-                  ? TextField(
-                      controller: _searchController,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Search...',
-                        border: InputBorder.none,
-                      ),
-                      style: const TextStyle(color: Colors.black),
-                      onSubmitted: (value) {
-                        _onSearchChanged();
-                      },
-                      textInputAction: TextInputAction.search,
-                    )
-                  : Text(
-                      Provider.of<ListingViewModel>(context).showingProducts
-                          ? 'Products'
-                          : 'Bundles',
-                    ),
-              actions: [
-                _isSearching
-                    ? IconButton(
-                        icon: Icon(Icons.cancel),
-                        onPressed: () {
-                          setState(() {
-                            _isSearching = false;
-                            _searchController.clear();
-                            Provider.of<ListingViewModel>(context,
-                                    listen: false)
-                                .updateSearchQuery('');
-                          });
-                        },
-                      )
-                    : IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: () {
-                          setState(() {
-                            _isSearching = true;
-                          });
-                        },
-                      ),
-                IconButton(
-                  icon: Icon(Icons.swap_horiz),
-                  onPressed: () {
-                    Provider.of<ListingViewModel>(context, listen: false)
-                        .toggleView();
-                  },
+      appBar: _buildAppBar(context),
+      body: _buildBody(context),
+      floatingActionButton: _buildFloatingActionButton(context),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: _isSearching
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search...',
+                border: InputBorder.none,
+              ),
+              style: const TextStyle(color: Colors.white),
+              textInputAction: TextInputAction.search,
+            )
+          : const Text('Listings'),
+      actions: [
+        IconButton(
+          icon: Icon(_isSearching ? Icons.cancel : Icons.search),
+          onPressed: _toggleSearch,
+        ),
+        const SizedBox(width: 8),
+        Consumer<ListingViewModel>(
+          builder: (context, viewModel, _) {
+            return DropdownButton<String>(
+              value: viewModel.filter,
+              dropdownColor: Colors.white,
+              underline: const SizedBox(),
+              icon:
+                  const Icon(Icons.filter_list, color: AppColors.deepMossGreen),
+              onChanged: (String? value) {
+                if (value != null) {
+                  viewModel.setFilter(value);
+                }
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: 'All',
+                  child: Text('All'),
+                ),
+                DropdownMenuItem(
+                  value: 'Bundles',
+                  child: Text('Bundles'),
+                ),
+                DropdownMenuItem(
+                  value: 'Products',
+                  child: Text('Products'),
                 ),
               ],
             );
           },
         ),
-      ),
-      body: Consumer<ListingViewModel>(
-        builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
+        const SizedBox(width: 8),
+      ],
+    );
+  }
 
-          if (viewModel.items.isEmpty) {
-            if (viewModel.showingProducts) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('No products found',
-                        style: TextStyle(fontSize: 18, color: Colors.grey)),
-                  ],
+  Widget _buildBody(BuildContext context) {
+    return Consumer<ListingViewModel>(
+      builder: (context, viewModel, _) {
+        if (viewModel.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (viewModel.filteredItems.isEmpty) {
+          return _buildEmptyState(viewModel.filter == 'Products');
+        }
+
+        return ListView.builder(
+          itemCount: viewModel.filteredItems.length,
+          itemBuilder: (context, index) {
+            final item = viewModel.filteredItems[index];
+            return _buildItemCard(context, item);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(bool showingProducts) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            showingProducts ? 'No products found' : 'No bundles found',
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemCard(BuildContext context, dynamic item) {
+    final itemId = item.id;
+    final itemName = item.name;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      elevation: 4.0,
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(8.0),
+        leading: CachedNetworkImage(
+          imageUrl: item.mainImageUrl,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          placeholder: (context, _) => const CircularProgressIndicator(),
+          errorWidget: (context, _, __) =>
+              const Icon(Icons.error, size: 60, color: AppColors.watermelonRed),
+        ),
+        title:
+            Text(itemName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        trailing: _buildActionButtons(context, item),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductSummaryView(productId: itemId),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, dynamic item) {
+    final itemId = item.id;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.edit, color: AppColors.palmLeaf),
+          onPressed: () {
+            if (item is ProductModel) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateProductView(
+                    productId: itemId,
+                    onProductAdded: () {
+                      Provider.of<ListingViewModel>(context, listen: false)
+                          .fetchItems();
+                    },
+                  ),
                 ),
               );
-            } else {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('No bundles found',
-                        style: TextStyle(fontSize: 18, color: Colors.grey)),
-                  ],
+            } else if (item is BundleModel) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateBundleView(bundleId: itemId),
                 ),
               );
             }
-          }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete, color: AppColors.watermelonRed),
+          onPressed: () async {
+            final confirmDelete = await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text("Confirm Deletion"),
+                  content:
+                      const Text("Are you sure you want to delete this item?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text("Delete",
+                          style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                );
+              },
+            );
+            if (confirmDelete == true) {
+              await Provider.of<ListingViewModel>(context, listen: false)
+                  .deleteItem(itemId, item is ProductModel);
+            }
+          },
+        ),
+      ],
+    );
+  }
 
-          return ListView.builder(
-            itemCount: viewModel.filteredItems.length,
-            itemBuilder: (context, index) {
-              final item = viewModel.filteredItems[index];
-              final itemId = item.id;
-              final itemName = item.name;
-
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ProductSummaryView(productId: itemId),
-                    ),
-                  );
-                },
-                child: Card(
-                  elevation: 4.0,
-                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(8.0),
-                    leading: CachedNetworkImage(
-                      imageUrl: item.mainImageUrl,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          Icon(Icons.error, size: 60),
-                    ),
-                    title: Text(itemName,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Color(0xFF6A994E)),
-                          onPressed: () {
-                            if (item is ProductModel) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UpdateProductView(
-                                    productId: itemId,
-                                    onProductAdded: () {
-                                      Provider.of<ListingViewModel>(context,
-                                              listen: false)
-                                          .refreshItems();
-                                    },
-                                  ),
-                                ),
-                              );
-                            } else if (item is BundleModel) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UpdateBundleView(
-                                    bundleId: itemId,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Color(0xFFBC4749)),
-                          onPressed: () async {
-                            await viewModel.deleteItem(
-                                itemId, item is ProductModel);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: Consumer<ListingViewModel>(
-        builder: (context, viewModel, child) {
-          return FloatingActionButton(
-            onPressed: () async {
-              if (viewModel.showingProducts) {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddProductView(
-                      onProductAdded: () {
-                        Provider.of<ListingViewModel>(context, listen: false)
-                            .fetchItems();
+  Widget _buildFloatingActionButton(BuildContext context) {
+    return Consumer<ListingViewModel>(
+      builder: (context, viewModel, _) {
+        return FloatingActionButton(
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.add_circle_outline),
+                      title: const Text('Add Product'),
+                      onTap: () async {
+                        Navigator.pop(context); // Close the bottom sheet
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddProductView(
+                              onProductAdded: () {
+                                Provider.of<ListingViewModel>(context,
+                                        listen: false)
+                                    .fetchItems();
+                              },
+                            ),
+                          ),
+                        );
+                        viewModel.fetchItems();
                       },
                     ),
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.pages_outlined),
+                      title: const Text('Add Bundle'),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SelectProductsView(),
+                          ),
+                        );
+                        viewModel.fetchItems();
+                      },
+                    ),
+                  ],
                 );
-              } else {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SelectProductsView(),
-                  ),
-                ).then((result) {
-                  if (result == true) {
-                    viewModel.fetchItems();
-                  }
-                });
-              }
-            },
-            tooltip: viewModel.showingProducts ? 'Add Product' : 'Add Bundle',
-            backgroundColor: Color(0xFFA7C957),
-            foregroundColor: Color(0xFFA386641),
-            child: const Icon(Icons.add),
-          );
-        },
-      ),
+              },
+            );
+          },
+          tooltip: 'Add Item',
+          backgroundColor: AppColors.middleGreenYellow,
+          child: const Icon(Icons.add, color: AppColors.deepMossGreen),
+        );
+      },
     );
   }
 }

@@ -16,6 +16,8 @@ class AddBundleViewModel extends ChangeNotifier {
   final TextEditingController bundleStockController = TextEditingController();
   final TextEditingController bundleDiscountController =
       TextEditingController();
+  final TextEditingController bundleDescriptionController =
+      TextEditingController();
   final formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
@@ -45,6 +47,7 @@ class AddBundleViewModel extends ChangeNotifier {
     bundlePriceController.text = bundle.price.toString();
     bundleStockController.text = bundle.stock.toString();
     bundleDiscountController.text = bundle.discount.toString();
+    bundleDescriptionController.text = bundle.description;
     _updateBundleStock();
   }
 
@@ -52,12 +55,14 @@ class AddBundleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createBundle(Map<String, int> productQuantities) async {
+  Future<void> createBundle(
+      Map<String, Map<String, dynamic>> productDetails) async {
     try {
       final bundleName = bundleNameController.text;
       final bundlePrice = double.tryParse(bundlePriceController.text) ?? 0.0;
       final bundleStock = int.tryParse(bundleStockController.text) ?? 0;
       final bundleDiscount = int.tryParse(bundleDiscountController.text) ?? 0;
+      final bundleDescription = bundleDescriptionController.text;
 
       final mainImageRef = FirebaseStorage.instance
           .ref()
@@ -71,12 +76,13 @@ class AddBundleViewModel extends ChangeNotifier {
         id: '',
         name: bundleName,
         mainImageUrl: mainImageUrl,
+        description: bundleDescription,
         category: selectedCategory,
-        description: '',
-        items: productQuantities.entries
+        items: productDetails.entries
             .map((entry) => {
                   'batchId': entry.key,
-                  'quantity': entry.value,
+                  'quantity': entry.value['quantity'],
+                  'quantifier': entry.value['quantifier'],
                 })
             .toList(),
         price: bundlePrice,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/select_products_viewmodel.dart';
 import 'package:unshelf_seller/views/add_bundle_view.dart';
-import 'package:flutter/material.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:intl/intl.dart';
 
 class SelectProductsView extends StatefulWidget {
@@ -109,7 +109,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             );
           }
 
-          if (viewModel.products.isEmpty) {
+          if (viewModel.items.isEmpty) {
             return const Center(
               child: Text('No products available'),
             );
@@ -127,7 +127,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                   mainImageUrl: product.product!.mainImageUrl,
                   price: product.price,
                   expiryDate: product.expiryDate,
-                  isSelected: viewModel.selectedProducts.keys
+                  isSelected: viewModel.selectedItems.keys
                       .contains(product.batchNumber),
                   onTap: () =>
                       viewModel.addProductToBundle(product.batchNumber),
@@ -141,7 +141,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (viewModel.selectedProducts.length < 2) {
+          if (viewModel.selectedItems.length < 2) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Please select at least two products'),
@@ -154,7 +154,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  AddBundleView(products: viewModel.selectedProducts),
+                  AddBundleView(products: viewModel.selectedItems),
             ),
           ).then((result) {
             if (result == true) {
@@ -163,8 +163,8 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             }
           });
         },
-        backgroundColor: const Color(0xFFA7C957),
-        child: const Icon(Icons.arrow_forward, color: Color(0xFF386641)),
+        backgroundColor: AppColors.middleGreenYellow,
+        child: const Icon(Icons.arrow_forward, color: AppColors.deepMossGreen),
       ),
     );
   }
