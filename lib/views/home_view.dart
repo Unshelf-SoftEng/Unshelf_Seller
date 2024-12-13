@@ -29,7 +29,7 @@ class _HomeViewState extends State<HomeView> {
 
   final List<String> _titles = [
     'Dashboard',
-    'Orders',
+    "Orders",
     'Listings',
     'Profile',
   ];
@@ -166,7 +166,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
-            label: 'Orders',
+            label: "Orders",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),

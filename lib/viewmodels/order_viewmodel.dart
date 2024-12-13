@@ -30,13 +30,17 @@ class OrderViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchOrders() async {
+    _isLoading = true;
+    notifyListeners();
     _orders = await _orderService.getOrders();
     _isLoading = false;
+    notifyListeners();
   }
 
-  OrderModel? selectOrder(String orderId) {
+  Future<OrderModel?> selectOrder(String orderId) async {
     _isLoading = true;
-    _selectedOrder = _orders.firstWhere((order) => order.id == orderId);
+    notifyListeners();
+    _selectedOrder = await _orderService.getOrder(orderId);
     _isLoading = false;
     notifyListeners();
     return _selectedOrder;
@@ -47,147 +51,211 @@ class OrderViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fulfillOrder() async {
+  Future<void> approveOrder() async {
+    _isLoading = true;
+    notifyListeners();
+
     try {
-      // Ensure the order and buyer details exist
       if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
         throw Exception("Order or buyer information is missing.");
       }
 
-      // Mark order as 'Ready' initially
-      _selectedOrder?.status = 'Ready';
+      final orderRef = FirebaseFirestore.instance
+          .collection('orders')
+          .doc(_selectedOrder?.id);
 
-      // Variables to calculate total order amount
-      double totalOrderAmount = 0.0;
-
-      // Begin transaction for all order items and points calculation
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        for (var item in _selectedOrder!.items) {
+        transaction.update(orderRef, {
+          'status': 'Processing',
+        });
+      });
+
+      _selectedOrder!.status = 'Processing';
+
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> cancelOrder() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
+        throw Exception("Order or buyer information is missing.");
+      }
+
+      final orderRef = FirebaseFirestore.instance
+          .collection('orders')
+          .doc(_selectedOrder?.id);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.update(orderRef, {
+          'status': 'Cancelled',
+          'cancelledAt': FieldValue.serverTimestamp(),
+        });
+      });
+
+      _selectedOrder!.status = 'Cancelled';
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fulfillOrder() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
+        print('Order or buyer information is missing.');
+        throw Exception("Order or buyer information is missing.");
+      }
+
+      final orderRef = FirebaseFirestore.instance
+          .collection('orders')
+          .doc(_selectedOrder?.id);
+
+      var pickupCode = generatePickUpCode();
+      _selectedOrder!.pickupCode = pickupCode;
+
+      // Split item processing into smaller transactions if necessary
+      for (var item in _selectedOrder!.items) {
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          print('Processing item: ${item.batchId}');
           final batchRef = FirebaseFirestore.instance
               .collection('batches')
               .doc(item.batchId);
-          final orderRef = FirebaseFirestore.instance
-              .collection('orders')
-              .doc(_selectedOrder?.id);
 
-          // Fetch product stock
-          DocumentSnapshot productDoc = await transaction.get(batchRef);
+          DocumentSnapshot batchSnapshot = await transaction.get(batchRef);
 
-          if (!productDoc.exists) {
+          print('Batch snapshot: ${batchSnapshot.data()}');
+
+          if (!batchSnapshot.exists) {
+            print('Batch ${item.batchId} does not exist.');
             throw Exception("Batch ${item.batchId} does not exist.");
           }
 
-          double currentStock = productDoc['stock'];
+          double currentStock = batchSnapshot['stock']?.toDouble() ?? 0.0;
           int quantity = item.quantity;
           double newStockValue = currentStock - quantity;
 
           if (newStockValue < 0) {
+            print('Insufficient stock for batch ${item.batchId}.');
             throw Exception(
-                "Insufficient stock for batch ${item.batchId}. Cannot complete order.");
+                "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
           }
 
-          // Update stock and listing status
-          transaction.update(batchRef, {'stock': newStockValue});
-          transaction.update(batchRef, {'isListed': newStockValue > 0});
+          transaction.update(batchRef, {
+            'stock': newStockValue,
+            'isListed': newStockValue > 0,
+          });
 
-          // Calculate price
-          double pricePerUnit = productDoc['price'];
-          totalOrderAmount += pricePerUnit * quantity;
+          print('Stock updated for batch ${item.batchId}.');
+        });
+      }
 
-          // Update order to 'Completed' with completion timestamp
-          transaction.update(orderRef, {'status': 'Completed'});
-          transaction
-              .update(orderRef, {'completedAt': FieldValue.serverTimestamp()});
-        }
+      // After processing all items, update the order status
+      final orderUpdate = {
+        'pickupCode': pickupCode,
+        'status': 'Ready',
+      };
 
-        if (totalOrderAmount > 0) {
-          int earnedPoints = (totalOrderAmount / 200).floor();
-
-          if (earnedPoints > 0) {
-            final userRef = FirebaseFirestore.instance
-                .collection('users')
-                .doc(_selectedOrder?.buyerId);
-
-            DocumentSnapshot userDoc = await transaction.get(userRef);
-
-            if (!userDoc.exists) {
-              throw Exception(
-                  "User ${_selectedOrder?.buyerId} does not exist.");
-            }
-
-            int currentPoints = userDoc['points'] ?? 0;
-            transaction
-                .update(userRef, {'points': currentPoints + earnedPoints});
-
-            print('User earned $earnedPoints points for this purchase.');
-          }
-        }
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.update(orderRef, orderUpdate);
       });
 
-      // Generate pickup code if the transaction succeeds
-      generatePickUpCode();
+      _selectedOrder!.status = 'Ready';
 
       notifyListeners();
     } catch (e) {
-      print("Error fulfilling order: $e");
-      // Handle errors gracefully
-      throw Exception("Transaction failed: $e");
+      print("Error during order fulfillment: $e");
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  void generatePickUpCode() {
-    // Use the nanoid library to generate a short, unique, and URL-safe code
-    final code = customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
-
-    _selectedOrder?.pickupCode = code;
-
-    // Update the pick up code in Firestore
-    FirebaseFirestore.instance
-        .collection('orders')
-        .doc(_selectedOrder?.id)
-        .update({'pickupCode': code});
+  String generatePickUpCode() {
+    return customAlphabet('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
   }
 
-  Future<void> completeOrder(String orderId) async {
-    _selectedOrder?.status = 'Completed';
+  Future<void> completeOrder() async {
     try {
-      DocumentReference orderRef =
-          FirebaseFirestore.instance.collection('orders').doc(orderId);
+      DateTime now = DateTime.now();
+      DocumentReference orderRef = FirebaseFirestore.instance
+          .collection('orders')
+          .doc(_selectedOrder?.id);
+
+      // Fetch the order data
       DocumentSnapshot orderDoc = await orderRef.get();
 
-      // Check if any orders were found
-      if (orderDoc.exists) {
-        await FirebaseFirestore.instance.runTransaction((transaction) async {
-          // Update the order status to 'Completed'
-          transaction.update(orderRef, {'status': 'Completed'});
-          transaction
-              .update(orderRef, {'completedAt': FieldValue.serverTimestamp()});
-
-          double transactionFee =
-              double.parse((orderDoc['totalPrice'] * 0.02).toStringAsFixed(2));
-          double sellerEarnings = double.parse(
-              (orderDoc['totalPrice'] - transactionFee).toStringAsFixed(2));
-
-          // Prepare the transaction data
-          Map<String, dynamic> transactionData = {
-            'date': FieldValue.serverTimestamp(),
-            'isPaid': orderDoc['isPaid'],
-            'orderId': orderId,
-            'sellerEarnings': sellerEarnings,
-            'sellerId': orderDoc['sellerId'],
-            'transactionFee': transactionFee,
-            'type': 'Sale',
-          };
-
-          transaction.set(
-            FirebaseFirestore.instance.collection('transactions').doc(),
-            transactionData,
-          );
-        });
-        notifyListeners();
-      } else {
-        print('No order found with ID: $orderId');
+      // Check if the order exists
+      if (!orderDoc.exists) {
+        print('No order found with ID: ${_selectedOrder?.id}');
+        return;
       }
+
+      // Get buyerId and totalPrice safely
+      String buyerId = orderDoc['buyerId'];
+      double totalPrice = orderDoc['totalPrice']?.toDouble() ?? 0.0;
+
+      // Reference to the user document
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(buyerId);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        transaction.update(orderRef, {
+          'status': 'Completed',
+          'completedAt': now,
+          'isPaid': true,
+        });
+
+        double transactionFee =
+            double.parse((totalPrice * 0.02).toStringAsFixed(2));
+        double sellerEarnings =
+            double.parse((totalPrice - transactionFee).toStringAsFixed(2));
+
+        int earnedPoints = (totalPrice / 200).floor();
+
+        // Update user's points in Firestore
+        transaction.update(userRef, {
+          'points': FieldValue.increment(earnedPoints),
+        });
+
+        // Prepare the transaction data
+        Map<String, dynamic> transactionData = {
+          'date': FieldValue.serverTimestamp(),
+          'isPaid': orderDoc['isPaid'],
+          'orderId': orderDoc['orderId'],
+          'sellerEarnings': sellerEarnings,
+          'sellerId': orderDoc['sellerId'],
+          'transactionFee': transactionFee,
+          'type': 'Sale',
+        };
+
+        transaction.set(
+          FirebaseFirestore.instance.collection('transactions').doc(),
+          transactionData,
+        );
+
+        print(
+            'Order completed. Seller earnings: ₱$sellerEarnings. User earned $earnedPoints points.');
+        _selectedOrder!.status = 'Completed';
+        _selectedOrder!.completedAt = Timestamp.fromDate(now);
+        _selectedOrder!.isPaid = true;
+      });
+
+      notifyListeners();
     } catch (e) {
       print('Error completing order: $e');
     }
@@ -197,6 +265,11 @@ class OrderViewModel extends ChangeNotifier {
     _orders = [];
     _selectedOrder = null;
     _currentStatus = 'All';
+    notifyListeners();
+  }
+
+  void clearSelectedOrder() {
+    _selectedOrder = null;
     notifyListeners();
   }
 }

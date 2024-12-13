@@ -8,11 +8,12 @@ class OrderModel {
   final List<OrderItem> items;
   String status;
   final Timestamp createdAt;
-  final bool isPaid;
+  bool isPaid;
   List<BatchModel> products = [];
   double totalPrice;
   String buyerName;
   Timestamp? completedAt;
+  Timestamp? cancelledAt;
   String? pickupCode;
   Timestamp? pickupTime;
 
@@ -28,6 +29,7 @@ class OrderModel {
     this.products = const [],
     this.buyerName = '',
     this.completedAt,
+    this.cancelledAt,
     this.pickupCode = '',
     this.pickupTime,
   });
@@ -40,7 +42,8 @@ class OrderModel {
       orderId: data['orderId'] ?? '',
       status: data['status'] ?? '',
       createdAt: data['createdAt'] as Timestamp,
-      completedAt: data['completetedAt'] as Timestamp?,
+      completedAt: data['completedAt'] as Timestamp?,
+      cancelledAt: data['cancelledAt'] as Timestamp?,
       pickupCode: data['pickupCode'] ?? '',
       pickupTime: data['pickupTime'] as Timestamp?,
       buyerId: data['buyerId'] ?? '',
@@ -57,12 +60,14 @@ class OrderModel {
 class OrderItem {
   final int quantity;
   final String? batchId;
+  final String? bundleId;
   final double? price;
   String? name;
 
   OrderItem({
-    this.batchId,
     required this.quantity,
+    this.batchId,
+    this.bundleId,
     this.price,
     this.name,
   });
@@ -71,6 +76,7 @@ class OrderItem {
     return OrderItem(
       quantity: map['quantity'] as int,
       batchId: map['batchId'] ?? '',
+      bundleId: map['bundleId'] ?? '',
       price: map['price'] as double,
       name: map['name'] ?? '',
     );

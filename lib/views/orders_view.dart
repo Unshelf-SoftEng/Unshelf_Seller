@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/views/order_details_view.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class OrdersView extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class OrdersView extends StatefulWidget {
 }
 
 class _OrdersViewState extends State<OrdersView> {
-  String? _selectedStatus;
+  String? _selectedStatus = 'All';
 
   @override
   void initState() {
@@ -30,22 +31,19 @@ class _OrdersViewState extends State<OrdersView> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
-          DropdownButton<String>(
-            value: _selectedStatus,
-            hint: const Text('Filter by Status'),
-            items: <String>['All', 'Pending', 'Cancelled', 'Ready', 'Completed']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedStatus = newValue;
-                ordersViewModel.filterOrdersByStatus(newValue);
-              });
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildFilterButton('All', ordersViewModel),
+                _buildFilterButton('Pending', ordersViewModel),
+                _buildFilterButton('Processing', ordersViewModel),
+                _buildFilterButton('Ready', ordersViewModel),
+                _buildFilterButton('Completed', ordersViewModel),
+                _buildFilterButton('Cancelled', ordersViewModel),
+              ],
+            ),
           ),
         ],
       ),
@@ -62,207 +60,31 @@ class _OrdersViewState extends State<OrdersView> {
                 final filteredOrders = ordersViewModel.filteredOrders;
 
                 if (filteredOrders.isEmpty) {
-                  if (ordersViewModel.currentStatus == 'Pending') {
-                    return const Center(
-                        child: Text('No pending orders found.'));
-                  } else if (ordersViewModel.currentStatus == 'Completed') {
-                    return const Center(
-                        child: Text('No completed orders found.'));
-                  } else if (ordersViewModel.currentStatus == 'Ready') {
-                    return const Center(child: Text('No ready orders found.'));
-                  } else if (ordersViewModel.currentStatus == 'Cancelled') {
-                    return const Center(
-                        child: Text('No cancelled orders found.'));
-                  } else {
-                    return const Center(child: Text('No orders found.'));
-                  }
+                  final statusMessages = {
+                    'Pending': 'No pending orders for today.',
+                    'Processing': 'No orders currently being processed today.',
+                    'Ready': 'No orders ready for pickup today.',
+                    'Completed': 'No completed orders today.',
+                    'Cancelled': 'No cancelled orders today.',
+                  };
+
+                  // Retrieve message for the current status, or use a default message
+                  String message =
+                      statusMessages[ordersViewModel.currentStatus] ??
+                          'No orders found.';
+
+                  return Center(
+                    child: Text(message),
+                  );
                 }
 
-                return ListView.separated(
+                return ListView.builder(
                   itemCount: ordersViewModel.filteredOrders.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey[300],
-                    thickness: 1.0,
-                  ),
                   itemBuilder: (context, index) {
                     final order = ordersViewModel.filteredOrders[index];
-                    return ListTile(
-                      contentPadding: EdgeInsets.all(16.0),
-                      title: Row(
-                        children: [
-                          // Left side: Product Details
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              padding: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  right: BorderSide(
-                                      color: Colors.grey[300]!,
-                                      width:
-                                          1.0), // Border to separate from right side
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  // Product Image
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      border: Border.all(
-                                          color: Colors.grey, width: 1),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        CupertinoIcons.gift,
-                                        size: 30.0,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 8.0),
-                                  // Product Name and Details
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 4.0),
-                                        Text(
-                                          'Order ID: ${order.orderId}',
-                                          style: const TextStyle(
-                                              fontSize: 12.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 4.0),
-                                        Text(
-                                          'Created At: ${order.createdAt.toDate().toLocal().toString().split(' ')[0]}',
-                                          style: TextStyle(
-                                              fontSize: 10.0,
-                                              color: Colors.grey[600]),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          // Right side: Price and Status
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  // Price
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 8.0,
-                                      horizontal:
-                                          MediaQuery.of(context).size.width *
-                                              0.05,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Colors.grey[300]!,
-                                          width: 1.0,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      '₱ ${order.totalPrice.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        fontSize:
-                                            MediaQuery.of(context).size.width *
-                                                0.03,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8.0),
-                                  Row(
-                                    children: [
-                                      // Status
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.03, // Responsive horizontal padding
-                                            vertical: 6.0,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                            border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            order.status,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.015,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      // Payment Status (Paid/Not Paid)
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.03,
-                                            vertical: 6.0,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: order.isPaid
-                                                ? Colors.green[300]
-                                                : Colors.red[300],
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                            border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            order.isPaid ? 'Paid' : 'Not Paid',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: (MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.015),
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    final isDarkBackground = index % 2 == 0;
+
+                    return GestureDetector(
                       onTap: () {
                         ordersViewModel.selectOrder(order.id);
                         Navigator.push(
@@ -274,6 +96,86 @@ class _OrdersViewState extends State<OrdersView> {
                           ),
                         );
                       },
+                      child: Container(
+                        color: isDarkBackground
+                            ? Colors.grey[200]
+                            : Colors.grey[100],
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Middle Section: Order Info
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Order ID: ${order.orderId}',
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.0),
+                                    Text(
+                                      '${order.createdAt.toDate().toLocal().toString().split(' ')[0]}',
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.0),
+                                    Text(
+                                      'Status: ${order.status}',
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Right Section: Price and Payment Status
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '₱ ${order.totalPrice.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[800],
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 4.0, horizontal: 12.0),
+                                  decoration: BoxDecoration(
+                                    color: order.isPaid
+                                        ? Colors.green[300]
+                                        : Colors.red[300],
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: Text(
+                                    order.isPaid ? 'Paid' : 'Unpaid',
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 );
@@ -281,6 +183,32 @@ class _OrdersViewState extends State<OrdersView> {
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(String status, OrderViewModel ordersViewModel) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 1.0),
+      child: TextButton(
+        style: TextButton.styleFrom(
+          minimumSize: const Size(60, 30),
+          backgroundColor: _selectedStatus == status
+              ? AppColors.deepMossGreen
+              : Colors.grey[200],
+          foregroundColor:
+              _selectedStatus == status ? Colors.white : Colors.black,
+        ),
+        onPressed: () {
+          setState(() {
+            _selectedStatus = status;
+            ordersViewModel.filterOrdersByStatus(_selectedStatus);
+          });
+        },
+        child: Text(
+          status,
+          style: const TextStyle(fontSize: 8.0),
+        ),
       ),
     );
   }
