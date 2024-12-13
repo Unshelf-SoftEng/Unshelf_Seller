@@ -6,12 +6,13 @@ import 'package:unshelf_seller/views/restock_selection_view.dart';
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
-import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/edit_user_profile_view.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as lat_lng2;
+import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreView extends StatefulWidget {
   @override
@@ -186,7 +187,7 @@ class _StoreViewState extends State<StoreView> {
           ListTile(
             title: const Text('Store Inventory'),
             subtitle: const Text('View and edit your store inventory'),
-            leading: Icon(Icons.inventory),
+            leading: const Icon(Icons.inventory),
             onTap: () async {
               final result = await Navigator.push(
                 context,
@@ -203,9 +204,9 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
-            title: const Text('Store Hours'),
-            subtitle: Text('View and edit your store hours'),
-            leading: Icon(Icons.access_time),
+            title: const Text('Business Hours'),
+            subtitle: const Text('View and edit your business hours'),
+            leading: const Icon(Icons.access_time),
             onTap: () {
               Navigator.push(
                 context,
@@ -217,9 +218,9 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
-            title: Text('Store Location'),
-            subtitle: Text('View and edit your store location'),
-            leading: Icon(Icons.location_on),
+            title: const Text('Store Location'),
+            subtitle: const Text('View and edit your store location'),
+            leading: const Icon(Icons.location_on),
             onTap: () async {
               final result = await Navigator.push(
                 context,
@@ -261,12 +262,10 @@ class _StoreViewState extends State<StoreView> {
                           viewModel.storeDetails!.storeLatitude!,
                           viewModel.storeDetails!.storeLongitude!,
                         ),
-                        child: Container(
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Color(0xFFBC4749),
-                            size: 40.0,
-                          ),
+                        child: const Icon(
+                          Icons.location_pin,
+                          color: AppColors.watermelonRed,
+                          size: 40.0,
                         ),
                       ),
                     ],
@@ -284,8 +283,8 @@ class _StoreViewState extends State<StoreView> {
       child: Column(
         children: [
           ListTile(
-            title: Text('Settings'),
-            leading: Icon(Icons.settings),
+            title: const Text('Settings'),
+            leading: const Icon(Icons.settings),
             onTap: () {
               Navigator.push(
                 context,
@@ -296,23 +295,23 @@ class _StoreViewState extends State<StoreView> {
             },
           ),
           ListTile(
-            title: Text('Help Center'),
-            leading: Icon(Icons.help_outline),
+            title: const Text('Help Center'),
+            leading: const Icon(Icons.help_outline),
             onTap: () {},
           ),
           ListTile(
-            title: Text('Customer Support'),
-            leading: Icon(Icons.support_agent),
+            title: const Text('Customer Support'),
+            leading: const Icon(Icons.support_agent),
             onTap: () {},
           ),
           ListTile(
-            title: Text('Privacy Notice'),
-            leading: Icon(Icons.privacy_tip),
+            title: const Text('Privacy Notice'),
+            leading: const Icon(Icons.privacy_tip),
             onTap: () {},
           ),
           ListTile(
-            title: Text('Log Out'),
-            leading: Icon(Icons.logout),
+            title: const Text('Log Out'),
+            leading: const Icon(Icons.logout),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
               Navigator.of(context).pushAndRemoveUntil(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/views/store_analytics_view.dart';
+import 'package:unshelf_seller/views/product_analytics_view.dart';
 
 class DashboardView extends StatefulWidget {
   @override
@@ -34,8 +35,8 @@ class _DashboardViewState extends State<DashboardView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildDailyAnalyticsCard(viewModel),
-                const SizedBox(height: 12.0), // Increased spacing
-                _buildStoreInsightsCard(viewModel),
+                const SizedBox(height: 16.0),
+                _buildAnalyticsNavigation(),
               ],
             ),
           );
@@ -47,7 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
       color: const Color(0xFF6A994E),
-      elevation: 8.0, // Increased elevation
+      elevation: 8.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -56,7 +57,7 @@ class _DashboardViewState extends State<DashboardView> {
           children: [
             const Center(
               child: Text(
-                'Daily Analytics',
+                "Today's Orders",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -74,10 +75,10 @@ class _DashboardViewState extends State<DashboardView> {
             const SizedBox(height: 16.0),
             _buildAnalyticsRow(
                 'Pending', viewModel.pendingOrders, Icons.hourglass_empty),
-            const SizedBox(height: 12.0), // More space between rows
+            const SizedBox(height: 12.0),
             _buildAnalyticsRow(
                 'Processed', viewModel.processedOrders, Icons.cached),
-            const SizedBox(height: 12.0), // More space between rows
+            const SizedBox(height: 12.0),
             _buildAnalyticsRow(
                 'Completed', viewModel.completedOrders, Icons.check_circle),
           ],
@@ -86,70 +87,67 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildStoreInsightsCard(DashboardViewModel viewModel) {
-    return Card(
-      color: const Color(0xFF6A994E),
-      elevation: 8.0, // Increased elevation
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: Text('Store Insights',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 30.0)),
-            ),
-            const SizedBox(height: 8.0), // Increased space
-            Center(
-              child: Text(
-                'An overview of the shop data for ${viewModel.monthYear}',
-                style: const TextStyle(color: Colors.white, fontSize: 12.0),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            _buildInsightsRow('Total Orders', '${viewModel.totalOrders}',
-                Icons.shopping_cart),
-            const SizedBox(height: 16.0),
-            _buildInsightsRow(
-                'Total Sales',
-                '${viewModel.totalSales.toStringAsFixed(2)} Php',
-                Icons.attach_money),
-            const SizedBox(height: 20.0), // Added extra space before the button
+  Widget _buildAnalyticsNavigation() {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 16.0,
+      mainAxisSpacing: 16.0,
+      children: [
+        _buildNavigationCard(
+          title: 'Store Analytics',
+          icon: Icons.store,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => StoreAnalyticsView()),
+            );
+          },
+        ),
+        _buildNavigationCard(
+          title: 'Product Analytics',
+          icon: Icons.analytics,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProductAnalyticsView()),
+            );
+          },
+        ),
+      ],
+    );
+  }
 
-            // Elevated Button for better interaction
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StoreAnalyticsView()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white, // Button color
-                  foregroundColor: Color(0xFF6A994E), // Text color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
-                  elevation: 4.0, // Shadow effect for the button
+  Widget _buildNavigationCard(
+      {required String title,
+      required IconData icon,
+      required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: Colors.white,
+        elevation: 4.0,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 48.0, color: Color(0xFF6A994E)),
+              const SizedBox(height: 8.0),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6A994E),
+                  fontSize: 16.0,
                 ),
-                child: Text(
-                  'VIEW STORE ANALYTICS',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
-                  ),
-                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -175,57 +173,18 @@ class _DashboardViewState extends State<DashboardView> {
                 child: Text(
                   '$value',
                   style: const TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 14.0,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFFFFDC5F)),
                 ),
               ),
-              const SizedBox(height: 4.0),
               Center(
                 child: Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 14.0,
+                    fontSize: 10.0,
                     color: Colors.white,
                   ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInsightsRow(String title, String value, IconData icon) {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: Colors.white, size: 32.0),
-            ],
-          ),
-          const SizedBox(width: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFDC5F),
-                ),
-              ),
-              const SizedBox(height: 4.0),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.white,
                 ),
               ),
             ],

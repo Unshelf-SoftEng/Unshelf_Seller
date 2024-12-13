@@ -4,11 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/settings_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
 import 'package:unshelf_seller/views/home_view.dart';
-import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
@@ -70,7 +71,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Unshelf',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF386641)),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.deepMossGreen),
         useMaterial3: true,
         textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),

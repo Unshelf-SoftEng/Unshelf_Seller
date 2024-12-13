@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:unshelf_seller/views/home_view.dart';
-import 'package:unshelf_seller/views/register_view.dart';
-import 'package:unshelf_seller/views/forgot_password_view.dart';
+import 'package:unshelf_seller/authentication/views/register_view.dart';
+import 'package:unshelf_seller/authentication/views/forgot_password_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _LoginViewState extends State<LoginView> {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-in successful')),
+        const SnackBar(content: Text('Google sign-in successful')),
       );
 
       Navigator.pushReplacement(
@@ -51,14 +52,14 @@ class _LoginViewState extends State<LoginView> {
         MaterialPageRoute(builder: (context) => HomeView()),
       );
     } catch (e) {
-      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-in failed. Please try again.')),
+        const SnackBar(
+            content: Text('Google sign-in failed. Please try again.')),
       );
     }
   }
 
-  Future<void> _Login() async {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       try {
         UserCredential userCredential =
@@ -129,8 +130,8 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log In'),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFF386641),
+        titleTextStyle: const TextStyle(
+            color: AppColors.deepMossGreen,
             fontSize: 20,
             fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
@@ -151,10 +152,12 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                      borderSide:
+                          BorderSide(color: AppColors.middleGreenYellow),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                      borderSide:
+                          BorderSide(color: AppColors.middleGreenYellow),
                     ),
                   ),
                   validator: (value) {
@@ -170,10 +173,12 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                      borderSide:
+                          BorderSide(color: AppColors.middleGreenYellow),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFFA7C957)),
+                      borderSide:
+                          BorderSide(color: AppColors.middleGreenYellow),
                     ),
                   ),
                   obscureText: true,
@@ -183,7 +188,7 @@ class _LoginViewState extends State<LoginView> {
                     }
                     return null;
                   },
-                  onFieldSubmitted: (value) => _Login(),
+                  onFieldSubmitted: (value) => _login(),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -195,20 +200,20 @@ class _LoginViewState extends State<LoginView> {
                     },
                     child: const Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Color(0xFF6A994E)),
+                      style: TextStyle(color: AppColors.palmLeaf),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  style: ButtonStyle(
+                  style: const ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all(const Color(0xFFA7C957)),
+                        WidgetStatePropertyAll(AppColors.middleGreenYellow),
                     foregroundColor:
-                        MaterialStateProperty.all(const Color(0xFF386641)),
+                        WidgetStatePropertyAll(AppColors.deepMossGreen),
                     alignment: Alignment.center,
                   ),
-                  onPressed: _Login,
+                  onPressed: _login,
                   child: const Text('Log In'),
                 ),
                 const SizedBox(height: 20),
@@ -233,8 +238,8 @@ class _LoginViewState extends State<LoginView> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    backgroundColor: const Color(0xFFA7C957),
-                    foregroundColor: const Color(0xFF386641),
+                    backgroundColor: AppColors.middleGreenYellow,
+                    foregroundColor: AppColors.deepMossGreen,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                   ),
@@ -247,11 +252,11 @@ class _LoginViewState extends State<LoginView> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => RegisterView()));
+                            builder: (context) => const RegisterView()));
                       },
                       child: const Text(
                         'Sign Up',
-                        style: TextStyle(color: Color(0xFF6A994E)),
+                        style: TextStyle(color: AppColors.palmLeaf),
                       ),
                     ),
                   ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/viewmodels/forgot_password_viewmodel.dart';
+import 'package:unshelf_seller/authentication/views/forgot_password_viewmodel.dart';
 import 'package:unshelf_seller/services/authentication_service.dart';
 
 import 'package:provider/provider.dart';

@@ -243,7 +243,7 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                   if (selectedOrdersValue == 'Daily')
                     Chart(
                       dataMap: analyticsViewModel.dailyOrdersMap,
-                      maxXValue: 15,
+                      maxXValue: 14,
                       maxYValue: analyticsViewModel.dailyMaxYOrder,
                     )
                   else if (selectedOrdersValue == 'Weekly')
@@ -293,7 +293,7 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                   if (selectedSalesValue == 'Daily')
                     Chart(
                       dataMap: analyticsViewModel.dailySalesMap,
-                      maxXValue: 15,
+                      maxXValue: 14,
                       maxYValue: analyticsViewModel.dailyMaxYSales,
                     )
                   else if (selectedSalesValue == 'Weekly')

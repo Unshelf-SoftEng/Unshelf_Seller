@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unshelf_seller/views/login_view.dart';
+import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/views/home_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -157,8 +158,8 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFF386641),
+        titleTextStyle: const TextStyle(
+            color: AppColors.deepMossGreen,
             fontSize: 20,
             fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
@@ -197,10 +198,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                 ),
                 validator: (value) {
@@ -216,10 +217,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Password',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                 ),
                 obscureText: true,
@@ -236,10 +237,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Password Confirmation',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                 ),
                 obscureText: true,
@@ -258,10 +259,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                 ),
                 validator: (value) {
@@ -279,8 +280,10 @@ class _RegisterViewState extends State<RegisterView> {
               ElevatedButton(
                 onPressed: _register,
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Color(0xFFA7C957)),
-                  foregroundColor: MaterialStatePropertyAll(Color(0xFF386641)),
+                  backgroundColor:
+                      WidgetStatePropertyAll(AppColors.middleGreenYellow),
+                  foregroundColor:
+                      WidgetStatePropertyAll(AppColors.deepMossGreen),
                 ),
                 child: const Text('Sign Up'),
               ),
@@ -315,8 +318,8 @@ class _RegisterViewState extends State<RegisterView> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  backgroundColor: const Color(0xFFA7C957),
-                  foregroundColor: const Color(0xFF386641),
+                  backgroundColor: AppColors.middleGreenYellow,
+                  foregroundColor: AppColors.deepMossGreen,
                   padding:
                       const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 ),
@@ -335,7 +338,7 @@ class _RegisterViewState extends State<RegisterView> {
                     },
                     child: const Text(
                       'Sign In',
-                      style: TextStyle(color: Color(0xFF6A994E)),
+                      style: TextStyle(color: AppColors.palmLeaf),
                     ),
                   ),
                 ],

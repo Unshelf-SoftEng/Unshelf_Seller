@@ -2,14 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/services/product_service.dart';
 
 class BatchService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ProductService _productService = ProductService();
 
   Future<BatchModel?> getBatchById(String batchId) async {
     var doc = await _firestore.collection('batches').doc(batchId).get();
     if (doc.exists) {
-      return BatchModel.fromSnapshot(doc, null);
+      var product = await _productService.getProduct(doc['productId']);
+      return BatchModel.fromSnapshot(doc, product);
     }
     return null;
   }

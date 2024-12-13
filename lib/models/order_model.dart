@@ -14,7 +14,7 @@ class OrderModel {
   String buyerName;
   Timestamp? completedAt;
   String? pickupCode;
-  String? pickupTime;
+  Timestamp? pickupTime;
 
   OrderModel({
     required this.id,
@@ -29,7 +29,7 @@ class OrderModel {
     this.buyerName = '',
     this.completedAt,
     this.pickupCode = '',
-    this.pickupTime = '',
+    this.pickupTime,
   });
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
@@ -37,18 +37,18 @@ class OrderModel {
 
     return OrderModel(
       id: doc.id,
-      orderId: data['orderId'],
-      status: data['status'],
+      orderId: data['orderId'] ?? '',
+      status: data['status'] ?? '',
       createdAt: data['createdAt'] as Timestamp,
       completedAt: data['completetedAt'] as Timestamp?,
-      pickupCode: data['pickupCode'] as String?,
-      pickupTime: data['pickupTime'],
-      buyerId: data['buyer_id'],
+      pickupCode: data['pickupCode'] ?? '',
+      pickupTime: data['pickupTime'] as Timestamp?,
+      buyerId: data['buyerId'] ?? '',
       items: List<OrderItem>.from(
         data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
-      totalPrice: data['totalPrice'],
-      isPaid: data['isPaid'],
+      totalPrice: data['totalPrice'] ?? 0,
+      isPaid: data['isPaid'] ?? false,
       products: [],
     );
   }
@@ -56,20 +56,23 @@ class OrderModel {
 
 class OrderItem {
   final int quantity;
-  final String batchNumber;
+  final String? batchId;
+  final double? price;
   String? name;
 
   OrderItem({
-    required this.batchNumber,
+    this.batchId,
     required this.quantity,
+    this.price,
     this.name,
   });
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
       quantity: map['quantity'] as int,
-      batchNumber: map['batchNumber'],
-      name: map['name'],
+      batchId: map['batchId'] ?? '',
+      price: map['price'] as double,
+      name: map['name'] ?? '',
     );
   }
 }

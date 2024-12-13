@@ -31,7 +31,7 @@ class _ChartState extends State<Chart> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
-      height: screenHeight * 0.25, // Dynamically adjust height
+      height: screenHeight * 0.25, // 25% of the screen height
       child: Padding(
         padding: EdgeInsets.symmetric(
           vertical: screenHeight * 0.02,
@@ -46,12 +46,12 @@ class _ChartState extends State<Chart> {
   Widget bottomTitleWidgets(double value, TitleMeta meta, double screenWidth) {
     final style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: screenWidth * 0.02, // Slightly larger font for readability
+      fontSize: screenWidth * 0.02,
     );
 
     DateTime date = widget.dataMap.keys.elementAt(value.toInt());
     String dateString;
-    if (widget.maxXValue == 15) {
+    if (widget.maxXValue == 14) {
       dateString = DateFormat('MM/dd').format(date);
     } else if (widget.maxXValue == 6) {
       dateString = DateFormat('MMM yy').format(date);
@@ -96,9 +96,7 @@ class _ChartState extends State<Chart> {
     return LineChartData(
       gridData: FlGridData(
         show: true,
-        horizontalInterval: widget.maxYValue > 0
-            ? widget.maxYValue / 5
-            : 1.0, // Limit horizontal grid lines
+        horizontalInterval: widget.maxYValue > 0 ? widget.maxYValue / 5 : 1.0,
         drawVerticalLine: false,
       ),
       titlesData: FlTitlesData(
@@ -115,9 +113,7 @@ class _ChartState extends State<Chart> {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: widget.maxYValue > 0
-                ? widget.maxYValue / 4
-                : 1.0, // Limit vertical labels
+            interval: widget.maxYValue > 0 ? widget.maxYValue / 4 : 1.0,
             getTitlesWidget: (value, meta) =>
                 leftTitleWidgets(value, meta, screenWidth),
             reservedSize: reservedSize,

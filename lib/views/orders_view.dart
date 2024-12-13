@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/views/order_details_view.dart';
+import 'package:flutter/cupertino.dart';
 
 class OrdersView extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _OrdersViewState extends State<OrdersView> {
           DropdownButton<String>(
             value: _selectedStatus,
             hint: const Text('Filter by Status'),
-            items: <String>['All', 'Pending', 'Completed', 'Ready']
+            items: <String>['All', 'Pending', 'Cancelled', 'Ready', 'Completed']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -69,6 +70,9 @@ class _OrdersViewState extends State<OrdersView> {
                         child: Text('No completed orders found.'));
                   } else if (ordersViewModel.currentStatus == 'Ready') {
                     return const Center(child: Text('No ready orders found.'));
+                  } else if (ordersViewModel.currentStatus == 'Cancelled') {
+                    return const Center(
+                        child: Text('No cancelled orders found.'));
                   } else {
                     return const Center(child: Text('No orders found.'));
                   }
@@ -77,8 +81,8 @@ class _OrdersViewState extends State<OrdersView> {
                 return ListView.separated(
                   itemCount: ordersViewModel.filteredOrders.length,
                   separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey[300], // Customize the border color
-                    thickness: 1.0, // Customize the border thickness
+                    color: Colors.grey[300],
+                    thickness: 1.0,
                   ),
                   itemBuilder: (context, index) {
                     final order = ordersViewModel.filteredOrders[index];
@@ -106,14 +110,16 @@ class _OrdersViewState extends State<OrdersView> {
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(order
-                                            .products[0].product!.mainImageUrl),
-                                        fit: BoxFit.cover,
-                                      ),
                                       borderRadius: BorderRadius.circular(8.0),
                                       border: Border.all(
                                           color: Colors.grey, width: 1),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        CupertinoIcons.gift,
+                                        size: 30.0,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 8.0),
@@ -123,27 +129,18 @@ class _OrdersViewState extends State<OrdersView> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          order.products.isNotEmpty
-                                              ? order.products[0].product!.name
-                                              : 'No Product Name',
-                                          style: const TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
                                         const SizedBox(height: 4.0),
                                         Text(
                                           'Order ID: ${order.orderId}',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 12.0,
-                                              color: Colors.grey[600]),
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(height: 4.0),
                                         Text(
-                                          'Created At: ${order.createdAt.toDate().toLocal().toString().split(' ')[0]}', // Format the date as needed
+                                          'Created At: ${order.createdAt.toDate().toLocal().toString().split(' ')[0]}',
                                           style: TextStyle(
-                                              fontSize: 14.0,
+                                              fontSize: 10.0,
                                               color: Colors.grey[600]),
                                         ),
                                       ],

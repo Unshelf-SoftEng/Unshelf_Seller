@@ -16,7 +16,6 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   @override
   void initState() {
     super.initState();
-    // Trigger fetching the order details when this widget initializes
     final viewModel = Provider.of<OrderViewModel>(context, listen: false);
     viewModel.selectOrder(widget.orderId);
   }
@@ -101,30 +100,24 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // Set the max width for each product card (e.g., 200.0).
                     double maxItemWidth = 200.0;
 
-                    // Calculate the number of columns based on the available width and max item width.
                     int crossAxisCount =
                         (constraints.maxWidth / maxItemWidth).floor();
 
-                    // Ensure at least 2 items per row if the space is small.
                     if (crossAxisCount < 2) {
                       crossAxisCount = 2;
                     }
 
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:
-                            crossAxisCount, // Dynamically calculated
-                        crossAxisSpacing: 12.0, // Space between columns
-                        mainAxisSpacing: 12.0, // Space between rows
-                        childAspectRatio:
-                            3 / 4, // Aspect ratio of each item (width / height)
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 12.0,
+                        mainAxisSpacing: 12.0,
+                        childAspectRatio: 3 / 4,
                       ),
-                      itemCount: order.products.length,
+                      itemCount: order.items.length,
                       itemBuilder: (context, index) {
-                        final product = order.products[index];
                         return Card(
                           elevation: 2,
                           shape: RoundedRectangleBorder(
@@ -137,9 +130,9 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(10)),
                                 child: Image.network(
-                                  product.product!.mainImageUrl,
+                                  order.products[index].product!.mainImageUrl,
                                   width: double.infinity,
-                                  height: 120, // Fixed height for images
+                                  height: 120,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -150,7 +143,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        product.product!.name,
+                                        order.products[index].product!.name,
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
