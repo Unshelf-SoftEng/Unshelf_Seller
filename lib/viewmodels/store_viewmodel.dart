@@ -35,7 +35,6 @@ class StoreViewModel extends ChangeNotifier {
         userProfile = null;
       } else {
         userProfile = UserProfileModel.fromSnapshot(userDoc);
-        notifyListeners();
       }
     } catch (e) {
       errorMessage = "Error fetching user profile: ${e.toString()}";
@@ -47,15 +46,17 @@ class StoreViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchStoreDetails() async {
+    isLoading = true;
+    notifyListeners();
+
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       errorMessage = "User is not logged in";
+      isLoading = false;
+      notifyListeners();
       return;
     }
-
-    isLoading = true;
-    notifyListeners();
 
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -69,19 +70,18 @@ class StoreViewModel extends ChangeNotifier {
           .get();
 
       if (!userDoc.exists || !storeDoc.exists) {
-        errorMessage = "User profile or store not found";
         storeDetails = null;
+        errorMessage = "User profile or store not found";
       } else {
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
-        notifyListeners();
       }
     } catch (e) {
       errorMessage = "Error fetching store details: ${e.toString()}";
       storeDetails = null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-
-    isLoading = false;
-    notifyListeners();
   }
 
   Future<int> fetchStoreFollowers() async {
@@ -119,7 +119,7 @@ class StoreViewModel extends ChangeNotifier {
       errorMessage = "User is not logged in";
       isLoading = false;
       notifyListeners();
-      return 0.0; // or throw an exception if needed
+      return 0.0;
     }
 
     try {

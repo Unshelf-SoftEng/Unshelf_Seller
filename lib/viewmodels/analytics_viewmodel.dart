@@ -55,11 +55,8 @@ class AnalyticsViewModel extends ChangeNotifier {
   Future<void> fetchAnalyticsData() async {
     _isLoading = true;
     notifyListeners();
-
     await getTotals();
     await getOrdersandSalesData();
-    await getTopProducts();
-
     _isLoading = false;
     notifyListeners();
   }
@@ -87,50 +84,64 @@ class AnalyticsViewModel extends ChangeNotifier {
         .collection('orders')
         .where('sellerId', isEqualTo: user!.uid)
         .where('status', isEqualTo: 'Completed')
+        .where('createdAt',
+            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 13)))
         .get();
-    // Map to hold product quantities
-    Map<String, int> productCountMap = {};
 
-    // Iterate through orders
+    Map<String, int> batchCountMap = {};
+    Map<String, int> bundleCountMap = {};
+
     for (var orderDoc in ordersSnapshot.docs) {
-      List<dynamic> orderItems = orderDoc['orderItems'];
+      var orderItems = orderDoc['orderItems'];
+      print(orderItems);
+
       for (var item in orderItems) {
-        String productId = item['productId'];
+        String batchId = item['batchId'];
+        String bundleId = item['bundleId'];
         int quantity = item['quantity'];
 
-        // Increment product count
-        if (productCountMap.containsKey(productId)) {
-          productCountMap[productId] = productCountMap[productId]! + quantity;
-        } else {
-          productCountMap[productId] = quantity;
+        if (batchId != null) {
+          batchCountMap[batchId] = (batchCountMap[batchId] ?? 0) + quantity;
+        }
+        if (bundleId != null) {
+          bundleCountMap[bundleId] = (bundleCountMap[bundleId] ?? 0) + quantity;
         }
       }
     }
 
-    // Convert the map to a list of products and their quantities
-    List<MapEntry<String, int>> productEntries =
-        productCountMap.entries.toList();
+    Map<String, int> productEntries = {};
 
-    // Sort products by quantity in descending order
-    productEntries.sort((a, b) => b.value.compareTo(a.value));
+    batchCountMap.forEach((key, value) async {
+      // Fetch batch details using the key
+      DocumentSnapshot batchDoc = await FirebaseFirestore.instance
+          .collection('batches')
+          .doc(key) // Use 'key' to fetch the document
+          .get();
 
-    // Get top 5 products
-    for (int i = 0; i < productEntries.length && i < 5; i++) {
-      String productId = productEntries[i].key;
-      int totalQuantity = productEntries[i].value;
+      if (batchDoc.exists) {
+        String productId = batchDoc['productId'];
+        productEntries[productId] = (productEntries[productId] ?? 0) + value;
+      }
+    });
 
-      // Fetch product details
+    var sortedEntries = productEntries.entries.toList()
+      ..sort((a, b) =>
+          b.value.compareTo(a.value)); // Sort by value in descending order
+
+    var top5 = sortedEntries.take(5).toList();
+
+    for (var entry in top5) {
+      // Fetch product details using the productId
       DocumentSnapshot productDoc = await FirebaseFirestore.instance
           .collection('products')
-          .doc(productId)
+          .doc(entry.key) // Use 'key' to fetch the document
           .get();
 
       if (productDoc.exists) {
         topProducts.add({
-          'productId': productId,
+          'productId': productDoc.id,
           'name': productDoc['name'],
-          'imageUrl': productDoc['mainImageUrl'],
-          'totalQuantity': totalQuantity,
+          'quantity': entry.value,
         });
       }
     }

@@ -193,9 +193,9 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                         Center(
                           child: Column(
                             children: [
-                              Text(
+                              const Text(
                                 'Total Sales',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                 ),

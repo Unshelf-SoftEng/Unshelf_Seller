@@ -7,6 +7,7 @@ import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 import 'package:unshelf_seller/authentication/views/login_view.dart';
+import 'package:unshelf_seller/views/order_history_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/edit_user_profile_view.dart';
 import 'package:unshelf_seller/models/user_model.dart';
@@ -34,12 +35,20 @@ class _StoreViewState extends State<StoreView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<StoreViewModel>(context);
 
+    if (viewModel.isLoading) {
+      return Scaffold(
+        body: _buildLoading(),
+      );
+    }
+
+    if (viewModel.storeDetails == null || viewModel.userProfile == null) {
+      return Scaffold(
+        body: _buildLoading(),
+      );
+    }
+
     return Scaffold(
-      body: viewModel.isLoading
-          ? _buildLoading()
-          : viewModel.errorMessage != null
-              ? _buildError(viewModel)
-              : _buildContent(context, viewModel),
+      body: _buildContent(context, viewModel),
     );
   }
 
@@ -47,38 +56,9 @@ class _StoreViewState extends State<StoreView> {
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildError(StoreViewModel viewModel) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(viewModel.errorMessage!),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              final viewModel =
-                  Provider.of<StoreViewModel>(context, listen: false);
-              viewModel.fetchStoreDetails();
-            },
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildContent(BuildContext context, StoreViewModel viewModel) {
     if (viewModel.isLoading) {
       return _buildLoading();
-    }
-
-    if (viewModel.errorMessage != null) {
-      return _buildError(viewModel);
-    }
-
-    // Ensure storeDetails and userProfile are initialized properly
-    if (viewModel.storeDetails == null || viewModel.userProfile == null) {
-      return const Center(child: Text('Loading data...')); // Loading state
     }
 
     return SingleChildScrollView(
@@ -182,6 +162,17 @@ class _StoreViewState extends State<StoreView> {
                       updatedProfile.phoneNumber;
                 });
               }
+            },
+          ),
+          ListTile(
+            title: const Text('Order History'),
+            subtitle: const Text('View all orders placed in your store'),
+            leading: const Icon(Icons.history),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => OrderHistoryView()),
+              );
             },
           ),
           ListTile(

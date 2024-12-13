@@ -46,14 +46,29 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
 
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Order Details'),
+          title: const Text('Product Analytics'),
           backgroundColor: const Color(0xFF6A994E),
+          foregroundColor: const Color(0xFFFFFFFF),
+          titleTextStyle: const TextStyle(
+              color: Color(0xFFFFFFFF),
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
           leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => {
-                    viewModel.clearSelectedOrder(),
-                    Navigator.of(context).pop()
-                  }),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF386641),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4.0),
+            child: Container(
+              color: const Color(0xFFC8DD96),
+              height: 4.0,
+            ),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),

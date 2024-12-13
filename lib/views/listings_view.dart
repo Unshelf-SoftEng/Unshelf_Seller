@@ -162,7 +162,6 @@ class _ListingsViewState extends State<ListingsView> {
           width: 60,
           height: 60,
           fit: BoxFit.cover,
-          placeholder: (context, _) => const CircularProgressIndicator(),
           errorWidget: (context, _, __) =>
               const Icon(Icons.error, size: 60, color: AppColors.watermelonRed),
         ),

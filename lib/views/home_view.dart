@@ -94,47 +94,55 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         backgroundColor: Color(0xFF6A994E),
         automaticallyImplyLeading: _buildLeadingIcon() == null,
-        leading: _buildLeadingIcon(),
+        leading: Padding(
+          padding: const EdgeInsets.only(
+              left: 16.0), // Adjust left padding if needed
+          child: _buildLeadingIcon(), // Custom leading icon
+        ),
         title: null, // Remove the default title
         actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NotificationsView(),
-                ),
-              );
-            },
-            child: Stack(
-              children: [
-                const Icon(Icons.notifications, size: 30),
-                if (_notifications.any((n) => !n['seen']))
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 18,
-                        minHeight: 18,
-                      ),
-                      child: Center(
-                        child: Text(
-                          _unseenCount.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+          Padding(
+            padding: const EdgeInsets.only(
+                right: 16.0), // Adjust right padding for notifications
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationsView(),
+                  ),
+                );
+              },
+              child: Stack(
+                children: [
+                  const Icon(Icons.notifications, size: 30),
+                  if (_notifications.any((n) => !n['seen']))
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Center(
+                          child: Text(
+                            _unseenCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
