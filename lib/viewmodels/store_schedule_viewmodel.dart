@@ -9,16 +9,47 @@ class StoreScheduleViewModel extends ChangeNotifier {
   late Map<String, Map<String, String>> _storeSchedule;
 
   StoreScheduleViewModel(StoreModel storeDetails) {
-    _storeSchedule = storeDetails.storeSchedule ??
-        {
-          'Monday': {'open': 'Closed', 'close': 'Closed'},
-          'Tuesday': {'open': 'Closed', 'close': 'Closed'},
-          'Wednesday': {'open': 'Closed', 'close': 'Closed'},
-          'Thursday': {'open': 'Closed', 'close': 'Closed'},
-          'Friday': {'open': 'Closed', 'close': 'Closed'},
-          'Saturday': {'open': 'Closed', 'close': 'Closed'},
-          'Sunday': {'open': 'Closed', 'close': 'Closed'},
-        };
+    print(storeDetails.storeSchedule);
+
+    for (var entry in storeDetails.storeSchedule!.entries) {
+      print(entry.key);
+      print(entry.value);
+    }
+
+    storeDetails.storeSchedule?.forEach((key, value) {
+      // Check if 'isOpen' doesn't exist or is null
+      if (value['isOpen'] == null) {
+        value['isOpen'] = 'false';
+      }
+
+      if (value['open'] == 'Closed') {
+        value['open'] = '';
+      }
+
+      if (value['close'] == 'Closed') {
+        value['close'] = '';
+      }
+    });
+
+    final List<String> orderedDays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+
+    _storeSchedule = Map.fromEntries(
+      orderedDays.map((day) {
+        return MapEntry(
+          day,
+          storeDetails.storeSchedule![day] ??
+              {'isOpen': 'false', 'open': '', 'close': ''},
+        );
+      }),
+    );
   }
 
   Map<String, Map<String, String>> get storeSchedule => _storeSchedule;
@@ -31,10 +62,26 @@ class StoreScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> toggleDay(String day) async {
+    _storeSchedule[day]!['isOpen'] =
+        _storeSchedule[day]!['isOpen'] == 'true' ? 'false' : 'true';
+    notifyListeners();
+  }
+
   Future<void> saveProfile(BuildContext context, String userId) async {
+    // Perform validation
+    if (!_validateSchedule()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Please set valid opening and closing times for active days.')),
+      );
+      return; // Do not proceed if validation fails
+    }
+
     try {
       await _firestore.collection('stores').doc(userId).update({
-        'storeSchedule': _storeSchedule,
+        'store_schedule': _storeSchedule,
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile saved successfully')),
@@ -44,5 +91,25 @@ class StoreScheduleViewModel extends ChangeNotifier {
         SnackBar(content: Text('Failed to save profile: $e')),
       );
     }
+  }
+
+  /// Validation Method
+  bool _validateSchedule() {
+    for (var entry in _storeSchedule.entries) {
+      final isOpen = entry.value['isOpen'] == 'true';
+      final openTime = entry.value['open']?.trim();
+      final closeTime = entry.value['close']?.trim();
+
+      if (isOpen) {
+        // Ensure both times are set for open days
+        if (openTime == null ||
+            openTime == '' ||
+            closeTime == null ||
+            closeTime == '') {
+          return false;
+        }
+      }
+    }
+    return true; // Passes validation
   }
 }

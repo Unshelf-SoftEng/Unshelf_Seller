@@ -159,8 +159,8 @@ class _OrdersViewState extends State<OrdersView> {
                                       vertical: 4.0, horizontal: 12.0),
                                   decoration: BoxDecoration(
                                     color: order.isPaid
-                                        ? Colors.green[300]
-                                        : Colors.red[300],
+                                        ? AppColors.palmLeaf
+                                        : AppColors.watermelonRed,
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   child: Text(

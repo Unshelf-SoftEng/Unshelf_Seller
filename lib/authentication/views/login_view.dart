@@ -86,17 +86,41 @@ class _LoginViewState extends State<LoginView> {
             );
             return;
           }
+
+          bool isApproved = userDoc['isApproved'];
+          if (isApproved == false) {
+            await FirebaseAuth.instance
+                .signOut(); // Sign out the unapproved user
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text(
+                      'Your account is not approved yet. Please wait for approval.')),
+            );
+            return;
+          }
+
           String role = userDoc['type'];
           if (role == 'seller') {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Sign in successful')),
             );
 
-            // Redirect to home page
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomeView()),
-            );
+            if (userDoc['isFirstTime']) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeView(),
+                ),
+              );
+            } else {
+              // Redirect to home page
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeView(),
+                ),
+              );
+            }
           } else {
             await FirebaseAuth.instance.signOut();
             ScaffoldMessenger.of(context).showSnackBar(

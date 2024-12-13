@@ -9,12 +9,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 class StoreProfileViewModel extends ChangeNotifier {
   final String storeId; // The ID of the store to update
   late TextEditingController _nameController;
+  late TextEditingController _addressController;
+  late TextEditingController _phoneNumberController;
   Uint8List? _profileImage;
   final ImagePicker picker = ImagePicker();
 
   StoreProfileViewModel(StoreModel storeDetails)
       : storeId = storeDetails.userId {
     _nameController = TextEditingController(text: storeDetails.storeName);
+    _addressController = TextEditingController(text: storeDetails.storeAddress);
+    _phoneNumberController =
+        TextEditingController(text: storeDetails.storePhoneNumber);
   }
 
   TextEditingController get nameController => _nameController;
@@ -42,6 +47,14 @@ class StoreProfileViewModel extends ChangeNotifier {
         final updateData = {
           'storeName': _nameController.text,
         };
+
+        if (_addressController.text.isNotEmpty) {
+          updateData['storeAddress'] = _addressController.text;
+        }
+
+        if (_phoneNumberController.text.isNotEmpty) {
+          updateData['storePhoneNumber'] = _phoneNumberController.text;
+        }
 
         if (_profileImage != null) {
           // Assuming you have a method to upload the image and get the URL

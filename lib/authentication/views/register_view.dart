@@ -35,19 +35,24 @@ class _RegisterViewState extends State<RegisterView> {
         'isBanned': false,
       });
 
-      // Initialization of the store data
       await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
         'storeSchedule': {
-          'Monday': {'open': 'Closed', 'close': 'Closed'},
-          'Tuesday': {'open': 'Closed', 'close': 'Closed'},
-          'Wednesday': {'open': 'Closed', 'close': 'Closed'},
-          'Thursday': {'open': 'Closed', 'close': 'Closed'},
-          'Friday': {'open': 'Closed', 'close': 'Closed'},
-          'Saturday': {'open': 'Closed', 'close': 'Closed'},
-          'Sunday': {'open': 'Closed', 'close': 'Closed'},
+          'Monday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Tuesday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Wednesday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Thursday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Friday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Saturday': {'open': '', 'close': '', 'isOpen': 'false'},
+          'Sunday': {'open': '', 'close': '', 'isOpen': 'false'},
         },
         'storeName': "",
         'storeImageUrl': "",
+        'isApproved': false,
+        'isNew': true,
+        'latitude': 10.3157,
+        'longitude': 123.8854,
+        'storeAddress': "",
+        'storePhoneNumber': "",
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

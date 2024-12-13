@@ -6,8 +6,10 @@ class StoreModel {
   final String name;
   final String phoneNumber;
   final String storeName;
-  double? storeLongitude; // Nullable
-  double? storeLatitude; // Nullable
+  double? storeLongitude;
+  double? storeLatitude;
+  String? storeAddress;
+  String? storePhoneNumber;
   final Map<String, Map<String, String>>? storeSchedule;
   final String? storeImageUrl; // Nullable
   double? storeRating;
