@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
 import 'restock_details_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class RestockSelectionView extends StatefulWidget {
+  const RestockSelectionView({super.key});
+
   @override
   State<RestockSelectionView> createState() => _RestockSelectionViewState();
 }
@@ -23,31 +27,11 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
     final viewModel = Provider.of<RestockViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Products to Restock'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Select Products for Restocking',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -82,11 +66,8 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
-                            color: isSelected
-                                ? const Color(
-                                    0xFF6A994E) // Very green when selected
-                                : Colors
-                                    .white, // Default white when not selected
+                            color:
+                                isSelected ? AppColors.palmLeaf : Colors.white,
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -97,20 +78,17 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors
-                                          .black, // White text when selected
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
                                 ),
                               ),
                               subtitle: Text(
-                                'Current Quantity: ${product.stock ?? 0}',
+                                'Current Quantity: ${product.stock}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: isSelected
                                       ? Colors.white70
-                                      : Colors.grey[
-                                          700], // Lighter text when selected
+                                      : Colors.grey[700],
                                 ),
                               ),
                               leading: CircleAvatar(
@@ -152,7 +130,8 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RestockDetailsView(),
+                                  builder: (context) =>
+                                      const RestockDetailsView(),
                                 ),
                               );
                             }
@@ -164,7 +143,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                         ),
                         backgroundColor: viewModel.selectedProducts.isNotEmpty
                             ? const Color(0xFF6A994E)
-                            : Colors.grey, // Disabled state color
+                            : Colors.grey,
                       ),
                       child: const Text(
                         'Next',

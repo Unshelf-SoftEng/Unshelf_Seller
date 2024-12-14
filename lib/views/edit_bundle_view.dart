@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
-import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 
 class EditBundleView extends StatefulWidget {
   final String bundleId;
@@ -13,44 +15,24 @@ class EditBundleView extends StatefulWidget {
 }
 
 class _EditBundleViewState extends State<EditBundleView> {
-  late BundleViewModel viewModel;
+  final Map<String, Map<String, dynamic>> productDetails = {};
 
   @override
   void initState() {
     super.initState();
-    viewModel = context.read<BundleViewModel>();
-    viewModel.getBundleDetails(widget.bundleId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<BundleViewModel>(context, listen: false);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Bundle'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.autorenew), // Icon for AI suggestions
-            onPressed: () async {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BundleSuggestionsView(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Center(child: CircularProgressIndicator()),
-    );
+        appBar: CustomAppBar(
+            title: 'Edit Bundle Details',
+            onBackPressed: () {
+              Navigator.pop(context);
+            }),
+        body: Consumer<BundleViewModel>(builder: (context, viewModel, child) {
+          return Center(child: CircularProgressIndicator());
+        }));
   }
 }
 
@@ -76,8 +58,7 @@ class _ProductListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(
-          vertical: 4.0, horizontal: 8.0), // Add margin to each tile
+      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       elevation: 2.0,
       child: ListTile(
         contentPadding: const EdgeInsets.all(8.0),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
@@ -25,33 +26,13 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   Widget build(BuildContext context) {
     return Consumer<OrderViewModel>(builder: (context, viewModel, child) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Bundle Details'),
-          backgroundColor: AppColors.palmLeaf,
-          foregroundColor: const Color(0xFFFFFFFF),
-          titleTextStyle: const TextStyle(
-              color: Color(0xFFFFFFFF),
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.deepMossGreen,
-            ),
-            onPressed: () {
+        appBar: CustomAppBar(
+            title: 'Bundle Details',
+            onBackPressed: () {
               Navigator.pop(context);
-            },
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(4.0),
-            child: Container(
-              color: AppColors.lightGreen,
-              height: 4.0,
-            ),
-          ),
-        ),
+            }),
         body: viewModel.isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16.0, vertical: 10.0),
@@ -180,7 +161,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       ListView.builder(
                         itemCount: viewModel.selectedOrder!.items.length,
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           return Card(
                             elevation: 2,
@@ -316,7 +297,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.watermelonRed,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
@@ -348,7 +329,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFA7C957),
+                          backgroundColor: AppColors.middleGreenYellow,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
@@ -364,7 +345,6 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                   ElevatedButton(
                     onPressed: () async {
                       try {
-                        print('Fulfilling order');
                         await viewModel.fulfillOrder();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -415,7 +395,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFA7C957),
+                      backgroundColor: AppColors.middleGreenYellow,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 12),

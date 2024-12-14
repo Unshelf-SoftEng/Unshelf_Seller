@@ -75,7 +75,7 @@ class BundleViewModel extends ChangeNotifier {
 
       final mainImageUrl = await mainImageRef.getDownloadURL();
 
-      BundleModel bundle = new BundleModel(
+      BundleModel bundle = BundleModel(
         id: '',
         name: bundleName,
         mainImageUrl: mainImageUrl,

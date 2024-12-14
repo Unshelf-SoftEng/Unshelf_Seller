@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/views/add_batch_view.dart';
 import 'package:unshelf_seller/views/edit_batch_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class ProductDetailsView extends StatefulWidget {
   final String productId;
@@ -28,49 +31,29 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Product Details'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Product Details',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: Consumer<ProductSummaryViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (viewModel.product == null) {
-            return Center(child: Text('No product data available.'));
+            return const Center(child: Text('No product data available.'));
           }
 
           final mainImageUrl = viewModel.product!.mainImageUrl;
           final additionalImages = viewModel.product!.additionalImageUrls;
 
           // Create a list of images to display
-          final images = [mainImageUrl]..addAll(additionalImages ?? []);
+          final images = [mainImageUrl, ...?additionalImages];
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -189,7 +172,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         style: const TextStyle(
           fontSize: 20.0,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF6A994E), // Consistent green color
+          color: AppColors.palmLeaf,
         ),
       ),
     );
@@ -355,18 +338,11 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               ),
             ),
           ),
-        // Button to add a batch below the ListView
         if (batches != null && batches.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor:
-                    WidgetStatePropertyAll(const Color(0xFFA7C957)),
-                foregroundColor:
-                    WidgetStatePropertyAll(const Color(0xFF386641)),
-                alignment: Alignment.center,
-              ),
+            child: CustomButton(
+              text: 'Add Batch',
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -381,7 +357,6 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   viewModel.fetchProductData(widget.productId!);
                 }
               },
-              child: const Text('Add Batch'),
             ),
           ),
       ],

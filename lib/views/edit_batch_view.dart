@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unshelf_seller/viewmodels/add_batch_viewmodel.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/viewmodels/batch_viewmodel.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class EditBatchView extends StatefulWidget {
   final String batchNumber;
 
-  const EditBatchView({required this.batchNumber});
+  const EditBatchView({super.key, required this.batchNumber});
 
   @override
   State<EditBatchView> createState() => _EditBatchViewState();
@@ -18,31 +21,38 @@ class _EditBatchViewState extends State<EditBatchView> {
     super.initState();
     // Use addPostFrameCallback to fetch data after the initial build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AddBatchViewModel>(context, listen: false)
+      Provider.of<BatchViewModel>(context, listen: false)
           .fetchBatch(widget.batchNumber);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<AddBatchViewModel>(context);
+    final viewModel = Provider.of<BatchViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Batch'),
-        backgroundColor: const Color(0xFF6A994E),
-      ),
+      appBar: CustomAppBar(
+          title: 'Edit Batch Details',
+          onBackPressed: () {
+            viewModel.clearData();
+            Navigator.pop(context);
+          }),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Batch Number (optional)'),
-                    onChanged: (value) => viewModel.batchNumber = value,
-                    controller: viewModel.batchNumberController,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Text(
+                      'Batch Number: ${viewModel.batchNumber}',
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.palmLeaf,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
@@ -97,23 +107,16 @@ class _EditBatchViewState extends State<EditBatchView> {
                     controller: viewModel.discountController,
                   ),
                   const SizedBox(height: 16.0),
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(const Color(0xFFA7C957)),
-                        foregroundColor:
-                            WidgetStatePropertyAll(const Color(0xFF386641)),
-                        alignment: Alignment.center),
+                  CustomButton(
+                    text: 'Update Product Batch',
                     onPressed: () async {
                       await viewModel.updateBatch();
                       if (!viewModel.isLoading) {
+                        viewModel.clearData();
                         Navigator.pop(context, true);
                       }
                     },
-                    child: viewModel.isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : Text('Update Product Batch'),
-                  ),
+                  )
                 ],
               ),
             ),

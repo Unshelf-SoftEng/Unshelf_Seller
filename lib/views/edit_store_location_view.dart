@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/store_model.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class EditStoreLocationView extends StatefulWidget {
   final StoreModel storeDetails;
 
-  EditStoreLocationView({required this.storeDetails});
+  const EditStoreLocationView({super.key, required this.storeDetails});
 
   @override
   State<EditStoreLocationView> createState() => _EditStoreLocationViewState();
@@ -48,47 +50,26 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Store Location'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
+      appBar: CustomAppBar(
+        title: 'Edit Store Location',
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
+        actionWidget: IconButton(
+          icon: const Icon(Icons.save),
+          onPressed: () async {
+            try {
+              await viewModel.saveLocation();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Location saved successfully!')),
+              );
+              Navigator.pop(context, true);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to save location: $e')),
+              );
+            }
           },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () async {
-              try {
-                await viewModel.saveLocation();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Location saved successfully!')),
-                );
-                Navigator.pop(context, true);
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed to save location: $e')),
-                );
-              }
-            },
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
         ),
       ),
       body: FlutterMap(
@@ -109,7 +90,7 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
         children: [
           TileLayer(
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
+            subdomains: const ['a', 'b', 'c'],
           ),
           MarkerLayer(
             markers: [
@@ -118,9 +99,9 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
                   storeDetails.storeLatitude ?? 1.3521,
                   storeDetails.storeLongitude ?? 103.8198,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.location_pin,
-                  color: Colors.red,
+                  color: AppColors.watermelonRed,
                   size: 40.0,
                 ),
               ),

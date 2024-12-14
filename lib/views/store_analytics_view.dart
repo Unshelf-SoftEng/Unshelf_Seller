@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
-import 'package:unshelf_seller/views/chart.dart';
-import 'package:unshelf_seller/views/product_analytics_view.dart';
+import 'package:unshelf_seller/components/chart.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreAnalyticsView extends StatefulWidget {
+  const StoreAnalyticsView({super.key});
+
   @override
   State<StoreAnalyticsView> createState() => _StoreAnalyticsViewState();
 }
@@ -29,26 +31,24 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Store Analytics'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
+        title: const Text('Store Analytics'),
+        backgroundColor: AppColors.palmLeaf,
+        foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
-            color: Color(0xFF386641),
+            color: AppColors.deepMossGreen,
           ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
+          preferredSize: const Size.fromHeight(4.0),
           child: Container(
-            color: Color(0xFFC8DD96),
+            color: AppColors.lightGreen,
             height: 4.0,
           ),
         ),
@@ -84,7 +84,7 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black, // Changed to black
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 16),

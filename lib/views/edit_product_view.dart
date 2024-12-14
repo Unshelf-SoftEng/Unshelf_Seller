@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
-import 'package:unshelf_seller/views/image_delete_view.dart';
+import 'package:unshelf_seller/components/image_delete_view.dart';
 import 'package:unshelf_seller/models/product_model.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class EditProductView extends StatefulWidget {
   final VoidCallback onProductAdded;
@@ -32,9 +34,12 @@ class _EditProductViewState extends State<EditProductView> {
   Widget build(BuildContext context) {
     return Consumer<ProductViewModel>(builder: (context, viewModel, child) {
       return Scaffold(
-        appBar: AppBar(
-            backgroundColor: const Color(0xFF6A994E),
-            title: const Text('Edit Product Details')),
+        appBar: CustomAppBar(
+            title: 'Edit Product Details',
+            onBackPressed: () {
+              Navigator.pop(context);
+              viewModel.clearData();
+            }),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15.0),
           child: Column(
@@ -330,7 +335,8 @@ class _EditProductViewState extends State<EditProductView> {
                           : SizedBox(
                               width: 200,
                               height: 30,
-                              child: ElevatedButton(
+                              child: CustomButton(
+                                text: 'Update Product',
                                 onPressed: () async {
                                   await viewModel.updateProduct(context);
 
@@ -346,11 +352,6 @@ class _EditProductViewState extends State<EditProductView> {
                                     Navigator.pop(context, true);
                                   }
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF6A994E),
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('Update Product'),
                               ),
                             ),
                     ),

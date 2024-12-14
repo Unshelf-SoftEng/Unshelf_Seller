@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
-import 'package:unshelf_seller/views/image_delete_view.dart';
+import 'package:unshelf_seller/components/image_delete_view.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 
 class AddBundleView extends StatefulWidget {
   final Map<String, BatchModel> products;
@@ -33,31 +35,11 @@ class _AddBundleViewState extends State<AddBundleView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Enter Bundle Details'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Enter Bundle Details',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: Consumer<BundleViewModel>(
         builder: (context, viewModel, child) {
           return Padding(
@@ -136,7 +118,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     const SizedBox(height: 20.0),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: const Text(
+                      child: Text(
                         'Description',
                         style: TextStyle(
                           fontSize: 14,
@@ -218,7 +200,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     const SizedBox(height: 20.0),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: const Text(
+                      child: Text(
                         'Price',
                         style: TextStyle(
                           fontSize: 14,
@@ -238,7 +220,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 12.0, horizontal: 12.0),
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: const TextStyle(color: Colors.black),
                       ),
                       keyboardType:
                           const TextInputType.numberWithOptions(decimal: true),
@@ -318,14 +300,14 @@ class _AddBundleViewState extends State<AddBundleView> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color.fromARGB(255, 228, 228, 228),
+                        fillColor: const Color.fromARGB(255, 228, 228, 228),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.0),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                             vertical: 12.0, horizontal: 12.0),
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: const TextStyle(color: Colors.black),
                       ),
                       validator: (value) {
                         final intValue = int.tryParse(value ?? '');
@@ -339,7 +321,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                       ],
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 15.0),
                     const Text(
@@ -360,7 +342,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                             Expanded(
                               child: Text(
                                 product.product!.name,
-                                style: TextStyle(fontSize: 16.0),
+                                style: const TextStyle(fontSize: 16.0),
                               ),
                             ),
                             SizedBox(
@@ -368,7 +350,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               child: Row(
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.remove),
+                                    icon: const Icon(Icons.remove),
                                     onPressed: () {
                                       setState(() {
                                         if (productDetails[productId]![
@@ -383,10 +365,10 @@ class _AddBundleViewState extends State<AddBundleView> {
                                   Text(
                                     productDetails[productId]!['quantity']
                                         .toString(),
-                                    style: TextStyle(fontSize: 16.0),
+                                    style: const TextStyle(fontSize: 16.0),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.add),
+                                    icon: const Icon(Icons.add),
                                     onPressed: () {
                                       setState(() {
                                         productDetails[productId]![
@@ -402,14 +384,8 @@ class _AddBundleViewState extends State<AddBundleView> {
                       );
                     }),
                     const SizedBox(height: 15.0),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(const Color(0xFFA7C957)),
-                        foregroundColor:
-                            WidgetStatePropertyAll(const Color(0xFF386641)),
-                        alignment: Alignment.center,
-                      ),
+                    CustomButton(
+                      text: 'Create Bundle',
                       onPressed: () async {
                         final form = viewModel.formKey.currentState;
 
@@ -431,7 +407,6 @@ class _AddBundleViewState extends State<AddBundleView> {
                           );
                         }
                       },
-                      child: Text('Create Bundle'),
                     ),
                   ],
                 ),

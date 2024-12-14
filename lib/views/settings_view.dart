@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/settings_viewmodel.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class SettingsView extends StatelessWidget {
+  const SettingsView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: CustomAppBar(
+          title: 'Settings',
+          onBackPressed: () {
+            Navigator.pop(context);
+          }),
       body: Consumer<SettingsViewModel>(
         builder: (context, viewModel, child) {
           return ListView(

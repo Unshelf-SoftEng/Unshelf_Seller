@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/views/store_analytics_view.dart';
 import 'package:unshelf_seller/views/product_analytics_view.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class DashboardView extends StatefulWidget {
+  const DashboardView({super.key});
+
   @override
   State<DashboardView> createState() => _DashboardViewState();
 }
@@ -44,7 +47,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
-      color: const Color(0xFF6A994E),
+      color: AppColors.palmLeaf,
       elevation: 8.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -88,7 +91,7 @@ class _DashboardViewState extends State<DashboardView> {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 16.0,
       mainAxisSpacing: 16.0,
       children: [
@@ -132,13 +135,13 @@ class _DashboardViewState extends State<DashboardView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 48.0, color: Color(0xFF6A994E)),
+              Icon(icon, size: 48.0, color: AppColors.palmLeaf),
               const SizedBox(height: 8.0),
               Text(
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF6A994E),
+                  color: AppColors.palmLeaf,
                   fontSize: 16.0,
                 ),
                 textAlign: TextAlign.center,
@@ -172,7 +175,7 @@ class _DashboardViewState extends State<DashboardView> {
                   style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFFFDC5F)),
+                      color: AppColors.saffronYellow),
                 ),
               ),
               Center(

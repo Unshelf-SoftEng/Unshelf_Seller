@@ -53,6 +53,8 @@ class _RegisterViewState extends State<RegisterView> {
         'longitude': 123.8854,
         'storeAddress': "",
         'storePhoneNumber': "",
+        'storeFollowers': 0,
+        'storeRating': 0,
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

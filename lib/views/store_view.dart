@@ -16,6 +16,8 @@ import 'package:latlong2/latlong.dart' as lat_lng2;
 import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreView extends StatefulWidget {
+  const StoreView({super.key});
+
   @override
   State<StoreView> createState() => _StoreViewState();
 }
@@ -95,15 +97,27 @@ class _StoreViewState extends State<StoreView> {
 
   Widget _buildStoreCard(StoreViewModel viewModel, BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: ClipOval(
-          child: Image.network(
-            viewModel.storeDetails?.storeImageUrl ?? '',
-            width: 60.0,
-            height: 60.0,
-            fit: BoxFit.cover,
-          ),
+          child: viewModel.storeDetails?.storeImageUrl == ''
+              ? Container(
+                  color: Colors
+                      .grey, // Set the background color to gray if no image is available
+                  width: 60.0,
+                  height: 60.0,
+                  child: const Icon(
+                    Icons.store, // Optional: Show a default icon if no image
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                )
+              : Image.network(
+                  viewModel.storeDetails?.storeImageUrl ?? '',
+                  width: 60.0,
+                  height: 60.0,
+                  fit: BoxFit.cover,
+                ),
         ),
         title: Text(viewModel.storeDetails?.storeName ?? 'Store Name'),
         subtitle: Column(
@@ -115,7 +129,7 @@ class _StoreViewState extends State<StoreView> {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           onPressed: () async {
             final result = await Navigator.push(
               context,
@@ -139,13 +153,13 @@ class _StoreViewState extends State<StoreView> {
   Widget _buildDetailsAndActionsSection(
       BuildContext context, StoreViewModel viewModel) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         children: [
           ListTile(
-            title: Text('User Profile'),
-            subtitle: Text('View and edit your profile'),
-            leading: Icon(Icons.person),
+            title: const Text('User Profile'),
+            subtitle: const Text('View and edit your profile'),
+            leading: const Icon(Icons.person),
             onTap: () async {
               final updatedProfile = await Navigator.push(
                 context,
@@ -230,7 +244,7 @@ class _StoreViewState extends State<StoreView> {
               }
             },
           ),
-          Container(
+          SizedBox(
             height: 100.0,
             child: FlutterMap(
               options: MapOptions(
@@ -245,7 +259,7 @@ class _StoreViewState extends State<StoreView> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
+                  subdomains: const ['a', 'b', 'c'],
                 ),
                 if (viewModel.storeDetails?.storeLatitude != null)
                   MarkerLayer(

@@ -35,7 +35,7 @@ class StoreModel {
     Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
     Map<String, dynamic> storeData = storeDoc.data() as Map<String, dynamic>;
 
-    var printStore = storeData['store_schedule'];
+    var printStore = storeData['storeSchedule'];
 
     printStore.forEach((key, value) {
       print("Day: $key");
@@ -48,10 +48,9 @@ class StoreModel {
       userId: userDoc.id,
       email: userData['email'] ?? '',
       name: userData['name'] ?? '',
-      phoneNumber: userData['phone_number'] ?? '',
-      storeName: storeData['store_name'] ?? '',
-      storeSchedule:
-          (storeData['store_schedule'] as Map<String, dynamic>?)?.map(
+      phoneNumber: userData['phoneNumber'] ?? '',
+      storeName: storeData['storeName'] ?? '',
+      storeSchedule: (storeData['storeSchedule'] as Map<String, dynamic>?)?.map(
         (key, value) => MapEntry(
           key,
           (value as Map<String, dynamic>).map(
@@ -61,9 +60,9 @@ class StoreModel {
       ),
       storeLongitude: storeData['longitude'] ?? 0.0,
       storeLatitude: storeData['latitude'] ?? 0.0,
-      storeImageUrl: storeData['store_image_url'] ?? '',
-      storeRating: 0.0,
-      storeFollowers: 0,
+      storeImageUrl: storeData['storeImageUrl'] ?? '',
+      storeRating: storeData['storeRating'] ?? 0.0,
+      storeFollowers: storeData['storeFollowers'] ?? 0,
     );
   }
 }

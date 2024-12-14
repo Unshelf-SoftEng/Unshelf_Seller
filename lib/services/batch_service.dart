@@ -49,9 +49,9 @@ class BatchService {
     required DateTime expiryDate,
     required int discount,
   }) async {
-    User user = FirebaseAuth.instance.currentUser!;
     final String generatedBatchNumber;
-    if (batchNumber == null) {
+
+    if (batchNumber == null || batchNumber == '') {
       final datePart = DateFormat('yyyyMMdd').format(DateTime.now());
       final snapshot = await _firestore
           .collection('batches')
@@ -66,14 +66,27 @@ class BatchService {
 
       if (snapshot.docs.isNotEmpty) {
         final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
-        final latestSuffix = int.tryParse(
-                latestBatchNumber.substring(latestBatchNumber.length - 1)) ??
-            -1;
-        batchCount = latestSuffix + 1;
+        print('Latest batch number: $latestBatchNumber');
+
+        // Extract the numeric suffix after the last '-'
+        final regex =
+            RegExp(r'(\d+)$'); // Matches the numeric part after the last '-'
+        final match = regex.firstMatch(latestBatchNumber);
+
+        if (match != null) {
+          final latestSuffix = int.tryParse(match.group(0) ?? '') ??
+              -1; // Parse the numeric part
+          print('Latest suffix: $latestSuffix');
+          batchCount = latestSuffix + 1; // Increment the suffix by 1
+        }
       }
 
-      final suffix = batchCount.toString().padLeft(1, '0');
+      final suffix = batchCount
+          .toString()
+          .padLeft(3, '0'); // Ensure the suffix is always 3 digits
       generatedBatchNumber = '$datePart-$suffix';
+
+      print('Generated batch number: $generatedBatchNumber');
     } else {
       generatedBatchNumber = batchNumber;
     }

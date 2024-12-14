@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
-import 'package:unshelf_seller/views/image_delete_view.dart';
+import 'package:unshelf_seller/components/image_delete_view.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 
 class AddProductView extends StatelessWidget {
   final VoidCallback onProductAdded;
 
-  const AddProductView({Key? key, required this.onProductAdded})
-      : super(key: key);
+  const AddProductView({super.key, required this.onProductAdded});
 
   @override
   Widget build(BuildContext context) {
@@ -16,65 +17,15 @@ class AddProductView extends StatelessWidget {
       create: (_) => ProductViewModel(),
       child: Consumer<ProductViewModel>(builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text('Enter Product Details'),
-            backgroundColor: const Color(0xFF6A994E),
-            foregroundColor: const Color(0xFFFFFFFF),
-            titleTextStyle: TextStyle(
-                color: const Color(0xFFFFFFFF),
-                fontSize: 20,
-                fontWeight: FontWeight.bold),
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Color(0xFF386641),
-              ),
-              onPressed: () {
+          appBar: CustomAppBar(
+              title: 'Enter Product Details',
+              onBackPressed: () {
                 Navigator.pop(context);
-              },
-            ),
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(4.0),
-              child: Container(
-                color: Color(0xFFC8DD96),
-                height: 4.0,
-              ),
-            ),
-          ),
+              }),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                // Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                //   Stack(
-                //     alignment: Alignment.center,
-                //     children: [
-                //       Container(
-                //         width: 40,
-                //         height: 40,
-                //         decoration: BoxDecoration(
-                //           shape: BoxShape.circle,
-                //           border: Border.all(color: Colors.green, width: 5),
-                //           color: Colors.transparent,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                //   const SizedBox(width: 16.0),
-                //   const Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Text('Product Details',
-                //           style: TextStyle(
-                //               fontSize: 14, fontWeight: FontWeight.bold)),
-                //       Text(
-                //         'Enter product details below',
-                //         style: TextStyle(fontSize: 12, color: Colors.grey),
-                //       ),
-                //     ],
-                //   )
-                // ]),
-                const SizedBox(height: 30.0),
                 Form(
                   key: viewModel.formKey,
                   child: Column(
@@ -85,7 +36,7 @@ class AddProductView extends StatelessWidget {
                         child: Container(
                           width: double.infinity,
                           height: 350,
-                          color: const Color(0xFF386641),
+                          color: AppColors.deepMossGreen,
                           child: viewModel.mainImageState.data != null
                               ? ImageWithDelete(
                                   imageData: viewModel.mainImageState.data!,
@@ -345,24 +296,20 @@ class AddProductView extends StatelessWidget {
                             : SizedBox(
                                 width: 200,
                                 height: 30,
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await viewModel.addProduct(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Product added successfully!'),
-                                      ),
-                                    );
-                                    onProductAdded();
-                                    Navigator.pop(context, true);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFA7C957),
-                                    foregroundColor: const Color(0xFF386641),
-                                  ),
-                                  child: const Text('Add Product'),
-                                ),
+                                child: CustomButton(
+                                    text: 'Add Product',
+                                    onPressed: () async {
+                                      await viewModel.addProduct(context);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Product added successfully!'),
+                                        ),
+                                      );
+                                      onProductAdded();
+                                      Navigator.pop(context, true);
+                                    }),
                               ),
                       ),
                     ],

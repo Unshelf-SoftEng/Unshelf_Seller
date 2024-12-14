@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/bundle_suggestion_viewmodel.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class BundleSuggestionsView extends StatelessWidget {
+  const BundleSuggestionsView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Bundle Suggestions'),
-        backgroundColor: const Color(0xFF6A994E),
+      appBar: CustomAppBar(
+        title: 'Bundle Suggestions',
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: Consumer<BundleSuggestionViewModel>(
         builder: (context, viewModel, child) {

@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/components/chat_bubble.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/my_textfield.dart';
 import 'package:unshelf_seller/services/chat_service.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class ChatView extends StatefulWidget {
   final String receiverName;
@@ -38,29 +40,11 @@ class _ChatViewState extends State<ChatView>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.receiverName),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle:
-            const TextStyle(color: const Color(0xFFFFFFFF), fontSize: 20),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: widget.receiverName,
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: Column(
         children: [
           Expanded(child: _buildMessageList()),
@@ -144,7 +128,7 @@ class _ChatViewState extends State<ChatView>
             icon: const Icon(
               Icons.send,
               size: 30,
-              color: Color(0xFF6E9E57),
+              color: AppColors.palmLeaf,
             ),
           ),
         ],

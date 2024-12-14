@@ -105,7 +105,7 @@ class _LoginViewState extends State<LoginView> {
               const SnackBar(content: Text('Sign in successful')),
             );
 
-            if (userDoc['isFirstTime']) {
+            if (userDoc['isNew']) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

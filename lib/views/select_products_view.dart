@@ -6,12 +6,14 @@ import 'package:unshelf_seller/utils/colors.dart';
 import 'package:intl/intl.dart';
 
 class SelectProductsView extends StatefulWidget {
+  const SelectProductsView({super.key});
+
   @override
   State<SelectProductsView> createState() => _SelectProductsViewState();
 }
 
 class _SelectProductsViewState extends State<SelectProductsView> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
 
   @override
@@ -25,7 +27,6 @@ class _SelectProductsViewState extends State<SelectProductsView> {
 
   void _onSearchChanged() {
     final searchQuery = _searchController.text;
-    print(searchQuery);
     Provider.of<SelectProductsViewModel>(context, listen: false)
         .updateSearchQuery(searchQuery);
   }
@@ -50,28 +51,26 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                 },
                 textInputAction: TextInputAction.search,
               )
-            : Text('Choose Products for Bundle',
-                style: const TextStyle(
-                    color: const Color(0xFFFFFFFF),
+            : const Text('Choose Products for Bundle',
+                style: TextStyle(
+                    color: Colors.white,
                     fontSize: 19,
                     fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
+        backgroundColor: AppColors.palmLeaf,
+        foregroundColor: Colors.white,
         titleTextStyle: const TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Color(0xFF386641),
+            color: AppColors.deepMossGreen,
           ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
+          preferredSize: const Size.fromHeight(4.0),
           child: Container(
             color: const Color(0xFFC8DD96),
             height: 4.0,
@@ -80,7 +79,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
         actions: [
           _isSearching
               ? IconButton(
-                  icon: Icon(Icons.cancel),
+                  icon: const Icon(Icons.cancel),
                   onPressed: () {
                     setState(() {
                       _isSearching = false;
@@ -92,7 +91,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                   },
                 )
               : IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () {
                     setState(() {
                       _isSearching = true;
@@ -219,7 +218,7 @@ class _ProductListTile extends StatelessWidget {
           ],
         ),
         tileColor: isSelected
-            ? Color(0xFF6A994E).withOpacity(0.1)
+            ? AppColors.palmLeaf.withOpacity(0.1)
             : Colors.transparent,
         onTap: onTap,
         onLongPress: onLongPress,

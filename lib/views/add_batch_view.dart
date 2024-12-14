@@ -1,115 +1,149 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unshelf_seller/viewmodels/add_batch_viewmodel.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/viewmodels/batch_viewmodel.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class AddBatchView extends StatelessWidget {
   final String productId;
+  final _formKey = GlobalKey<FormState>();
 
-  const AddBatchView({required this.productId});
+  AddBatchView({required this.productId});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<AddBatchViewModel>(context);
+    final viewModel = Provider.of<BatchViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Enter Bundle Details'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Enter Batch Details',
+        onBackPressed: () {
+          viewModel.clearData();
+          Navigator.pop(context);
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextFormField(
-              decoration:
-                  const InputDecoration(labelText: 'Batch Number (optional)'),
-              onChanged: (value) => viewModel.batchNumber = value,
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Expiry Date'),
-              readOnly: true, // Set this to true to prevent keyboard popup
-              controller: TextEditingController(
-                text: viewModel.expiryDate != null
-                    ? "${viewModel.expiryDate!.day}/${viewModel.expiryDate!.month}/${viewModel.expiryDate!.year}"
-                    : '',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                decoration:
+                    const InputDecoration(labelText: 'Batch Number (optional)'),
+                controller: viewModel.batchNumberController,
               ),
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2100),
-                );
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Expiry Date'),
+                readOnly: true,
+                controller: TextEditingController(
+                  text: viewModel.expiryDate != null
+                      ? "${viewModel.expiryDate!.day}/${viewModel.expiryDate!.month}/${viewModel.expiryDate!.year}"
+                      : '',
+                ),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2100),
+                  );
 
-                if (date != null) {
-                  viewModel.expiryDate = date;
-                }
-              },
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Price (₱)'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) => viewModel.price = double.tryParse(value),
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Stock'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) => viewModel.stock = int.tryParse(value),
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Quantifier'),
-              onChanged: (value) => viewModel.quantifier = value,
-            ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Discount (%)'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) => viewModel.discount = int.tryParse(value),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              style: const ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(const Color(0xFFA7C957)),
-                  foregroundColor:
-                      WidgetStatePropertyAll(const Color(0xFF386641)),
-                  alignment: Alignment.center),
-              onPressed: () async {
-                await viewModel.addBatch(productId);
-                if (!viewModel.isLoading) {
-                  Navigator.pop(context, true);
-                }
-              },
-              child: viewModel.isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text('Add Product Batch'),
-            ),
-          ],
+                  if (date != null) {
+                    viewModel.expiryDate = date;
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Expiry date is required';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Price (₱)'),
+                keyboardType: TextInputType.number,
+                controller: viewModel.priceController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Price is required';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid price';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Stock'),
+                keyboardType: TextInputType.number,
+                controller: viewModel.stockController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Stock is required';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Please enter a valid stock quantity';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Quantifier'),
+                controller: viewModel.quantifierController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Quantifier is required';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Discount (%)'),
+                keyboardType: TextInputType.number,
+                controller: viewModel.discountController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Discount is required';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid discount percentage';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              CustomButton(
+                  text: 'Add Product Batch',
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      // Call the ViewModel method to add the batch
+                      await viewModel.addBatch(productId);
+
+                      if (!viewModel.isLoading) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Product batch added successfully!')),
+                        );
+                        viewModel.clearData();
+                        Navigator.pop(context, true);
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('Please fill in all required fields')),
+                      );
+                    }
+                  }),
+            ],
+          ),
         ),
       ),
     );

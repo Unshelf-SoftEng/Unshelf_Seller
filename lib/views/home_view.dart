@@ -10,6 +10,8 @@ import 'package:unshelf_seller/views/balance_overview_view.dart';
 import 'package:unshelf_seller/views/notifications_view.dart';
 
 class HomeView extends StatefulWidget {
+  const HomeView({super.key});
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -21,10 +23,10 @@ class _HomeViewState extends State<HomeView> {
 
   // List of screens to display
   final List<Widget> _screens = [
-    DashboardView(),
-    OrdersView(),
+    const DashboardView(),
+    const OrdersView(),
     ListingsView(),
-    StoreView(),
+    const StoreView(),
   ];
 
   final List<String> _titles = [
@@ -92,7 +94,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF6A994E),
+        backgroundColor: const Color(0xFF6A994E),
         automaticallyImplyLeading: _buildLeadingIcon() == null,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0),
@@ -107,7 +109,7 @@ class _HomeViewState extends State<HomeView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NotificationsView(),
+                    builder: (context) => const NotificationsView(),
                   ),
                 );
               },
@@ -146,9 +148,9 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
+          preferredSize: const Size.fromHeight(4.0),
           child: Container(
-            color: Color(0xFFC8DD96),
+            color: const Color(0xFFC8DD96),
             height: 4.0,
           ),
         ),
@@ -198,7 +200,7 @@ class _HomeViewState extends State<HomeView> {
     switch (_selectedIndex) {
       case 0: // Dashboard
         return IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.chat,
             size: 30,
           ),
@@ -213,10 +215,12 @@ class _HomeViewState extends State<HomeView> {
         );
       case 3: // Store
         return IconButton(
-          icon: Icon(Icons.account_balance_wallet, size: 30),
+          icon: const Icon(Icons.account_balance_wallet, size: 30),
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => BalanceOverviewView()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const BalanceOverviewView()));
           },
         );
       default:

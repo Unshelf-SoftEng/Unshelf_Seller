@@ -47,19 +47,20 @@ class UserProfileViewModel extends ChangeNotifier {
         return;
       }
 
+      if (emailController.text != user.email) {
+        final credential = EmailAuthProvider.credential(
+          email: user.email!,
+          password: passwordController.text,
+        );
+
+        await user.reauthenticateWithCredential(credential);
+      }
+
       if (passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isNotEmpty) {
         await FirebaseAuth.instance.currentUser!
             .updatePassword(passwordController.text);
       }
-
-      userProfile = UserProfileModel(
-        userId: user.uid,
-        name: nameController.text,
-        email: emailController.text,
-        phoneNumber: phoneController.text,
-        password: passwordController.text,
-      );
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -73,18 +74,12 @@ class UserProfileViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (error) {
-      _errorMessage = 'Failed to update user profile';
+      _errorMessage = 'Failed to update user profile: $error';
+      _isLoading = false;
+      notifyListeners();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    super.dispose();
   }
 }

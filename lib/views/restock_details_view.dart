@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
 
 class RestockDetailsView extends StatefulWidget {
+  const RestockDetailsView({super.key});
+
   @override
   State<RestockDetailsView> createState() => _RestockDetailsViewState();
 }
@@ -14,9 +17,11 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
     final viewModel = Provider.of<RestockViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Enter Restock Details'),
-        backgroundColor: const Color(0xFF6A994E),
+      appBar: CustomAppBar(
+        title: 'Enter Restock Details',
+        onBackPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,10 +95,8 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      product.expiryDate != null
-                                          ? DateFormat('MM-dd-yyyy')
-                                              .format(product.expiryDate!)
-                                          : 'Select Expiry Date',
+                                      DateFormat('MM-dd-yyyy')
+                                          .format(product.expiryDate),
                                       style: TextStyle(
                                         color: Colors.grey[800],
                                         fontSize: 16,
@@ -115,9 +118,8 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
             ElevatedButton(
               onPressed: () async {
                 // Check if all products have a quantity > 0 and expiry date selected
-                final isFormValid = viewModel.selectedProducts.every(
-                    (product) =>
-                        product.stock! > 0 && product.expiryDate != null);
+                final isFormValid = viewModel.selectedProducts
+                    .every((product) => product.stock > 0);
 
                 if (!isFormValid) {
                   // Show an error message if the validation fails

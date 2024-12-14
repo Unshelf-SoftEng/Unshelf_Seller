@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 import 'package:unshelf_seller/models/store_model.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/store_schedule_viewmodel.dart';
 
 class EditStoreScheduleView extends StatelessWidget {
   final StoreModel storeDetails;
 
-  EditStoreScheduleView({required this.storeDetails});
+  const EditStoreScheduleView({super.key, required this.storeDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -15,26 +18,13 @@ class EditStoreScheduleView extends StatelessWidget {
       child: Consumer<StoreScheduleViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Edit Store Schedule'),
-              backgroundColor: const Color(0xFF6A994E),
-              foregroundColor: const Color(0xFFFFFFFF),
-              titleTextStyle: TextStyle(
-                color: const Color(0xFFFFFFFF),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Color(0xFF386641)),
-                onPressed: () => Navigator.pop(context),
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(4.0),
-                child: Container(color: Color(0xFFC8DD96), height: 4.0),
-              ),
-            ),
+            appBar: CustomAppBar(
+                title: 'Edit Store Schedule',
+                onBackPressed: () {
+                  Navigator.pop(context);
+                }),
             body: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Expanded(
@@ -43,7 +33,7 @@ class EditStoreScheduleView extends StatelessWidget {
                         bool isActive =
                             viewModel.storeSchedule[day]!['isOpen'] == 'true';
                         return Card(
-                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Column(
@@ -54,7 +44,7 @@ class EditStoreScheduleView extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(day,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold)),
                                     Switch(
@@ -66,7 +56,7 @@ class EditStoreScheduleView extends StatelessWidget {
                                   ],
                                 ),
                                 if (isActive) ...[
-                                  SizedBox(height: 8.0),
+                                  const SizedBox(height: 8.0),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -118,20 +108,14 @@ class EditStoreScheduleView extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStatePropertyAll(const Color(0xFFA7C957)),
-                      foregroundColor:
-                          WidgetStatePropertyAll(const Color(0xFF386641)),
-                    ),
-                    onPressed: () async {
-                      await viewModel.saveProfile(context, storeDetails.userId);
-                      // Do not call Navigator.pop(context) here.
-                    },
-                    child: Text('Save Changes'),
-                  ),
+                  const SizedBox(height: 20),
+                  CustomButton(
+                      text: 'Save Changes',
+                      onPressed: () async {
+                        await viewModel.saveProfile(
+                            context, storeDetails.userId);
+                        // Do not call Navigator.pop(context) here.
+                      }),
                 ],
               ),
             ),
@@ -156,12 +140,12 @@ class _TimePickerButton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        SizedBox(height: 4.0),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 4.0),
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6A994E),
+            backgroundColor: AppColors.palmLeaf,
             foregroundColor: Colors.white,
           ),
           child: Text(time.isEmpty ? 'Set Time' : time),

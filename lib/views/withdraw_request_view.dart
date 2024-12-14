@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 
 class WithdrawRequestView extends StatefulWidget {
   final WalletViewModel walletViewModel;
 
-  const WithdrawRequestView({Key? key, required this.walletViewModel})
-      : super(key: key);
+  const WithdrawRequestView({super.key, required this.walletViewModel});
 
   @override
-  _WithdrawRequestViewState createState() => _WithdrawRequestViewState();
+  State<WithdrawRequestView> createState() => _WithdrawRequestViewState();
 }
 
 class _WithdrawRequestViewState extends State<WithdrawRequestView> {
@@ -34,17 +34,15 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Withdraw Request'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
+        title: const Text('Withdraw Request'),
+        backgroundColor: AppColors.palmLeaf,
+        foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
-            color: Color(0xFF386641),
+            color: AppColors.deepMossGreen,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -67,7 +65,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 controller: _fullNameController,
                 decoration: InputDecoration(
                   labelText: 'Full Name',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   errorText:
                       _errorMessage.isNotEmpty && _errorMessage.contains('name')
                           ? _errorMessage
@@ -100,7 +98,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 controller: _bankAccountController,
                 decoration: InputDecoration(
                   labelText: 'Bank Account Number',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   errorText: _errorMessage.isNotEmpty &&
                           _errorMessage.contains('account')
                       ? _errorMessage

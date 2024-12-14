@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
@@ -28,26 +29,13 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
       final order = viewModel.selectedOrder;
 
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Order Details'),
-          backgroundColor: const Color(0xFF6A994E),
-          foregroundColor: const Color(0xFFFFFFFF),
-          titleTextStyle: TextStyle(
-              color: const Color(0xFFFFFFFF),
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Color(0xFF386641),
-            ),
-            onPressed: () {
+        appBar: CustomAppBar(
+            title: 'Order Details',
+            onBackPressed: () {
               Navigator.pop(context);
-            },
-          ),
-        ),
+            }),
         body: viewModel.isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16.0, vertical: 10.0),
@@ -98,7 +86,7 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                             const SizedBox(height: 6),
                             Text(
                               'Price: ₱${order.totalPrice}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -237,213 +225,11 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                         },
                       ),
                       // Order Details Section
-                      if (order.status == 'Ready') ...[
-                        _buildDetailRow('Pickup Code', order.pickupCode!),
-                        if (order.pickupTime != null) ...[
-                          _buildDetailRow(
-                              'Pickup Time',
-                              DateFormat('yyyy-MM-dd HH:mm')
-                                  .format(order.pickupTime!.toDate())),
-                        ],
-                        if (!order.isPaid) ...[
-                          _buildDetailRow(
-                              'Payment', order.totalPrice.toString()),
-                        ],
-                      ] else if (order.status == 'Completed') ...[
-                        _buildDetailRow(
-                            'Completed At',
-                            DateFormat('yyyy-MM-dd HH:mm')
-                                .format(order.completedAt!.toDate())),
-                      ] else if (order.status == 'Cancelled') ...[
-                        _buildDetailRow(
-                            'Cancelled At',
-                            DateFormat('yyyy-MM-dd HH:mm')
-                                .format(order.cancelledAt!.toDate())),
-                      ],
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
-        bottomNavigationBar: Card(
-          elevation: 8,
-          margin: EdgeInsets.zero,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (order!.status == 'Pending')
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Cancel Order'),
-                                content: const Text(
-                                    'Are you sure you want to cancel this order?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Close dialog
-                                    },
-                                    child: const Text('No'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      try {
-                                        await viewModel.cancelOrder();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                "Order has been canceled successfully."),
-                                            backgroundColor:
-                                                AppColors.watermelonRed,
-                                          ),
-                                        );
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                                "Failed to cancel order: ${e.toString()}"),
-                                            backgroundColor:
-                                                AppColors.watermelonRed,
-                                          ),
-                                        );
-                                      }
-                                      Navigator.of(context)
-                                          .pop(); // Close dialog
-                                    },
-                                    child: const Text('Yes, Cancel'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('Cancel Order'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await viewModel.approveOrder();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    "Order has been approved successfully!"),
-                                backgroundColor: AppColors.middleGreenYellow,
-                              ),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    "Failed to approve order: ${e.toString()}"),
-                                backgroundColor: AppColors.watermelonRed,
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFA7C957),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text('Approve Order'),
-                      ),
-                    ],
-                  ),
-                if (order.status == 'Processing')
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        print('Fulfilling order');
-                        await viewModel.fulfillOrder();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Order marked as ready for pickup!"),
-                            backgroundColor: AppColors.middleGreenYellow,
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                "Failed to fulfill order: ${e.toString()}"),
-                            backgroundColor: AppColors.watermelonRed,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFA7C957),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Mark as Ready'),
-                  ),
-                if (order.status == 'Ready')
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await viewModel.completeOrder();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Order has been completed!"),
-                            backgroundColor: AppColors.middleGreenYellow,
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                "Failed to complete order: ${e.toString()}"),
-                            backgroundColor: AppColors.watermelonRed,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFA7C957),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Complete Order'),
-                  ),
-              ],
-            ),
-          ),
-        ),
       );
     });
   }

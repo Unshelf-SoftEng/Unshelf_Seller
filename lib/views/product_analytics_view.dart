@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/views/chart.dart';
+import 'package:unshelf_seller/components/chart.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class ProductAnalyticsView extends StatefulWidget {
+  const ProductAnalyticsView({super.key});
+
   @override
   State<ProductAnalyticsView> createState() => _ProductAnalyticsViewState();
 }
@@ -129,31 +132,11 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Product Analytics'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: const TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Product Analytics',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4.0),
-          child: Container(
-            color: const Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -282,7 +265,7 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Sales Overview (${selectedSalesValue})',
+                  'Sales Overview ($selectedSalesValue)',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

@@ -118,7 +118,7 @@ class _ListingsViewState extends State<ListingsView> {
         }
 
         if (viewModel.filteredItems.isEmpty) {
-          return _buildEmptyState(viewModel.filter == 'Products');
+          return _buildEmptyState(viewModel.filter);
         }
 
         return ListView.builder(
@@ -132,17 +132,28 @@ class _ListingsViewState extends State<ListingsView> {
     );
   }
 
-  Widget _buildEmptyState(bool showingProducts) {
+  Widget _buildEmptyState(String filter) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.shopping_cart, size: 80, color: Colors.grey),
           const SizedBox(height: 16),
-          Text(
-            showingProducts ? 'No products found' : 'No bundles found',
-            style: const TextStyle(fontSize: 18, color: Colors.grey),
-          ),
+          if (filter == 'Products')
+            const Text(
+              'No products found',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            )
+          else if (filter == 'Bundles')
+            const Text(
+              'No bundles found',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            )
+          else
+            const Text(
+              'No listings found',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
         ],
       ),
     );
@@ -237,7 +248,7 @@ class _ListingsViewState extends State<ListingsView> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       child: const Text("Delete",
-                          style: TextStyle(color: Colors.red)),
+                          style: TextStyle(color: AppColors.watermelonRed)),
                     ),
                   ],
                 );

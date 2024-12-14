@@ -1,38 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/notification_viewmodel.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class NotificationsView extends StatelessWidget {
-  const NotificationsView({Key? key}) : super(key: key);
+  const NotificationsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Notifications'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Color(0xFF386641),
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Notifications',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(
-            color: Color(0xFFC8DD96),
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: Consumer<NotificationViewModel>(
         builder: (context, model, child) {
           return model.notifications.isNotEmpty
@@ -47,8 +29,8 @@ class NotificationsView extends StatelessWidget {
                             ? Icons.check_circle
                             : Icons.notifications,
                         color: notification.seen
-                            ? Color(0xFFA7C957)
-                            : Color(0xFF386641),
+                            ? AppColors.palmLeaf
+                            : AppColors.deepMossGreen,
                       ),
                       title: Text(
                         notification.title,

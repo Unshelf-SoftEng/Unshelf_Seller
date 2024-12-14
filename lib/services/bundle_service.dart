@@ -24,6 +24,7 @@ class BundleService extends ChangeNotifier {
       final bundleData = {
         'name': bundle.name,
         'category': bundle.category,
+        'description': bundle.description,
         'items': bundle.items,
         'price': bundle.price,
         'stock': bundle.stock,

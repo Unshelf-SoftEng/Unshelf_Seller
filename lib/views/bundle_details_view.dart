@@ -7,7 +7,7 @@ import 'package:unshelf_seller/utils/colors.dart';
 class BundleDetailsView extends StatefulWidget {
   final String bundleId;
 
-  BundleDetailsView({required this.bundleId});
+  const BundleDetailsView({super.key, required this.bundleId});
 
   @override
   State<BundleDetailsView> createState() => _BundleDetailsViewState();
@@ -26,26 +26,24 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bundle Details'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-            color: const Color(0xFFFFFFFF),
-            fontSize: 20,
-            fontWeight: FontWeight.bold),
+        title: const Text('Bundle Details'),
+        backgroundColor: AppColors.palmLeaf,
+        foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
-            color: Color(0xFF386641),
+            color: AppColors.deepMossGreen,
           ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
+          preferredSize: const Size.fromHeight(4.0),
           child: Container(
-            color: Color(0xFFC8DD96),
+            color: AppColors.lightGreen,
             height: 4.0,
           ),
         ),
@@ -71,21 +69,13 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                   // Bundle Image
                   Center(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: bundle.mainImageUrl != null
-                          ? Image.network(
-                              bundle.mainImageUrl,
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              width: 200,
-                              height: 200,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.image_not_supported),
-                            ),
-                    ),
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Image.network(
+                          bundle.mainImageUrl,
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )),
                   ),
                   const SizedBox(height: 20),
 
@@ -99,13 +89,13 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                   // Product List
                   const SizedBox(height: 10),
                   const Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    padding: EdgeInsets.symmetric(vertical: 12.0),
                     child: Text(
                       'Products',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF6A994E), // Consistent green color
+                        color: AppColors.palmLeaf,
                       ),
                     ),
                   ),
@@ -139,8 +129,7 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                         ),
                       ),
                     );
-                  }).toList(),
-
+                  }),
                   const SizedBox(height: 20),
                 ],
               ),

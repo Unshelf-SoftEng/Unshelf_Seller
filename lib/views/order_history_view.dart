@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/views/order_history_details_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 
 class OrderHistoryView extends StatefulWidget {
   @override
@@ -27,24 +28,11 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
     final ordersViewModel = Provider.of<OrderViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('View Order History'),
-        backgroundColor: const Color(0xFF6A994E),
-        foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: const TextStyle(
-          color: Color(0xFFFFFFFF),
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Color(0xFF386641)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(4.0),
-          child: Container(color: Color(0xFFC8DD96), height: 4.0),
-        ),
-      ),
+      appBar: CustomAppBar(
+          title: 'Order History',
+          onBackPressed: () {
+            Navigator.pop(context);
+          }),
       body: Column(
         children: [
           // Filter Buttons
@@ -145,7 +133,11 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                                           ),
                                           const SizedBox(height: 4.0),
                                           Text(
-                                            '${order.createdAt.toDate().toLocal().toString().split(' ')[0]}',
+                                            order.createdAt
+                                                .toDate()
+                                                .toLocal()
+                                                .toString()
+                                                .split(' ')[0],
                                             style: TextStyle(
                                               fontSize: 12.0,
                                               color: Colors.grey[600],
