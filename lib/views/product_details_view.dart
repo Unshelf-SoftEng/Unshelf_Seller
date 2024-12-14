@@ -213,9 +213,34 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Quantity: ${batch.stock}'),
                                 Text(
-                                    'Price: ₱${batch.price.toStringAsFixed(2)}'), // Display price with 2 decimal points
+                                  'Quantity: ${batch.stock}',
+                                  style: TextStyle(fontSize: 14.0),
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 13.0,
+                                      color: Colors.black,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text: 'Price: ',
+                                      ),
+                                      const TextSpan(
+                                        text: '\u20B1 ', // Peso symbol
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            '${batch.price.toStringAsFixed(2)}',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Display price with 2 decimal points
                                 Text(
                                     'Expiry Date: ${DateFormat('MM-dd-yyyy').format(batch.expiryDate)}'), // Formatted expiry date
                               ],

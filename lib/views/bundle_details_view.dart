@@ -83,7 +83,7 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                   _buildDetailCard('Name', bundle.name),
                   _buildDetailCard('Description', bundle.description),
                   _buildDetailCard('Category', bundle.category),
-                  _buildDetailCard('Price', '₱${bundle.price.toString()}'),
+                  _buildDetailCard('Price', bundle.price.toString()),
                   _buildDetailCard('Stock', bundle.stock.toString()),
                   _buildDetailCard('Discount', '${bundle.discount}%'),
 
@@ -161,15 +161,39 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
+            if (title != 'Price')
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                flex: 2,
+                child: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      const TextSpan(
+                        text: '\u20B1 ', // Peso symbol
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                      TextSpan(
+                        text: value,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

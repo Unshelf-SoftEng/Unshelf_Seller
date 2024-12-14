@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/chart.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/product_analytics_viewmodel.dart';
 
 class ProductAnalyticsView extends StatefulWidget {
@@ -24,8 +25,12 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
   @override
   void initState() {
     super.initState();
-    viewModel = Provider.of<ProductAnalyticsViewModel>(context, listen: false);
-    viewModel.fetchProductAnalytics();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel =
+          Provider.of<ProductAnalyticsViewModel>(context, listen: false);
+      viewModel.fetchProductAnalytics();
+    });
 
     DateTime today = DateTime.now();
 
@@ -259,12 +264,24 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
                                       fontWeight: FontWeight.w600),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  '₱ ${currentProductData['totalSales'].toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF6A994E),
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.palmLeaf,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text: '\u20B1 ', // Peso symbol
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      TextSpan(
+                                          text: currentProductData['totalSales']
+                                              .toStringAsFixed(2)),
+                                    ],
                                   ),
                                 ),
                               ],

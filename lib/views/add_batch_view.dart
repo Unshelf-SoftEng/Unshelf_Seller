@@ -63,7 +63,7 @@ class AddBatchView extends StatelessWidget {
               ),
               const SizedBox(height: 16.0),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Price (₱)'),
+                decoration: const InputDecoration(labelText: 'Price'),
                 keyboardType: TextInputType.number,
                 controller: viewModel.priceController,
                 validator: (value) {

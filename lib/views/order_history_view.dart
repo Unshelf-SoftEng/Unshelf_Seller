@@ -25,7 +25,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
 
   @override
   Widget build(BuildContext context) {
-    final ordersViewModel = Provider.of<OrderViewModel>(context);
+    final viewModel = Provider.of<OrderViewModel>(context);
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -44,12 +44,12 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _buildFilterButton('All', ordersViewModel),
-                  _buildFilterButton('Pending', ordersViewModel),
-                  _buildFilterButton('Processing', ordersViewModel),
-                  _buildFilterButton('Ready', ordersViewModel),
-                  _buildFilterButton('Completed', ordersViewModel),
-                  _buildFilterButton('Cancelled', ordersViewModel),
+                  _buildFilterButton('All', viewModel),
+                  _buildFilterButton('Pending', viewModel),
+                  _buildFilterButton('Processing', viewModel),
+                  _buildFilterButton('Ready', viewModel),
+                  _buildFilterButton('Completed', viewModel),
+                  _buildFilterButton('Cancelled', viewModel),
                 ],
               ),
             ),
@@ -58,7 +58,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
           // Orders List
           Expanded(
             child: FutureBuilder<void>(
-              future: ordersViewModel.fetchOrdersFuture,
+              future: viewModel.fetchOrdersFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -204,22 +204,22 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
     );
   }
 
-  Widget _buildFilterButton(String status, OrderViewModel ordersViewModel) {
+  Widget _buildFilterButton(String status, OrderViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: TextButton(
         style: TextButton.styleFrom(
           minimumSize: const Size(50, 30),
-          backgroundColor: _selectedStatus == status
+          backgroundColor: viewModel.currentStatus == status
               ? AppColors.deepMossGreen
               : Colors.grey[200],
           foregroundColor:
-              _selectedStatus == status ? Colors.white : Colors.black,
+              viewModel.currentStatus == status ? Colors.white : Colors.black,
         ),
         onPressed: () {
           setState(() {
-            _selectedStatus = status;
-            ordersViewModel.filterOrdersByStatus(_selectedStatus);
+            viewModel.currentStatus = status;
+            viewModel.filterOrdersByStatus(viewModel.currentStatus);
           });
         },
         child: Text(

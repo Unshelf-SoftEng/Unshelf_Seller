@@ -57,6 +57,7 @@ class AnalyticsViewModel extends ChangeNotifier {
     notifyListeners();
     await getTotals();
     await getOrdersandSalesData();
+
     _isLoading = false;
     notifyListeners();
   }
@@ -71,90 +72,15 @@ class AnalyticsViewModel extends ChangeNotifier {
     await getSalesMap('Weekly');
     await getSalesMap('Monthly');
     await getSalesMap('Annual');
-  }
 
-  Future<void> getTopProducts() async {
-    _isLoading = true;
-    notifyListeners();
-    // Clear any existing data
-    topProducts.clear();
-
-    // Fetch all orders
-    final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('sellerId', isEqualTo: user!.uid)
-        .where('status', isEqualTo: 'Completed')
-        .where('createdAt',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(Duration(days: 13)))
-        .get();
-
-    Map<String, int> batchCountMap = {};
-    Map<String, int> bundleCountMap = {};
-
-    for (var orderDoc in ordersSnapshot.docs) {
-      var orderItems = orderDoc['orderItems'];
-      print(orderItems);
-
-      for (var item in orderItems) {
-        String batchId = item['batchId'];
-        String bundleId = item['bundleId'];
-        int quantity = item['quantity'];
-
-        if (batchId != null) {
-          batchCountMap[batchId] = (batchCountMap[batchId] ?? 0) + quantity;
-        }
-        if (bundleId != null) {
-          bundleCountMap[bundleId] = (bundleCountMap[bundleId] ?? 0) + quantity;
-        }
-      }
-    }
-
-    Map<String, int> productEntries = {};
-
-    batchCountMap.forEach((key, value) async {
-      // Fetch batch details using the key
-      DocumentSnapshot batchDoc = await FirebaseFirestore.instance
-          .collection('batches')
-          .doc(key) // Use 'key' to fetch the document
-          .get();
-
-      if (batchDoc.exists) {
-        String productId = batchDoc['productId'];
-        productEntries[productId] = (productEntries[productId] ?? 0) + value;
-      }
-    });
-
-    var sortedEntries = productEntries.entries.toList()
-      ..sort((a, b) =>
-          b.value.compareTo(a.value)); // Sort by value in descending order
-
-    var top5 = sortedEntries.take(5).toList();
-
-    for (var entry in top5) {
-      // Fetch product details using the productId
-      DocumentSnapshot productDoc = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(entry.key) // Use 'key' to fetch the document
-          .get();
-
-      if (productDoc.exists) {
-        topProducts.add({
-          'productId': productDoc.id,
-          'name': productDoc['name'],
-          'quantity': entry.value,
-        });
-      }
-    }
-
-    _isLoading = false;
-    notifyListeners();
+    print('Weekly Orders: $_weeklyOrdersMap');
+    print('Weekly Sales: $_weeklySalesMap');
   }
 
   Future<void> getTotals() async {
     _isLoading = true;
     notifyListeners();
     try {
-      // Reset totals before fetching
       totalOrders = 0;
       totalSales = 0.0;
       totalCompletedOrders = 0;
@@ -167,7 +93,6 @@ class AnalyticsViewModel extends ChangeNotifier {
           .where('sellerId', isEqualTo: user!.uid)
           .get();
 
-      // Loop through all orders
       for (var doc in ordersSnapshot.docs) {
         totalOrders++; // Increment total orders
 
@@ -181,16 +106,14 @@ class AnalyticsViewModel extends ChangeNotifier {
         }
       }
 
-      // Fetch transactions
       QuerySnapshot transactionSnapshot = await FirebaseFirestore.instance
           .collection('transactions')
           .where('sellerId', isEqualTo: user!.uid)
           .get();
 
-      // Loop through transactions to calculate total sales
       for (var transDoc in transactionSnapshot.docs) {
         if (transDoc['type'] == 'Sale') {
-          double transAmount = (transDoc['sellerEarnings'] ?? 0.0);
+          double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
           totalSales += transAmount;
         }
       }
@@ -253,8 +176,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       for (var transDoc in transactionSnapshot.docs) {
         if (transDoc['type'] == 'Sale') {
           DateTime transDate = (transDoc['date'] as Timestamp).toDate();
-          double transAmount = transDoc['sellerEarnings'] ??
-              0.0; // Assuming 'amount' field exists
+          double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
           _updateSalesMap(period, transDate, transAmount);
         }
       }
@@ -271,8 +193,8 @@ class AnalyticsViewModel extends ChangeNotifier {
   void _initializeOrdersMap(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        for (int i = 0; i < 15; i++) {
-          DateTime date = today.subtract(Duration(days: 29 - i));
+        for (int i = 0; i < 14; i++) {
+          DateTime date = today.subtract(Duration(days: 14 - i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
           _dailyOrdersMap[saveDate] = 0;
         }
@@ -282,6 +204,10 @@ class AnalyticsViewModel extends ChangeNotifier {
         for (int i = 0; i < 4; i++) {
           DateTime weekStartDate =
               lastMonday.subtract(Duration(days: 21 - (i * 7)));
+
+          weekStartDate = DateTime(
+              weekStartDate.year, weekStartDate.month, weekStartDate.day);
+
           _weeklyOrdersMap[weekStartDate] = 0;
         }
         break;
@@ -315,8 +241,8 @@ class AnalyticsViewModel extends ChangeNotifier {
   void _initializeSalesMap(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        for (int i = 0; i < 15; i++) {
-          DateTime date = today.subtract(Duration(days: 29 - i));
+        for (int i = 0; i < 14; i++) {
+          DateTime date = today.subtract(Duration(days: 14 - i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
           _dailySalesMap[saveDate] = 0.0;
         }
@@ -326,6 +252,9 @@ class AnalyticsViewModel extends ChangeNotifier {
         for (int i = 0; i < 4; i++) {
           DateTime weekStartDate =
               lastMonday.subtract(Duration(days: 21 - (i * 7)));
+
+          weekStartDate = DateTime(
+              weekStartDate.year, weekStartDate.month, weekStartDate.day);
           _weeklySalesMap[weekStartDate] = 0;
         }
         break;
@@ -368,11 +297,15 @@ class AnalyticsViewModel extends ChangeNotifier {
 
         break;
       case 'Weekly':
-        key = orderDate.subtract(Duration(days: orderDate.weekday - 1));
+        key = DateTime(
+          orderDate.year,
+          orderDate.month,
+          orderDate.day,
+        ).subtract(Duration(days: orderDate.weekday - 1));
 
-        if (_weeklyOrdersMap.containsKey(key)) {
-          _weeklyOrdersMap[key] = (_weeklyOrdersMap[key] ?? 0) + 1;
-        }
+        key = DateTime(key.year, key.month, key.day);
+
+        _weeklyOrdersMap[key] = (_weeklyOrdersMap[key] ?? 0) + 1;
 
         break;
       case 'Monthly':
@@ -409,11 +342,15 @@ class AnalyticsViewModel extends ChangeNotifier {
 
         break;
       case 'Weekly':
-        key = saleDate.subtract(Duration(days: saleDate.weekday - 1));
+        key = DateTime(
+          saleDate.year,
+          saleDate.month,
+          saleDate.day,
+        ).subtract(Duration(days: saleDate.weekday - 1));
 
-        if (_weeklySalesMap.containsKey(key)) {
-          _weeklySalesMap[key] = (_weeklySalesMap[key] ?? 0.0) + saleAmount;
-        }
+        key = DateTime(key.year, key.month, key.day);
+
+        _weeklySalesMap[key] = (_weeklySalesMap[key] ?? 0.0) + saleAmount;
 
         break;
       case 'Monthly':
@@ -489,7 +426,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         } else {
           double maxSalesAmount =
               _dailySalesMap.values.reduce((a, b) => a > b ? a : b);
-          _dailyMaxYSales = maxSalesAmount.ceil() as double;
+          _dailyMaxYSales = maxSalesAmount.ceil().toDouble();
         }
         break;
       case 'Weekly':
@@ -498,7 +435,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         } else {
           double maxSalesAmount =
               _weeklySalesMap.values.reduce((a, b) => a > b ? a : b);
-          _weeklyMaxYSales = maxSalesAmount.ceil() as double;
+          _weeklyMaxYSales = maxSalesAmount.ceil().toDouble();
         }
         break;
       case 'Monthly':
@@ -507,7 +444,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         } else {
           double maxSalesAmount =
               _monthlySalesMap.values.reduce((a, b) => a > b ? a : b);
-          _monthlyMaxYSales = maxSalesAmount.ceil() as double;
+          _monthlyMaxYSales = maxSalesAmount.ceil().toDouble();
         }
         break;
       case 'Annual':
@@ -516,7 +453,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         } else {
           double maxSalesAmount =
               _annualSalesMap.values.reduce((a, b) => a > b ? a : b);
-          _annualMaxYSales = maxSalesAmount.ceil() as double;
+          _annualMaxYSales = maxSalesAmount.ceil().toDouble();
         }
         break;
     }

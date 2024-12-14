@@ -159,12 +159,24 @@ class _OrdersViewState extends State<OrdersView> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        '₱ ${order.totalPrice}',
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green[800],
+                                      RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(
+                                            fontSize: 18.0,
+                                            color: AppColors.palmLeaf,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          children: [
+                                            const TextSpan(
+                                              text: '\u20B1 ', // Peso symbol
+                                              style: TextStyle(
+                                                fontFamily: 'Roboto',
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '${order.totalPrice}',
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       const SizedBox(height: 8.0),
@@ -205,22 +217,22 @@ class _OrdersViewState extends State<OrdersView> {
     );
   }
 
-  Widget _buildFilterButton(String status, OrderViewModel ordersViewModel) {
+  Widget _buildFilterButton(String status, OrderViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: TextButton(
         style: TextButton.styleFrom(
           minimumSize: const Size(50, 30),
-          backgroundColor: _selectedStatus == status
+          backgroundColor: viewModel.currentStatus == status
               ? AppColors.deepMossGreen
               : Colors.grey[200],
           foregroundColor:
-              _selectedStatus == status ? Colors.white : Colors.black,
+              viewModel.currentStatus == status ? Colors.white : Colors.black,
         ),
         onPressed: () {
           setState(() {
-            _selectedStatus = status;
-            ordersViewModel.filterOrdersByStatus(_selectedStatus);
+            viewModel.currentStatus = status;
+            viewModel.filterOrdersByStatus(viewModel.currentStatus);
           });
         },
         child: Text(

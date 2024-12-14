@@ -49,6 +49,7 @@ class _ChartState extends State<Chart> {
     );
 
     DateTime date = widget.dataMap.keys.elementAt(value.toInt());
+
     String dateString;
     if (widget.maxXValue == 14) {
       dateString = DateFormat('MM/dd').format(date);
@@ -85,7 +86,8 @@ class _ChartState extends State<Chart> {
 
     for (int i = 0; i < keys.length; i++) {
       DateTime date = keys[i];
-      double value = (widget.dataMap[date] ?? 0.0) as double;
+      double value = (widget.dataMap[date] ?? 0.0).toDouble();
+
       spots.add(FlSpot(i.toDouble(), value.toDouble()));
     }
 

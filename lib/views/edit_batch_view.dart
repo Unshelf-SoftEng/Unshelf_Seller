@@ -78,7 +78,7 @@ class _EditBatchViewState extends State<EditBatchView> {
                   ),
                   const SizedBox(height: 16.0),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: 'Price (₱)'),
+                    decoration: const InputDecoration(labelText: 'Price'),
                     keyboardType: TextInputType.number,
                     onChanged: (value) =>
                         viewModel.price = double.tryParse(value),

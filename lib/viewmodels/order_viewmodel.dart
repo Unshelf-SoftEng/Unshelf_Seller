@@ -11,6 +11,11 @@ class OrderViewModel extends ChangeNotifier {
   OrderModel? get selectedOrder => _selectedOrder;
   List<OrderModel> get orders => _orders;
   String get currentStatus => _currentStatus;
+  set currentStatus(String status) {
+    _currentStatus = status;
+
+    notifyListeners();
+  }
 
   bool get isLoading => _isLoading;
   bool _isLoading = false;
