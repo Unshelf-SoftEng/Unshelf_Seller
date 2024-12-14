@@ -6,7 +6,7 @@ import 'package:unshelf_seller/views/product_analytics_view.dart';
 
 class StoreAnalyticsView extends StatefulWidget {
   @override
-  _StoreAnalyticsViewState createState() => _StoreAnalyticsViewState();
+  State<StoreAnalyticsView> createState() => _StoreAnalyticsViewState();
 }
 
 class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {

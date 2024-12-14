@@ -5,16 +5,16 @@ import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/views/add_batch_view.dart';
 import 'package:unshelf_seller/views/edit_batch_view.dart';
 
-class ProductSummaryView extends StatefulWidget {
+class ProductDetailsView extends StatefulWidget {
   final String productId;
 
-  ProductSummaryView({required this.productId});
+  ProductDetailsView({required this.productId});
 
   @override
-  _ProductSummaryViewState createState() => _ProductSummaryViewState();
+  State<ProductDetailsView> createState() => _ProductDetailsViewState();
 }
 
-class _ProductSummaryViewState extends State<ProductSummaryView> {
+class _ProductDetailsViewState extends State<ProductDetailsView> {
   @override
   void initState() {
     super.initState();
@@ -29,7 +29,7 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product Summary'),
+        title: Text('Product Details'),
         backgroundColor: const Color(0xFF6A994E),
         foregroundColor: const Color(0xFFFFFFFF),
         titleTextStyle: TextStyle(
@@ -77,13 +77,13 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                 // Image Gallery
                 _buildImageGallery(images, viewModel),
                 const SizedBox(height: 16.0),
-                // Product Details
                 _buildProductDetail('Name', viewModel.product!.name),
                 _buildProductDetail(
                     'Description', viewModel.product!.description),
                 _buildProductDetail('Category', viewModel.product!.category),
                 const SizedBox(height: 16.0),
                 // Batches Section
+                _buildSectionHeader('Batches'),
                 _buildBatchesSection(viewModel),
               ],
             ),
@@ -102,7 +102,6 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
           width: double.infinity,
           height: 250,
           decoration: BoxDecoration(
-            color: const Color(0xFF386641),
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: PageView.builder(
@@ -116,7 +115,8 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
                   borderRadius: BorderRadius.circular(12.0),
                   child: Image.network(
                     images[index],
-                    fit: BoxFit.cover,
+                    width: 200,
+                    height: 200,
                   ),
                 ),
               );
@@ -146,27 +146,51 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
 
   // Method to build product detail row
   Widget _buildProductDetail(String title, String value) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Header for sections
+  Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              '$title:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-            ),
-          ),
-          SizedBox(width: 8.0),
-          Expanded(
-            flex: 7,
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 16.0, color: Colors.grey[800]),
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF6A994E), // Consistent green color
+        ),
       ),
     );
   }
@@ -177,15 +201,6 @@ class _ProductSummaryViewState extends State<ProductSummaryView> {
 
     return Column(
       children: [
-        // Title for the batch list
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0),
-          child: Text(
-            'Batches',
-            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        // ListView for batches or a prompt to add a batch
         if (batches != null && batches.isNotEmpty)
           ListView.builder(
             itemCount: batches.length,

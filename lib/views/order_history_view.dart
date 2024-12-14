@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
-import 'package:unshelf_seller/views/order_details_view.dart';
+import 'package:unshelf_seller/views/order_history_details_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class OrderHistoryView extends StatefulWidget {
   @override
-  _OrderHistoryViewState createState() => _OrderHistoryViewState();
+  State<OrderHistoryView> createState() => _OrderHistoryViewState();
 }
 
 class _OrderHistoryViewState extends State<OrderHistoryView> {
@@ -28,11 +28,11 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Order History'),
+        title: const Text('View Order History'),
         backgroundColor: const Color(0xFF6A994E),
         foregroundColor: const Color(0xFFFFFFFF),
-        titleTextStyle: TextStyle(
-          color: const Color(0xFFFFFFFF),
+        titleTextStyle: const TextStyle(
+          color: Color(0xFFFFFFFF),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -111,7 +111,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => OrderDetailsView(
+                                  builder: (context) => OrderHistoryDetailsView(
                                     orderId: order.id,
                                   ),
                                 ),

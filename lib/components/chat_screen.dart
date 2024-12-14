@@ -99,11 +99,13 @@ class _ChatScreenState extends State<ChatScreen>
                           ),
                         );
                       },
-                      leading: CircleAvatar(
-                        radius: 30, // Slightly larger avatar
-                        backgroundImage: NetworkImage(data['profileImageUrl']),
-                        backgroundColor: Colors.grey
-                            .shade200, // Background color if image not available
+                      leading: ClipOval(
+                        child: Image.network(
+                          data['profileImageUrl'],
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       title: Text(
                         data['name'],

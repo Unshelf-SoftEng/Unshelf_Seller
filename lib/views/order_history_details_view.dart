@@ -4,16 +4,17 @@ import 'package:intl/intl.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
-class OrderDetailsView extends StatefulWidget {
+class OrderHistoryDetailsView extends StatefulWidget {
   final String orderId;
 
-  const OrderDetailsView({super.key, required this.orderId});
+  const OrderHistoryDetailsView({super.key, required this.orderId});
 
   @override
-  State<OrderDetailsView> createState() => _OrderDetailsViewState();
+  State<OrderHistoryDetailsView> createState() =>
+      _OrderHistoryDetailsViewState();
 }
 
-class _OrderDetailsViewState extends State<OrderDetailsView> {
+class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
   @override
   void initState() {
     super.initState();
@@ -24,30 +25,25 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Consumer<OrderViewModel>(builder: (context, viewModel, child) {
+      final order = viewModel.selectedOrder;
+
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Bundle Details'),
-          backgroundColor: AppColors.palmLeaf,
+          title: const Text('Order Details'),
+          backgroundColor: const Color(0xFF6A994E),
           foregroundColor: const Color(0xFFFFFFFF),
-          titleTextStyle: const TextStyle(
-              color: Color(0xFFFFFFFF),
+          titleTextStyle: TextStyle(
+              color: const Color(0xFFFFFFFF),
               fontSize: 20,
               fontWeight: FontWeight.bold),
           leading: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back,
-              color: AppColors.deepMossGreen,
+              color: Color(0xFF386641),
             ),
             onPressed: () {
               Navigator.pop(context);
             },
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(4.0),
-            child: Container(
-              color: AppColors.lightGreen,
-              height: 4.0,
-            ),
           ),
         ),
         body: viewModel.isLoading
@@ -74,7 +70,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Order ID: ${viewModel.selectedOrder!.orderId}',
+                              'Order ID: ${order!.orderId}',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -83,7 +79,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Buyer Name: ${viewModel.selectedOrder!.buyerName}',
+                              'Buyer Name: ${order.buyerName}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
@@ -92,7 +88,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Order Date: ${DateFormat('yyyy-MM-dd').format(viewModel.selectedOrder!.createdAt.toDate())}',
+                              'Order Date: ${DateFormat('yyyy-MM-dd').format(order.createdAt.toDate())}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
@@ -101,8 +97,8 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Price: ₱${viewModel.selectedOrder!.totalPrice}',
-                              style: const TextStyle(
+                              'Price: ₱${order.totalPrice}',
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -123,7 +119,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    viewModel.selectedOrder!.status,
+                                    order.status,
                                     style: const TextStyle(
                                       fontSize: 14.0, // Font size for the text
                                       color: Colors.black, // Text color
@@ -138,7 +134,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: viewModel.selectedOrder!.isPaid
+                                    color: order.isPaid
                                         ? AppColors.palmLeaf
                                         : AppColors.watermelonRed,
                                     border: Border.all(
@@ -148,9 +144,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    viewModel.selectedOrder!.isPaid
-                                        ? 'Paid'
-                                        : 'Not Paid',
+                                    order.isPaid ? 'Paid' : 'Not Paid',
                                     style: const TextStyle(
                                       fontSize: 14.0,
                                       color: Colors
@@ -164,86 +158,107 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          'Items in Order',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.palmLeaf,
-                          ),
+                      // Products List
+                      const Text(
+                        'Products',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 10),
-
+                      // Products List View (no Expanded around it)
                       ListView.builder(
-                        itemCount: viewModel.selectedOrder!.items.length,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: order.items.length,
+                        shrinkWrap:
+                            true, // Important for ListView inside scrollable widget
+                        physics:
+                            NeverScrollableScrollPhysics(), // Disable internal scrolling
                         itemBuilder: (context, index) {
                           return Card(
                             elevation: 2,
-                            child: ListTile(
-                              leading: ClipRRect(
-                                borderRadius: const BorderRadius.horizontal(
-                                    left: Radius.circular(10)),
-                                child: Image.network(
-                                  viewModel.selectedOrder!.products[index]
-                                      .product!.mainImageUrl,
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.horizontal(
+                                      left: Radius.circular(10)),
+                                  child: Image.network(
+                                    order.products[index].product!.mainImageUrl,
+                                    width: 80, // Reduced the size of the image
+                                    height: 80, // Reduced the size of the image
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                              title: Text(
-                                viewModel.selectedOrder!.products[index]
-                                    .product!.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          order.products[index].product!.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                'x ${viewModel.selectedOrder!.items[index].quantity} ${viewModel.selectedOrder!.products[index].quantifier}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.grey),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                                // Spacer for right-alignment
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        'x ${order.items[index].quantity} ${order.products[index].quantifier}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         },
                       ),
                       // Order Details Section
-                      if (viewModel.selectedOrder!.status == 'Ready') ...[
-                        _buildDetailRow('Pickup Code',
-                            viewModel.selectedOrder!.pickupCode!),
-                        if (viewModel.selectedOrder!.pickupTime != null) ...[
+                      if (order.status == 'Ready') ...[
+                        _buildDetailRow('Pickup Code', order.pickupCode!),
+                        if (order.pickupTime != null) ...[
                           _buildDetailRow(
                               'Pickup Time',
-                              DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                  .selectedOrder!.pickupTime!
-                                  .toDate())),
+                              DateFormat('yyyy-MM-dd HH:mm')
+                                  .format(order.pickupTime!.toDate())),
                         ],
-                        if (!viewModel.selectedOrder!.isPaid) ...[
-                          _buildDetailRow('Payment',
-                              viewModel.selectedOrder!.totalPrice.toString()),
+                        if (!order.isPaid) ...[
+                          _buildDetailRow(
+                              'Payment', order.totalPrice.toString()),
                         ],
-                      ] else if (viewModel.selectedOrder!.status ==
-                          'Completed') ...[
+                      ] else if (order.status == 'Completed') ...[
                         _buildDetailRow(
                             'Completed At',
-                            DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                .selectedOrder!.completedAt!
-                                .toDate())),
-                      ] else if (viewModel.selectedOrder!.status ==
-                          'Cancelled') ...[
+                            DateFormat('yyyy-MM-dd HH:mm')
+                                .format(order.completedAt!.toDate())),
+                      ] else if (order.status == 'Cancelled') ...[
                         _buildDetailRow(
                             'Cancelled At',
-                            DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                .selectedOrder!.cancelledAt!
-                                .toDate())),
+                            DateFormat('yyyy-MM-dd HH:mm')
+                                .format(order.cancelledAt!.toDate())),
                       ],
                     ],
                   ),
@@ -260,7 +275,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (viewModel.selectedOrder!.status == 'Pending')
+                if (order!.status == 'Pending')
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -360,7 +375,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       ),
                     ],
                   ),
-                if (viewModel.selectedOrder!.status == 'Processing')
+                if (order.status == 'Processing')
                   ElevatedButton(
                     onPressed: () async {
                       try {
@@ -393,7 +408,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                     ),
                     child: const Text('Mark as Ready'),
                   ),
-                if (viewModel.selectedOrder!.status == 'Ready')
+                if (order.status == 'Ready')
                   ElevatedButton(
                     onPressed: () async {
                       try {

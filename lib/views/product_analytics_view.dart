@@ -1,12 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/views/chart.dart';
-import 'package:intl/intl.dart';
 
 class ProductAnalyticsView extends StatefulWidget {
   @override
-  _ProductAnalyticsViewState createState() => _ProductAnalyticsViewState();
+  State<ProductAnalyticsView> createState() => _ProductAnalyticsViewState();
 }
 
 class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {

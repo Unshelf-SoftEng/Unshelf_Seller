@@ -12,7 +12,7 @@ class AddBundleView extends StatefulWidget {
   AddBundleView({required this.products});
 
   @override
-  _AddBundleViewState createState() => _AddBundleViewState();
+  State<AddBundleView> createState() => _AddBundleViewState();
 }
 
 class _AddBundleViewState extends State<AddBundleView> {

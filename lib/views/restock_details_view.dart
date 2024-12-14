@@ -5,7 +5,7 @@ import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
 
 class RestockDetailsView extends StatefulWidget {
   @override
-  _RestockDetailsViewState createState() => _RestockDetailsViewState();
+  State<RestockDetailsView> createState() => _RestockDetailsViewState();
 }
 
 class _RestockDetailsViewState extends State<RestockDetailsView> {

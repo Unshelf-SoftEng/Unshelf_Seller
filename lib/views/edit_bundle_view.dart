@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
-import 'package:unshelf_seller/views/image_delete_view.dart';
 import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 
 class EditBundleView extends StatefulWidget {
@@ -11,7 +9,7 @@ class EditBundleView extends StatefulWidget {
   EditBundleView({required this.bundleId});
 
   @override
-  _EditBundleViewState createState() => _EditBundleViewState();
+  State<EditBundleView> createState() => _EditBundleViewState();
 }
 
 class _EditBundleViewState extends State<EditBundleView> {

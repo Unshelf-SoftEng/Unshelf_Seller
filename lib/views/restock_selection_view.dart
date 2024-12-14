@@ -5,15 +5,17 @@ import 'restock_details_view.dart';
 
 class RestockSelectionView extends StatefulWidget {
   @override
-  _RestockSelectionViewState createState() => _RestockSelectionViewState();
+  State<RestockSelectionView> createState() => _RestockSelectionViewState();
 }
 
 class _RestockSelectionViewState extends State<RestockSelectionView> {
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<RestockViewModel>(context, listen: false);
-    viewModel.fetchProducts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = Provider.of<RestockViewModel>(context, listen: false);
+      viewModel.fetchProducts();
+    });
   }
 
   @override

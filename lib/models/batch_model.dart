@@ -29,7 +29,7 @@ class BatchModel {
       batchNumber: doc.id,
       productId: data['productId'],
       product: product,
-      price: data['price'] ?? 0.0,
+      price: (data['price'] as num).toDouble(),
       stock: data['stock'] ?? 0,
       quantifier: data['quantifier'] ?? '',
       expiryDate: data['expiryDate'] != null

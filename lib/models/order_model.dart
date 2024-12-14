@@ -50,7 +50,7 @@ class OrderModel {
       items: List<OrderItem>.from(
         data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
-      totalPrice: data['totalPrice'] ?? 0,
+      totalPrice: (data['totalPrice'] as num).toDouble(),
       isPaid: data['isPaid'] ?? false,
       products: [],
     );
@@ -77,7 +77,7 @@ class OrderItem {
       quantity: map['quantity'] as int,
       batchId: map['batchId'] ?? '',
       bundleId: map['bundleId'] ?? '',
-      price: map['price'] as double,
+      price: (map['price'] as num?)?.toDouble(),
       name: map['name'] ?? '',
     );
   }

@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 
 class SelectProductsView extends StatefulWidget {
   @override
-  _SelectProductsViewState createState() => _SelectProductsViewState();
+  State<SelectProductsView> createState() => _SelectProductsViewState();
 }
 
 class _SelectProductsViewState extends State<SelectProductsView> {

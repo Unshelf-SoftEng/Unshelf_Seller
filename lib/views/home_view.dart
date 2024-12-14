@@ -11,7 +11,7 @@ import 'package:unshelf_seller/views/notifications_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
-  _HomeViewState createState() => _HomeViewState();
+  State<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {

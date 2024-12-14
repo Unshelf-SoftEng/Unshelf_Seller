@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
 
-class UserProfileView extends StatelessWidget {
+class EditUserProfileView extends StatelessWidget {
   final UserProfileModel userProfile;
 
-  // Use the named parameter constructor
-  UserProfileView({required this.userProfile});
+  EditUserProfileView({required this.userProfile});
 
   @override
   Widget build(BuildContext context) {

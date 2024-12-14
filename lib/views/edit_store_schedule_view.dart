@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 import 'package:unshelf_seller/viewmodels/store_schedule_viewmodel.dart';
 
-class EditStoreSchedView extends StatelessWidget {
+class EditStoreScheduleView extends StatelessWidget {
   final StoreModel storeDetails;
 
-  EditStoreSchedView({required this.storeDetails});
+  EditStoreScheduleView({required this.storeDetails});
 
   @override
   Widget build(BuildContext context) {

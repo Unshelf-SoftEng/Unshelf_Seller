@@ -12,7 +12,7 @@ class EditStoreLocationView extends StatefulWidget {
   EditStoreLocationView({required this.storeDetails});
 
   @override
-  _EditStoreLocationViewState createState() => _EditStoreLocationViewState();
+  State<EditStoreLocationView> createState() => _EditStoreLocationViewState();
 }
 
 class _EditStoreLocationViewState extends State<EditStoreLocationView> {

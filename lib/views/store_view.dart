@@ -17,7 +17,7 @@ import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreView extends StatefulWidget {
   @override
-  _StoreViewState createState() => _StoreViewState();
+  State<StoreView> createState() => _StoreViewState();
 }
 
 class _StoreViewState extends State<StoreView> {
@@ -151,7 +151,7 @@ class _StoreViewState extends State<StoreView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      UserProfileView(userProfile: viewModel.userProfile!),
+                      EditUserProfileView(userProfile: viewModel.userProfile!),
                 ),
               );
 
@@ -204,8 +204,8 @@ class _StoreViewState extends State<StoreView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      EditStoreSchedView(storeDetails: viewModel.storeDetails!),
+                  builder: (context) => EditStoreScheduleView(
+                      storeDetails: viewModel.storeDetails!),
                 ),
               );
             },

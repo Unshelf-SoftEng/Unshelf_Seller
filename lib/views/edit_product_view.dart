@@ -15,7 +15,7 @@ class EditProductView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _EditProductViewState createState() => _EditProductViewState();
+  State<EditProductView> createState() => _EditProductViewState();
 }
 
 class _EditProductViewState extends State<EditProductView> {

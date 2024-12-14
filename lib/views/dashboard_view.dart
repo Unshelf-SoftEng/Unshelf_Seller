@@ -6,7 +6,7 @@ import 'package:unshelf_seller/views/product_analytics_view.dart';
 
 class DashboardView extends StatefulWidget {
   @override
-  _DashboardViewState createState() => _DashboardViewState();
+  State<DashboardView> createState() => _DashboardViewState();
 }
 
 class _DashboardViewState extends State<DashboardView> {
@@ -24,22 +24,19 @@ class _DashboardViewState extends State<DashboardView> {
     return Scaffold(
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDailyAnalyticsCard(viewModel),
-                const SizedBox(height: 16.0),
-                _buildAnalyticsNavigation(),
-              ],
-            ),
-          );
+          return viewModel.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDailyAnalyticsCard(viewModel),
+                      const SizedBox(height: 16.0),
+                      _buildAnalyticsNavigation(),
+                    ],
+                  ),
+                );
         },
       ),
     );

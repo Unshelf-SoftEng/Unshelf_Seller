@@ -1,14 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/services/bundle_service.dart';
+import 'package:unshelf_seller/services/batch_service.dart';
 
 class BundleViewModel extends ChangeNotifier {
   final TextEditingController bundleNameController = TextEditingController();
@@ -34,6 +32,8 @@ class BundleViewModel extends ChangeNotifier {
   BundleModel? _bundle;
   BundleModel? get bundle => _bundle;
 
+  final BatchService _batchService = BatchService();
+
   String selectedCategory = '';
   List<String> categories = [
     'Grocery',
@@ -41,6 +41,9 @@ class BundleViewModel extends ChangeNotifier {
     'Vegetables',
     'Baked Goods',
   ];
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   void initializeControllers(BundleModel bundle) {
     bundleNameController.text = bundle.name;
@@ -127,12 +130,37 @@ class BundleViewModel extends ChangeNotifier {
   }
 
   Future<void> getBundleDetails(String bundleId) async {
+    _isLoading = true;
+    notifyListeners();
     // Fetch bundle details
     _bundle = await _bundleService.getBundle(bundleId);
-    notifyListeners();
+
+    print('Bundle details fetched successfully');
+    print('Bundle: $_bundle');
+    print('Main image: $_mainImageData');
+    print('Items: ${_bundle!.items}');
+    print('Category: ${_bundle!.category}');
+    print('Description: ${_bundle!.description}');
+    print('Price: ${_bundle!.price}');
+
+    for (var item in _bundle!.items) {
+      final batch = await _batchService.getBatchById(item['batchId']);
+      item['name'] = batch!.product!.name;
+    }
 
     // Load main image
     await loadImageFromUrl(_bundle!.mainImageUrl);
+
+    print('Bundle details fetched successfully');
+    print('Bundle: $_bundle');
+    print('Main image: $_mainImageData');
+    print('Items: ${_bundle!.items}');
+    print('Category: ${_bundle!.category}');
+    print('Description: ${_bundle!.description}');
+    print('Price: ${_bundle!.price}');
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void clearSelection() {

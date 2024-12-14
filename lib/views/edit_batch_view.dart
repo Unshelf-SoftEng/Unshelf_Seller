@@ -9,7 +9,7 @@ class EditBatchView extends StatefulWidget {
   const EditBatchView({required this.batchNumber});
 
   @override
-  _EditBatchViewState createState() => _EditBatchViewState();
+  State<EditBatchView> createState() => _EditBatchViewState();
 }
 
 class _EditBatchViewState extends State<EditBatchView> {
@@ -98,6 +98,12 @@ class _EditBatchViewState extends State<EditBatchView> {
                   ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
+                    style: const ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(const Color(0xFFA7C957)),
+                        foregroundColor:
+                            WidgetStatePropertyAll(const Color(0xFF386641)),
+                        alignment: Alignment.center),
                     onPressed: () async {
                       await viewModel.updateBatch();
                       if (!viewModel.isLoading) {

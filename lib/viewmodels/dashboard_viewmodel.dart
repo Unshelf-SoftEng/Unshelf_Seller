@@ -50,38 +50,39 @@ class DashboardViewModel extends ChangeNotifier {
           .where((doc) => doc['status'] == 'Completed')
           .length;
 
-      // Assuming 'total' field exists in each order document for total price
-      final startOfMonth = DateTime(now.year, now.month);
+      // // Assuming 'total' field exists in each order document for total price
+      // final startOfMonth = DateTime(now.year, now.month);
 
-      QuerySnapshot ordersMonthly = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
-          .where('sellerId', isEqualTo: user?.uid)
-          .get();
+      // QuerySnapshot ordersMonthly = await FirebaseFirestore.instance
+      //     .collection('orders')
+      //     .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
+      //     .where('sellerId', isEqualTo: user?.uid)
+      //     .get();
 
-      totalSales = 0;
+      // totalSales = 0;
 
-      QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
-          .collection('transactions')
-          .where('date', isGreaterThanOrEqualTo: startOfMonth)
-          .where('sellerId', isEqualTo: user?.uid)
-          .get();
+      // QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
+      //     .collection('transactions')
+      //     .where('date', isGreaterThanOrEqualTo: startOfMonth)
+      //     .where('sellerId', isEqualTo: user?.uid)
+      //     .get();
 
-      double totalEarnings = 0.0;
+      // double totalEarnings = 0.0;
 
-      for (var trans in transactionMonthly.docs) {
-        if (trans['type'] == 'Sale') {
-          double amount = trans['sellerEarnings'];
-          totalEarnings += amount;
-        }
-      }
+      // for (var trans in transactionMonthly.docs) {
+      //   if (trans['type'] == 'Sale') {
+      //     double amount = trans['sellerEarnings'];
+      //     totalEarnings += amount;
+      //   }
+      // }
 
-      totalSales = totalEarnings;
-      totalOrders = ordersMonthly.docs.length;
-      _isLoading = false;
-      notifyListeners();
+      // totalSales = totalEarnings;
+      // totalOrders = ordersMonthly.docs.length;
     } catch (e) {
       print('Error fetching dashboard data: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

@@ -93,6 +93,12 @@ class AddBatchView extends StatelessWidget {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
+              style: const ButtonStyle(
+                  backgroundColor:
+                      WidgetStatePropertyAll(const Color(0xFFA7C957)),
+                  foregroundColor:
+                      WidgetStatePropertyAll(const Color(0xFF386641)),
+                  alignment: Alignment.center),
               onPressed: () async {
                 await viewModel.addBatch(productId);
                 if (!viewModel.isLoading) {

@@ -30,20 +30,21 @@ class OrderViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchOrders() async {
+    print('Fetching orders...');
     _isLoading = true;
     notifyListeners();
     _orders = await _orderService.getOrders();
+    print('Orders fetched: ${_orders.length}');
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<OrderModel?> selectOrder(String orderId) async {
+  Future<void> selectOrder(String orderId) async {
     _isLoading = true;
     notifyListeners();
     _selectedOrder = await _orderService.getOrder(orderId);
     _isLoading = false;
     notifyListeners();
-    return _selectedOrder;
   }
 
   void filterOrdersByStatus(String? status) {

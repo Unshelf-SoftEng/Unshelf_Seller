@@ -15,7 +15,7 @@ class ChatView extends StatefulWidget {
   });
 
   @override
-  _ChatViewState createState() => _ChatViewState();
+  State<ChatView> createState() => _ChatViewState();
 }
 
 class _ChatViewState extends State<ChatView>
@@ -128,7 +128,7 @@ class _ChatViewState extends State<ChatView>
 
   Widget _buildMessageInput() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+      padding: const EdgeInsets.all(5.0),
       child: Row(
         children: [
           Expanded(

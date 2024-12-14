@@ -17,7 +17,7 @@ class ImageWithDelete extends StatefulWidget {
   });
 
   @override
-  _ImageWithDeleteState createState() => _ImageWithDeleteState();
+  State<ImageWithDelete> createState() => _ImageWithDeleteState();
 }
 
 class _ImageWithDeleteState extends State<ImageWithDelete> {
@@ -26,7 +26,7 @@ class _ImageWithDeleteState extends State<ImageWithDelete> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onDelete, // Hide delete button when long press ends
+      onTap: widget.onDelete,
       child: MouseRegion(
         onEnter: (_) => _setHovering(true),
         onExit: (_) => _setHovering(false),

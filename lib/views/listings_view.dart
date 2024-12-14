@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
-import 'package:unshelf_seller/views/product_summary_view.dart';
+import 'package:unshelf_seller/views/product_details_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/select_products_view.dart';
 import 'package:unshelf_seller/views/edit_product_view.dart';
 import 'package:unshelf_seller/views/edit_bundle_view.dart';
+import 'package:unshelf_seller/views/bundle_details_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class ListingsView extends StatefulWidget {
   @override
-  _ListingsViewState createState() => _ListingsViewState();
+  State<ListingsView> createState() => _ListingsViewState();
 }
 
 class _ListingsViewState extends State<ListingsView> {
@@ -167,12 +167,21 @@ class _ListingsViewState extends State<ListingsView> {
             Text(itemName, style: const TextStyle(fontWeight: FontWeight.bold)),
         trailing: _buildActionButtons(context, item),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductSummaryView(productId: itemId),
-            ),
-          );
+          if (item is BundleModel) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BundleDetailsView(bundleId: itemId),
+              ),
+            );
+          } else if (item is ProductModel) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductDetailsView(productId: itemId),
+              ),
+            );
+          }
         },
       ),
     );

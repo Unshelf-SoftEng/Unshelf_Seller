@@ -6,7 +6,7 @@ import 'package:unshelf_seller/models/bundle_model.dart';
 class BundleService extends ChangeNotifier {
   Future<BundleModel?> getBundle(String bundleId) async {
     final productDoc = await FirebaseFirestore.instance
-        .collection('products')
+        .collection('bundles')
         .doc(bundleId)
         .get();
 
