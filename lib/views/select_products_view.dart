@@ -14,7 +14,6 @@ class SelectProductsView extends StatefulWidget {
 
 class _SelectProductsViewState extends State<SelectProductsView> {
   final TextEditingController _searchController = TextEditingController();
-  bool _isSearching = false;
 
   @override
   void initState() {
@@ -37,25 +36,11 @@ class _SelectProductsViewState extends State<SelectProductsView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  border: InputBorder.none,
-                ),
-                style: const TextStyle(color: Colors.black),
-                onChanged: (value) {
-                  _onSearchChanged();
-                },
-                textInputAction: TextInputAction.search,
-              )
-            : const Text('Choose Products for Bundle',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Choose Products for Bundle',
+          style: TextStyle(
+              color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: AppColors.palmLeaf,
         foregroundColor: Colors.white,
         titleTextStyle: const TextStyle(
@@ -66,6 +51,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             color: AppColors.deepMossGreen,
           ),
           onPressed: () {
+            viewModel.clearSelection();
             Navigator.pop(context);
           },
         ),
@@ -76,67 +62,67 @@ class _SelectProductsViewState extends State<SelectProductsView> {
             height: 4.0,
           ),
         ),
-        actions: [
-          _isSearching
-              ? IconButton(
-                  icon: const Icon(Icons.cancel),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = false;
-                      _searchController.clear();
-                      Provider.of<SelectProductsViewModel>(context,
-                              listen: false)
-                          .updateSearchQuery('');
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    setState(() {
-                      _isSearching = true;
-                    });
-                  },
-                ),
-        ],
       ),
-      body: Consumer<SelectProductsViewModel>(
-        builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (viewModel.items.isEmpty) {
-            return const Center(
-              child: Text('No products available'),
-            );
-          }
-
-          return Padding(
+      body: Column(
+        children: [
+          // Search bar moved to the body
+          Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ListView.builder(
-              itemCount: viewModel.filteredItems.length,
-              itemBuilder: (context, index) {
-                final product = viewModel.filteredItems[index];
-                return _ProductListTile(
-                  productId: product.batchNumber,
-                  name: product.product!.name,
-                  mainImageUrl: product.product!.mainImageUrl,
-                  price: product.price,
-                  expiryDate: product.expiryDate,
-                  isSelected: viewModel.selectedItems.keys
-                      .contains(product.batchNumber),
-                  onTap: () =>
-                      viewModel.addProductToBundle(product.batchNumber),
-                  onLongPress: () =>
-                      viewModel.removeProductFromBundle(product.batchNumber),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search products...',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (value) {
+                _onSearchChanged();
+              },
+            ),
+          ),
+          // Product List
+          Expanded(
+            child: Consumer<SelectProductsViewModel>(
+              builder: (context, viewModel, child) {
+                if (viewModel.isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (viewModel.items.isEmpty) {
+                  return const Center(
+                    child: Text('No products available'),
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    itemCount: viewModel.filteredItems.length,
+                    itemBuilder: (context, index) {
+                      final product = viewModel.filteredItems[index];
+                      return _ProductListTile(
+                        productId: product.batchNumber,
+                        name: product.product!.name,
+                        mainImageUrl: product.product!.mainImageUrl,
+                        price: product.price,
+                        expiryDate: product.expiryDate,
+                        isSelected: viewModel.selectedItems.keys
+                            .contains(product.batchNumber),
+                        onTap: () =>
+                            viewModel.addProductToBundle(product.batchNumber),
+                        onLongPress: () => viewModel
+                            .removeProductFromBundle(product.batchNumber),
+                      );
+                    },
+                  ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

@@ -6,7 +6,7 @@ import 'package:unshelf_seller/models/store_model.dart';
 class StoreScheduleViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DateFormat _timeFormatter = DateFormat('HH:mm');
-  late Map<String, Map<String, String>> _storeSchedule;
+  late Map<String, Map<String, dynamic>> _storeSchedule;
 
   StoreScheduleViewModel(StoreModel storeDetails) {
     print(storeDetails.storeSchedule);
@@ -19,7 +19,7 @@ class StoreScheduleViewModel extends ChangeNotifier {
     storeDetails.storeSchedule?.forEach((key, value) {
       // Check if 'isOpen' doesn't exist or is null
       if (value['isOpen'] == null) {
-        value['isOpen'] = 'false';
+        value['isOpen'] = false;
       }
 
       if (value['open'] == 'Closed') {
@@ -43,16 +43,24 @@ class StoreScheduleViewModel extends ChangeNotifier {
 
     _storeSchedule = Map.fromEntries(
       orderedDays.map((day) {
+        // Check if the storeSchedule has data for the day, otherwise default
+        var schedule = storeDetails.storeSchedule?[day] ??
+            {'isOpen': false, 'open': '', 'close': ''};
+
+        // Ensure 'isOpen' is a boolean and 'open' and 'close' are strings
         return MapEntry(
           day,
-          storeDetails.storeSchedule![day] ??
-              {'isOpen': 'false', 'open': '', 'close': ''},
+          {
+            'isOpen': schedule['isOpen'],
+            'open': schedule['open'],
+            'close': schedule['close'],
+          },
         );
       }),
     );
   }
 
-  Map<String, Map<String, String>> get storeSchedule => _storeSchedule;
+  Map<String, Map<String, dynamic>> get storeSchedule => _storeSchedule;
 
   Future<void> selectTime(String day, String type, TimeOfDay pickedTime) async {
     final timeString = _timeFormatter.format(
@@ -63,8 +71,8 @@ class StoreScheduleViewModel extends ChangeNotifier {
   }
 
   Future<void> toggleDay(String day) async {
-    _storeSchedule[day]!['isOpen'] =
-        _storeSchedule[day]!['isOpen'] == 'true' ? 'false' : 'true';
+    _storeSchedule[day]!['isOpen'] = !(_storeSchedule[day]!['isOpen']);
+
     notifyListeners();
   }
 
@@ -72,7 +80,7 @@ class StoreScheduleViewModel extends ChangeNotifier {
     // Perform validation
     if (!_validateSchedule()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
             content: Text(
                 'Please set valid opening and closing times for active days.')),
       );
@@ -81,7 +89,7 @@ class StoreScheduleViewModel extends ChangeNotifier {
 
     try {
       await _firestore.collection('stores').doc(userId).update({
-        'store_schedule': _storeSchedule,
+        'storeSchedule': _storeSchedule,
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile saved successfully')),

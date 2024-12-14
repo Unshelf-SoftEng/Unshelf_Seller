@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
-import 'package:unshelf_seller/components/image_delete_view.dart';
+import 'package:unshelf_seller/components/image_delete.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';

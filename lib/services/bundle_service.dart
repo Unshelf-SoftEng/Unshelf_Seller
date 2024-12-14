@@ -40,4 +40,27 @@ class BundleService extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<void> updateBundle(BundleModel bundle) async {
+    try {
+      final bundleData = {
+        'name': bundle.name,
+        'category': bundle.category,
+        'description': bundle.description,
+        'items': bundle.items,
+        'price': bundle.price,
+        'stock': bundle.stock,
+        'discount': bundle.discount,
+        'mainImageUrl': bundle.mainImageUrl,
+      };
+
+      await FirebaseFirestore.instance
+          .collection('bundles')
+          .doc(bundle.id)
+          .update(bundleData);
+    } catch (e) {
+      print('Error updating product in Firestore: $e');
+      rethrow;
+    }
+  }
 }

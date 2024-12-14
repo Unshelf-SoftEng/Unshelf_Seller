@@ -35,14 +35,14 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
           }),
       body: Column(
         children: [
-          // Filter Buttons
           Container(
+            alignment: Alignment.center,
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            color: Colors.grey[200],
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   _buildFilterButton('All', ordersViewModel),
                   _buildFilterButton('Pending', ordersViewModel),
@@ -206,10 +206,10 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
 
   Widget _buildFilterButton(String status, OrderViewModel ordersViewModel) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: TextButton(
         style: TextButton.styleFrom(
-          minimumSize: const Size(60, 35),
+          minimumSize: const Size(50, 30),
           backgroundColor: _selectedStatus == status
               ? AppColors.deepMossGreen
               : Colors.grey[200],
@@ -224,7 +224,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
         },
         child: Text(
           status,
-          style: const TextStyle(fontSize: 8.0),
+          style: const TextStyle(fontSize: 9.0),
         ),
       ),
     );

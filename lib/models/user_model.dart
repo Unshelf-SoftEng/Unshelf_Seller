@@ -22,7 +22,7 @@ class UserProfileModel {
       userId: userDoc.id,
       email: userData['email'] ?? '',
       name: userData['name'] ?? '',
-      phoneNumber: userData['phone_number'] ?? '',
+      phoneNumber: userData['phoneNumber'] ?? '',
       password: userData['password'] ?? '',
     );
   }

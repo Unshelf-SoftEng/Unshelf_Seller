@@ -29,25 +29,26 @@ class BundleModel extends ItemModel {
   factory BundleModel.fromSnapshot(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return BundleModel(
-        id: doc.id,
-        name: data['name'] ?? '',
-        description: data['description'] ?? '',
-        price: (data['price'] ?? 0.0).toDouble(),
-        stock: data['stock'] ?? 0,
-        discount: data['discount'] ?? 0,
-        items: (data['items'] as List<dynamic>?)
-                ?.map((item) => {
-                      'batchId': item['batchId'] as String,
-                      'quantity': (item['quantity'] as num).toInt(),
-                      'quantifier': item['quantifier'] as String,
-                    })
-                .toList() ??
-            [],
-        mainImageUrl: data['mainImageUrl'] ?? '',
-        additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList(),
-        category: '');
+      id: doc.id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      price: (data['price'] ?? 0.0).toDouble(),
+      stock: data['stock'] ?? 0,
+      discount: data['discount'] ?? 0,
+      items: (data['items'] as List<dynamic>?)
+              ?.map((item) => {
+                    'batchId': item['batchId'] as String,
+                    'quantity': (item['quantity'] as num).toInt(),
+                    'quantifier': item['quantifier'] as String,
+                  })
+              .toList() ??
+          [],
+      mainImageUrl: data['mainImageUrl'] ?? '',
+      additionalImageUrls: (data['additionalImageUrls'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      category: data['category'] ?? '',
+    );
   }
 
   // factory BundleModel.fromJson(Map<String, dynamic> json) {

@@ -30,8 +30,7 @@ class EditStoreScheduleView extends StatelessWidget {
                   Expanded(
                     child: ListView(
                       children: viewModel.storeSchedule.keys.map((day) {
-                        bool isActive =
-                            viewModel.storeSchedule[day]!['isOpen'] == 'true';
+                        bool isActive = viewModel.storeSchedule[day]!['isOpen'];
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Padding(

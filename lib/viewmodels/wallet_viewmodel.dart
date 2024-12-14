@@ -127,23 +127,19 @@ class WalletViewModel extends ChangeNotifier {
 
     // Fetch withdrawal transactions and update balance
     final withdrawalSnapshot = await FirebaseFirestore.instance
-        .collection('transactions') // Your transactions collection
-        .where('sellerId', isEqualTo: user.uid) // Use the actual field name
-        .where('type',
-            isEqualTo: 'withdraw') // Only fetch withdrawal transactions
+        .collection('transactions')
+        .where('sellerId', isEqualTo: user.uid)
+        .where('type', isEqualTo: 'withdraw')
         .get();
 
     for (var doc in withdrawalSnapshot.docs) {
-      double withdrawalAmount =
-          doc['amount'].toDouble(); // Ensure it is a double
-      newBalance -= withdrawalAmount; // Decrease balance with withdrawal amount
+      double withdrawalAmount = doc['amount'].toDouble();
+      newBalance -= withdrawalAmount;
 
-      // Add the withdrawal transaction to the list
       _transactions.add(Transaction(
         type: 'withdraw',
         amount: withdrawalAmount,
-        date: (doc['date'] as Timestamp)
-            .toDate(), // Assuming you also have date for withdrawals
+        date: (doc['date'] as Timestamp).toDate(),
       ));
     }
 

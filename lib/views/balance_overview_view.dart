@@ -110,7 +110,7 @@ class BalanceOverviewView extends StatelessWidget {
           },
           backgroundColor: AppColors.palmLeaf,
           child: Image.asset(
-            'assets/icons/withdraw_icon.png',
+            'assets/icons/withdraw.png',
             width: 24,
             height: 24,
           ),

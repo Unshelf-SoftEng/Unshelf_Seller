@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
-import 'package:unshelf_seller/components/image_delete_view.dart';
+import 'package:unshelf_seller/components/image_delete.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
@@ -26,7 +26,7 @@ class _AddBundleViewState extends State<AddBundleView> {
 
     widget.products.forEach((productId, product) {
       productDetails[productId] = {
-        'quantity': 1, // Default quantity
+        'quantity': 1,
         'quantifier': product.quantifier,
       };
     });
@@ -38,6 +38,8 @@ class _AddBundleViewState extends State<AddBundleView> {
       appBar: CustomAppBar(
           title: 'Enter Bundle Details',
           onBackPressed: () {
+            Provider.of<BundleViewModel>(context, listen: false)
+                .clearSelection();
             Navigator.pop(context);
           }),
       body: Consumer<BundleViewModel>(
@@ -81,7 +83,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     const SizedBox(height: 20.0),
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: const Text(
+                      child: Text(
                         'Name',
                         style: TextStyle(
                           fontSize: 14,
@@ -323,7 +325,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                       ],
                       style: const TextStyle(fontSize: 12),
                     ),
-                    const SizedBox(height: 15.0),
+                    const SizedBox(height: 20.0),
                     const Text(
                       'Enter the quantity of each product in the bundle',
                       style: TextStyle(
@@ -340,9 +342,47 @@ class _AddBundleViewState extends State<AddBundleView> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(
-                                product.product!.name,
-                                style: const TextStyle(fontSize: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Product Name
+                                  Text(
+                                    product.product!.name,
+                                    style: const TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(
+                                      height:
+                                          4.0), // Space between name and batch number
+                                  // Batch Number
+                                  Text(
+                                    'Batch: ${product.batchNumber}', // Show the batch number here
+                                    style: const TextStyle(
+                                        fontSize: 12.0, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 120,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Expiry Date
+                                  Text(
+                                    'Expiry Date:',
+                                    style: const TextStyle(
+                                        fontSize: 12.0, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    '${product.expiryDate.day.toString().padLeft(2, '0')}/${product.expiryDate.month.toString().padLeft(2, '0')}/${product.expiryDate.year}',
+                                    style: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(
@@ -414,56 +454,6 @@ class _AddBundleViewState extends State<AddBundleView> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _ProductListTile extends StatelessWidget {
-  final String mainImageUrl;
-  final String productId;
-  final String name;
-  final double price;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-
-  _ProductListTile({
-    required this.mainImageUrl,
-    required this.productId,
-    required this.name,
-    required this.price,
-    required this.isSelected,
-    required this.onTap,
-    required this.onLongPress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(
-          vertical: 4.0, horizontal: 8.0), // Add margin to each tile
-      elevation: 2.0,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(8.0),
-        leading: Image.network(
-          mainImageUrl,
-          width: 50.0,
-          height: 50.0,
-          fit: BoxFit.cover,
-        ),
-        title: Text(
-          name,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.green : Colors.black,
-          ),
-        ),
-        subtitle: Text('Price: $price'),
-        tileColor:
-            isSelected ? Colors.green.withOpacity(0.1) : Colors.transparent,
-        onTap: onTap,
-        onLongPress: onLongPress,
       ),
     );
   }

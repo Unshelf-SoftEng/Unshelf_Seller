@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:unshelf_seller/main.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/services/bundle_service.dart';
@@ -135,14 +136,6 @@ class BundleViewModel extends ChangeNotifier {
     // Fetch bundle details
     _bundle = await _bundleService.getBundle(bundleId);
 
-    print('Bundle details fetched successfully');
-    print('Bundle: $_bundle');
-    print('Main image: $_mainImageData');
-    print('Items: ${_bundle!.items}');
-    print('Category: ${_bundle!.category}');
-    print('Description: ${_bundle!.description}');
-    print('Price: ${_bundle!.price}');
-
     for (var item in _bundle!.items) {
       final batch = await _batchService.getBatchById(item['batchId']);
       item['name'] = batch!.product!.name;
@@ -150,17 +143,66 @@ class BundleViewModel extends ChangeNotifier {
 
     // Load main image
     await loadImageFromUrl(_bundle!.mainImageUrl);
+    _isLoading = false;
+    notifyListeners();
+  }
 
-    print('Bundle details fetched successfully');
-    print('Bundle: $_bundle');
-    print('Main image: $_mainImageData');
-    print('Items: ${_bundle!.items}');
-    print('Category: ${_bundle!.category}');
-    print('Description: ${_bundle!.description}');
-    print('Price: ${_bundle!.price}');
+  Future<void> initializeBundle(String bundleId) async {
+    _isLoading = true;
+    notifyListeners();
+    if (bundleId.isNotEmpty) {
+      await getBundleDetails(bundleId);
+    }
+
+    bundleNameController.text = _bundle!.name;
+    bundleDescriptionController.text = _bundle!.description;
+    bundlePriceController.text = _bundle!.price.toString();
+    bundleStockController.text = _bundle!.stock.toString();
+    bundleDiscountController.text = _bundle!.discount.toString();
+    selectedCategory = _bundle!.category;
+
+    print('category: $selectedCategory');
+
+    print('Bundle initialized successfully');
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> updateBundle() async {
+    try {
+      final bundleName = bundleNameController.text;
+      final bundlePrice = double.tryParse(bundlePriceController.text) ?? 0.0;
+      final bundleStock = int.tryParse(bundleStockController.text) ?? 0;
+      final bundleDiscount = int.tryParse(bundleDiscountController.text) ?? 0;
+      final bundleDescription = bundleDescriptionController.text;
+
+      final mainImageRef = FirebaseStorage.instance
+          .ref()
+          .child('bundle_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      await mainImageRef.putData(_mainImageData!);
+
+      final mainImageUrl = await mainImageRef.getDownloadURL();
+
+      BundleModel updatedBundle = BundleModel(
+        id: _bundle!.id,
+        name: bundleName,
+        mainImageUrl: mainImageUrl,
+        description: bundleDescription,
+        category: selectedCategory,
+        items: _bundle!.items,
+        price: bundlePrice,
+        stock: bundleStock,
+        discount: bundleDiscount,
+      );
+
+      _bundleService.updateBundle(updatedBundle);
+      print('Bundle updated successfully');
+      notifyListeners();
+    } catch (e) {
+      print('Failed to update bundle: $e');
+    }
   }
 
   void clearSelection() {
@@ -168,6 +210,7 @@ class BundleViewModel extends ChangeNotifier {
     bundlePriceController.clear();
     bundleStockController.clear();
     bundleDiscountController.clear();
+    bundleDescriptionController.clear();
     _mainImageData = null;
     selectedCategory = '';
     notifyListeners();

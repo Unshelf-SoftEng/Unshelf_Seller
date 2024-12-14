@@ -10,7 +10,7 @@ class StoreModel {
   double? storeLatitude;
   String? storeAddress;
   String? storePhoneNumber;
-  final Map<String, Map<String, String>>? storeSchedule;
+  final Map<String, Map<String, Object>>? storeSchedule;
   final String? storeImageUrl; // Nullable
   double? storeRating;
   int? storeFollowers;
@@ -51,18 +51,27 @@ class StoreModel {
       phoneNumber: userData['phoneNumber'] ?? '',
       storeName: storeData['storeName'] ?? '',
       storeSchedule: (storeData['storeSchedule'] as Map<String, dynamic>?)?.map(
-        (key, value) => MapEntry(
-          key,
-          (value as Map<String, dynamic>).map(
-            (k, v) => MapEntry(k, v as String),
-          ),
-        ),
+        (key, value) {
+          // Handle the nested map and include the isOpen boolean
+          var updatedValue = (value as Map<String, dynamic>).map(
+            (k, v) {
+              if (k == 'isOpen') {
+                // Cast isOpen value as boolean
+                return MapEntry(k, v as bool);
+              }
+              // Otherwise, keep the existing string value
+              return MapEntry(k, v as String);
+            },
+          );
+
+          return MapEntry(key, updatedValue);
+        },
       ),
       storeLongitude: storeData['longitude'] ?? 0.0,
       storeLatitude: storeData['latitude'] ?? 0.0,
       storeImageUrl: storeData['storeImageUrl'] ?? '',
-      storeRating: storeData['storeRating'] ?? 0.0,
-      storeFollowers: storeData['storeFollowers'] ?? 0,
+      storeRating: storeData['rating'] ?? 0.0,
+      storeFollowers: storeData['followerCount'] ?? 0,
     );
   }
 }

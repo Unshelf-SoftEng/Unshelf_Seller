@@ -82,6 +82,7 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                   // Name and Description
                   _buildDetailCard('Name', bundle.name),
                   _buildDetailCard('Description', bundle.description),
+                  _buildDetailCard('Category', bundle.category),
                   _buildDetailCard('Price', '₱${bundle.price.toString()}'),
                   _buildDetailCard('Stock', bundle.stock.toString()),
                   _buildDetailCard('Discount', '${bundle.discount}%'),

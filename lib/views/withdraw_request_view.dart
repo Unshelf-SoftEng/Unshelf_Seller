@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 
 class WithdrawRequestView extends StatefulWidget {
@@ -19,7 +19,6 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
   String _errorMessage = '';
   String? _selectedBank;
 
-  // Example list of PH banks for the dropdown
   final List<String> _phBanks = [
     'BDO',
     'BPI',
@@ -33,22 +32,11 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Withdraw Request'),
-        backgroundColor: AppColors.palmLeaf,
-        foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(
-            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.deepMossGreen,
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Withdraw Request',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-      ),
+          }),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
