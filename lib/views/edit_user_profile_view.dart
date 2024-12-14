@@ -4,6 +4,7 @@ import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class EditUserProfileView extends StatelessWidget {
   final UserProfileModel userProfile;
@@ -31,9 +32,20 @@ class EditUserProfileView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 10),
                       TextFormField(
                         controller: viewModel.nameController,
-                        decoration: const InputDecoration(labelText: 'Name'),
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your name';
@@ -41,9 +53,20 @@ class EditUserProfileView extends StatelessWidget {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
                         controller: viewModel.emailController,
-                        decoration: const InputDecoration(labelText: 'Email'),
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -53,10 +76,20 @@ class EditUserProfileView extends StatelessWidget {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
                         controller: viewModel.phoneController,
-                        decoration:
-                            const InputDecoration(labelText: 'Phone Number'),
+                        decoration: const InputDecoration(
+                          labelText: 'Phone Number',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                        ),
                         keyboardType: TextInputType.phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -67,11 +100,21 @@ class EditUserProfileView extends StatelessWidget {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
                         controller: viewModel.passwordController,
                         obscureText: true,
-                        decoration:
-                            const InputDecoration(labelText: 'Password'),
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -81,22 +124,29 @@ class EditUserProfileView extends StatelessWidget {
                           return null;
                         },
                       ),
+                      const SizedBox(height: 15),
                       TextFormField(
                         controller: viewModel.confirmPasswordController,
                         obscureText: true,
                         decoration: const InputDecoration(
-                            labelText: 'Confirm Password'),
+                          labelText: 'Confirm Password',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.middleGreenYellow),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please confirm your password';
-                          } else if (value !=
-                              viewModel.passwordController.text) {
-                            return 'Passwords do not match';
+                            return 'Please enter your password';
                           }
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Align(
                         alignment: Alignment.center,
                         child: CustomButton(

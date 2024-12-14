@@ -272,14 +272,36 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                 icon:
                                     const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () {
-                                  // Implement delete functionality
                                   showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
-                                      title: const Text('Delete Batch'),
+                                      title: const Text(
+                                        'Delete Batch',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87, // Title color
+                                        ),
+                                      ),
                                       content: const Text(
-                                          'Are you sure you want to delete this batch?'),
+                                        'Are you sure you want to delete this batch?',
+                                        style: TextStyle(
+                                            color: Colors
+                                                .black54), // Content color
+                                      ),
                                       actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: const Text(
+                                            'No',
+                                            style: TextStyle(
+                                              color: AppColors
+                                                  .palmLeaf, // Custom color for 'No'
+                                            ),
+                                          ),
+                                        ),
                                         TextButton(
                                           onPressed: () {
                                             viewModel
@@ -287,16 +309,21 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                             Navigator.of(context)
                                                 .pop(); // Close the dialog
                                           },
-                                          child: const Text('Yes'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                          },
-                                          child: const Text('No'),
+                                          child: const Text(
+                                            'Yes',
+                                            style: TextStyle(
+                                              color: AppColors
+                                                  .watermelonRed, // Custom color for 'Yes'
+                                            ),
+                                          ),
                                         ),
                                       ],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            12.0), // Rounded corners for the dialog
+                                      ),
+                                      backgroundColor: Colors
+                                          .white, // Background color of the dialog
                                     ),
                                   );
                                 },

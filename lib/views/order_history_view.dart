@@ -158,12 +158,24 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text(
-                                        '₱ ${order.totalPrice.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green[800],
+                                      RichText(
+                                        text: TextSpan(
+                                          style: const TextStyle(
+                                            fontSize: 18.0,
+                                            color: AppColors.palmLeaf,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          children: [
+                                            const TextSpan(
+                                              text: '\u20B1 ', // Peso symbol
+                                              style: TextStyle(
+                                                fontFamily: 'Roboto',
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: '${order.totalPrice}',
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       const SizedBox(height: 8.0),

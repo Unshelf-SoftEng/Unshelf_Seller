@@ -4,7 +4,7 @@ import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 import 'package:unshelf_seller/views/withdraw_request_view.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class BalanceOverviewView extends StatelessWidget {
   const BalanceOverviewView({super.key});
@@ -24,31 +24,50 @@ class BalanceOverviewView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Balance',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Center(
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
                 child: Text(
-                  '${walletViewModel.balance.toStringAsFixed(2)} Php',
-                  style: const TextStyle(
-                    fontSize: 32,
+                  'Current Balance',
+                  style: TextStyle(
+                    fontSize: 24.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF6A994E),
+                    color: AppColors.palmLeaf,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Transaction History',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 20),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 40.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      const TextSpan(
+                        text: '\u20B1 ', // Peso symbol
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                      TextSpan(
+                        text: walletViewModel.balance.toStringAsFixed(2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: Text(
+                  'Transaction History',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.palmLeaf,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -72,20 +91,45 @@ class BalanceOverviewView extends StatelessWidget {
                               ? AppColors.watermelonRed
                               : AppColors.palmLeaf,
                         ),
-                        title: Text(
-                          '${transaction.type} ${transaction.amount.toStringAsFixed(2)} Php',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: isWithdrawal
-                                ? AppColors.watermelonRed
-                                : AppColors.palmLeaf,
-                          ),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              transaction.type,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: isWithdrawal
+                                    ? AppColors.watermelonRed
+                                    : AppColors.palmLeaf,
+                              ),
+                            ),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: isWithdrawal
+                                      ? AppColors.watermelonRed
+                                      : AppColors.palmLeaf,
+                                ),
+                                children: [
+                                  const TextSpan(
+                                    text: '\u20B1 ', // Peso symbol
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: transaction.amount.toStringAsFixed(2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         subtitle: Text(
-                          transaction.date
-                              .toLocal()
-                              .toString()
-                              .substring(0, 16),
+                          DateFormat('MM-dd-yyyy')
+                              .format(transaction.date.toLocal()),
                           style: const TextStyle(color: Colors.grey),
                         ),
                         tileColor:

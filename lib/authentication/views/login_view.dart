@@ -229,18 +229,25 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  style: const ButtonStyle(
-                    backgroundColor:
-                        WidgetStatePropertyAll(AppColors.middleGreenYellow),
-                    foregroundColor:
-                        WidgetStatePropertyAll(AppColors.deepMossGreen),
-                    alignment: Alignment.center,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
                   ),
-                  onPressed: _login,
-                  child: const Text('Log In'),
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(200, 45),
+                        backgroundColor:
+                            AppColors.middleGreenYellow, // backgroundColor
+                        foregroundColor: Colors.black, // foregroundColor
+                        alignment: Alignment.center,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: _login,
+                      child: const Text('Log In')),
                 ),
-                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -252,21 +259,26 @@ class _LoginViewState extends State<LoginView> {
                     Expanded(child: Divider(color: Colors.grey[400])),
                   ],
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: _loginWithGoogle,
-                  label: const Text('Log in with Google'),
-                  icon: Image.asset('assets/images/google_logo.png',
-                      width: 24, height: 24, fit: BoxFit.contain),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: AppColors.middleGreenYellow,
-                    foregroundColor: AppColors.deepMossGreen,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
                   ),
+                  child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(200, 45),
+                        backgroundColor:
+                            AppColors.middleGreenYellow, // backgroundColor
+                        foregroundColor: Colors.black, // foregroundColor
+                        alignment: Alignment.center,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: Image.asset('assets/images/google_logo.png',
+                          width: 24, height: 24, fit: BoxFit.contain),
+                      onPressed: _loginWithGoogle,
+                      label: const Text('Log in with Google')),
                 ),
                 const SizedBox(height: 20),
                 Row(

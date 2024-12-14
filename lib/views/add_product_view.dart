@@ -150,24 +150,10 @@ class AddProductView extends StatelessWidget {
                                   )
                                 else
                                   Center(
-                                    child: ElevatedButton(
+                                    child: CustomButton(
+                                      text: 'Add Additional Image',
                                       onPressed: () =>
                                           viewModel.pickImage(false),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFFA7C957),
-                                        foregroundColor:
-                                            const Color(0xFF386641),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Add Additional Image',
-                                        style:
-                                            TextStyle(color: Color(0xFF386641)),
-                                      ),
                                     ),
                                   ),
                               ],
@@ -294,24 +280,19 @@ class AddProductView extends StatelessWidget {
                         alignment: Alignment.center,
                         child: viewModel.isLoading
                             ? const CircularProgressIndicator()
-                            : SizedBox(
-                                width: 200,
-                                height: 30,
-                                child: CustomButton(
-                                    text: 'Add Product',
-                                    onPressed: () async {
-                                      await viewModel.addProduct(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Product added successfully!'),
-                                        ),
-                                      );
-                                      onProductAdded();
-                                      Navigator.pop(context, true);
-                                    }),
-                              ),
+                            : CustomButton(
+                                text: 'Add Product',
+                                onPressed: () async {
+                                  await viewModel.addProduct(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Product added successfully!'),
+                                    ),
+                                  );
+                                  onProductAdded();
+                                  Navigator.pop(context, true);
+                                }),
                       ),
                     ],
                   ),

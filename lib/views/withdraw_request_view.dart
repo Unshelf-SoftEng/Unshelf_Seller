@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
+import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/components/custom_button.dart';
 
 class WithdrawRequestView extends StatefulWidget {
   final WalletViewModel walletViewModel;
@@ -43,7 +45,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
           child: Column(
             children: [
               Text(
-                'Your Balance: ₱ ${widget.walletViewModel.balance.toStringAsFixed(2)}',
+                'Current Balance: ₱ ${widget.walletViewModel.balance.toStringAsFixed(2)}',
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -53,7 +55,12 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 controller: _fullNameController,
                 decoration: InputDecoration(
                   labelText: 'Full Name',
-                  border: const OutlineInputBorder(),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
                   errorText:
                       _errorMessage.isNotEmpty && _errorMessage.contains('name')
                           ? _errorMessage
@@ -65,7 +72,12 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Select Bank',
-                  border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
                 ),
                 value: _selectedBank,
                 items: _phBanks
@@ -86,7 +98,12 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 controller: _bankAccountController,
                 decoration: InputDecoration(
                   labelText: 'Bank Account Number',
-                  border: const OutlineInputBorder(),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
                   errorText: _errorMessage.isNotEmpty &&
                           _errorMessage.contains('account')
                       ? _errorMessage
@@ -100,7 +117,12 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 controller: _amountController,
                 decoration: InputDecoration(
                   labelText: 'Withdrawal Amount',
-                  border: const OutlineInputBorder(),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                  ),
                   errorText: _errorMessage.isNotEmpty &&
                           _errorMessage.contains('amount')
                       ? _errorMessage
@@ -110,7 +132,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
               ),
               const SizedBox(height: 16),
               // Submit Button
-              ElevatedButton(
+              CustomButton(
                 onPressed: () {
                   final double? amount =
                       double.tryParse(_amountController.text);
@@ -143,10 +165,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                     }
                   });
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6A994E),
-                ),
-                child: const Text('Submit Request'),
+                text: 'Submit Request',
               ),
             ],
           ),

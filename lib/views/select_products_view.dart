@@ -149,7 +149,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
           });
         },
         backgroundColor: AppColors.middleGreenYellow,
-        child: const Icon(Icons.arrow_forward, color: AppColors.deepMossGreen),
+        child: const Icon(Icons.arrow_forward, color: Colors.black),
       ),
     );
   }

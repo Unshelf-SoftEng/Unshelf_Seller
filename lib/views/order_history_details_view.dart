@@ -19,8 +19,10 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<OrderViewModel>(context, listen: false);
-    viewModel.selectOrder(widget.orderId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = context.read<OrderViewModel>();
+      viewModel.selectOrder(widget.orderId);
+    });
   }
 
   @override
@@ -44,115 +46,57 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Order Overview Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.grey.shade300), // Border color
-                          borderRadius:
-                              BorderRadius.circular(8), // Rounded corners
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Order ID: ${order!.orderId}',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Buyer Name: ${order.buyerName}',
+                      // Order Overview Card (First Half with Details)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10.0),
+                            child: Text(
+                              'Order Information',
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Order Date: ${DateFormat('yyyy-MM-dd').format(order.createdAt.toDate())}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Price: ₱${order.totalPrice}',
-                              style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.palmLeaf,
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                // Box for Order Status
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.palmLeaf,
-                                    border: Border.all(
-                                      color: Colors.black, // Border color
-                                      width: 1.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    order.status,
-                                    style: const TextStyle(
-                                      fontSize: 14.0, // Font size for the text
-                                      color: Colors.black, // Text color
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: 10), // Space between the boxes
-
-                                // Box for Paid or Not Paid
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: order.isPaid
-                                        ? AppColors.palmLeaf
-                                        : AppColors.watermelonRed,
-                                    border: Border.all(
-                                      color: Colors.black, // Border color
-                                      width: 1.0, // Border width
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    order.isPaid ? 'Paid' : 'Not Paid',
-                                    style: const TextStyle(
-                                      fontSize: 14.0,
-                                      color: Colors
-                                          .white, // White text for clarity
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                          _buildDetailCard('Order ID', order!.orderId),
+                          _buildDetailCard('Buyer Name', order.buyerName),
+                          _buildDetailCard(
+                            'Order Date',
+                            DateFormat('MM-dd-yyyy HH:mm')
+                                .format(order.createdAt.toDate()),
+                          ),
+                          _buildDetailCard('Price', '${order.totalPrice}'),
+                          _buildDetailCard('Status', order.status),
+                          _buildDetailCard(
+                              'Paid', order.isPaid ? 'Paid' : 'Not Paid'),
+                          _buildDetailCard(
+                            'Pickup Time',
+                            DateFormat('MM-dd-yyyy HH:mm').format(
+                                order.pickupTime?.toDate() ?? DateTime.now()),
+                          ),
+                          _buildDetailCard(
+                              'Pickup Code', order.pickupCode ?? 'N/A'),
+                          _buildDetailCard(
+                            'Completed At',
+                            DateFormat('MM-dd-yyy HH:mm').format(
+                                order.completedAt?.toDate() ?? DateTime.now()),
+                          ),
+                        ],
                       ),
+
                       const SizedBox(height: 20),
-                      // Products List
-                      const Text(
-                        'Products',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        child: Text(
+                          'Order Items',
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.palmLeaf,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -224,7 +168,6 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                           );
                         },
                       ),
-                      // Order Details Section
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -234,30 +177,61 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
     });
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
+  Widget _buildDetailCard(String title, String value) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
               ),
             ),
-          ),
-        ],
+            if (title != 'Price')
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                flex: 2,
+                child: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      const TextSpan(
+                        text: '\u20B1 ', // Peso symbol
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                      TextSpan(
+                        text: value,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

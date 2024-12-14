@@ -26,8 +26,11 @@ class _EditProductViewState extends State<EditProductView> {
   @override
   void initState() {
     super.initState();
-    viewModel = context.read<ProductViewModel>();
-    viewModel.loadProduct(widget.product); // Load product once
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel = context.read<ProductViewModel>();
+      viewModel.loadProduct(
+          widget.product); // Load product once after the build phase
+    });
   }
 
   @override
@@ -194,19 +197,9 @@ class _EditProductViewState extends State<EditProductView> {
                                 )
                               else
                                 Center(
-                                  child: ElevatedButton(
+                                  child: CustomButton(
+                                    text: 'Add Addtional Image',
                                     onPressed: () => viewModel.pickImage(false),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF386641),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Add Additional Image',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
                                   ),
                                 ),
                             ],
@@ -327,32 +320,28 @@ class _EditProductViewState extends State<EditProductView> {
                       },
                       style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.center,
                       child: viewModel.isLoading
                           ? const CircularProgressIndicator()
-                          : SizedBox(
-                              width: 200,
-                              height: 30,
-                              child: CustomButton(
-                                text: 'Update Product',
-                                onPressed: () async {
-                                  await viewModel.updateProduct(context);
+                          : CustomButton(
+                              text: 'Update Product',
+                              onPressed: () async {
+                                await viewModel.updateProduct(context);
 
-                                  if (await viewModel.updateProduct(context)) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Product edited successfully!'),
-                                      ),
-                                    );
-                                    viewModel.clearData();
-                                    widget.onProductAdded();
-                                    Navigator.pop(context, true);
-                                  }
-                                },
-                              ),
+                                if (await viewModel.updateProduct(context)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Product edited successfully!'),
+                                    ),
+                                  );
+                                  viewModel.clearData();
+                                  widget.onProductAdded();
+                                  Navigator.pop(context, true);
+                                }
+                              },
                             ),
                     ),
                   ],

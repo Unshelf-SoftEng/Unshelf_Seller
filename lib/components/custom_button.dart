@@ -13,21 +13,45 @@ class CustomButton extends StatelessWidget {
     this.alignment = Alignment.center,
   });
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return ElevatedButton(
+  //     style: ButtonStyle(
+  //       backgroundColor: const WidgetStatePropertyAll(
+  //         AppColors.middleGreenYellow,
+  //       ),
+  //       foregroundColor: const WidgetStatePropertyAll(
+  //         AppColors.deepMossGreen,
+  //       ),
+  //       alignment: alignment,
+  //     ),
+  //     onPressed: onPressed,
+  //     child: Text(
+  //       text,
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ButtonStyle(
-        backgroundColor: const WidgetStatePropertyAll(
-          AppColors.middleGreenYellow,
-        ),
-        foregroundColor: const WidgetStatePropertyAll(
-          AppColors.deepMossGreen,
-        ),
-        alignment: alignment,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 12,
       ),
-      onPressed: onPressed,
-      child: Text(
-        text,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.middleGreenYellow, // backgroundColor
+          foregroundColor: Colors.black, // foregroundColor
+          alignment: alignment, // alignment
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+        ),
       ),
     );
   }

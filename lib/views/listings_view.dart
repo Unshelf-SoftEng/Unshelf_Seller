@@ -316,7 +316,7 @@ class _ListingsViewState extends State<ListingsView> {
           },
           tooltip: 'Add Item',
           backgroundColor: AppColors.middleGreenYellow,
-          child: const Icon(Icons.add, color: AppColors.deepMossGreen),
+          child: const Icon(Icons.add, color: Colors.black),
         );
       },
     );

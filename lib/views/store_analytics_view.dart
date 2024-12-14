@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/components/chart.dart';
-import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreAnalyticsView extends StatefulWidget {
   const StoreAnalyticsView({super.key});
