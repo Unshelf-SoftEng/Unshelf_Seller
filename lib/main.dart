@@ -15,7 +15,7 @@ import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/store_location_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
-import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
@@ -41,13 +41,11 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => DashboardViewModel()),
         ChangeNotifierProvider(create: (_) => OrderViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => ProductViewModel(productId: null),
-        ),
+        ChangeNotifierProvider(create: (_) => ProductViewModel()),
         ChangeNotifierProvider(create: (_) => StoreViewModel()),
         ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
         ChangeNotifierProvider(create: (_) => RestockViewModel()),
-        ChangeNotifierProvider(create: (_) => AddBundleViewModel()),
+        ChangeNotifierProvider(create: (_) => BundleViewModel()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(
             create: (_) => UserProfileViewModel(userProfile: null)),

@@ -7,8 +7,8 @@ import 'package:unshelf_seller/viewmodels/listing_viewmodel.dart';
 import 'package:unshelf_seller/views/product_summary_view.dart';
 import 'package:unshelf_seller/views/add_product_view.dart';
 import 'package:unshelf_seller/views/select_products_view.dart';
-import 'package:unshelf_seller/views/update_product_view.dart';
-import 'package:unshelf_seller/views/update_bundle_view.dart';
+import 'package:unshelf_seller/views/edit_product_view.dart';
+import 'package:unshelf_seller/views/edit_bundle_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class ListingsView extends StatefulWidget {
@@ -157,13 +157,11 @@ class _ListingsViewState extends State<ListingsView> {
       elevation: 4.0,
       child: ListTile(
         contentPadding: const EdgeInsets.all(8.0),
-        leading: CachedNetworkImage(
-          imageUrl: item.mainImageUrl,
+        leading: Image.network(
+          item.mainImageUrl,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
-          errorWidget: (context, _, __) =>
-              const Icon(Icons.error, size: 60, color: AppColors.watermelonRed),
         ),
         title:
             Text(itemName, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -193,8 +191,8 @@ class _ListingsViewState extends State<ListingsView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UpdateProductView(
-                    productId: itemId,
+                  builder: (context) => EditProductView(
+                    product: item,
                     onProductAdded: () {
                       Provider.of<ListingViewModel>(context, listen: false)
                           .fetchItems();
@@ -206,7 +204,7 @@ class _ListingsViewState extends State<ListingsView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UpdateBundleView(bundleId: itemId),
+                  builder: (context) => EditBundleView(bundleId: itemId),
                 ),
               );
             }

@@ -10,7 +10,7 @@ import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/services/bundle_service.dart';
 
-class AddBundleViewModel extends ChangeNotifier {
+class BundleViewModel extends ChangeNotifier {
   final TextEditingController bundleNameController = TextEditingController();
   final TextEditingController bundlePriceController = TextEditingController();
   final TextEditingController bundleStockController = TextEditingController();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:unshelf_seller/viewmodels/add_bundle_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/views/image_delete_view.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
@@ -58,7 +58,7 @@ class _AddBundleViewState extends State<AddBundleView> {
           ),
         ),
       ),
-      body: Consumer<AddBundleViewModel>(
+      body: Consumer<BundleViewModel>(
         builder: (context, viewModel, child) {
           return Padding(
             padding: const EdgeInsets.all(16.0),

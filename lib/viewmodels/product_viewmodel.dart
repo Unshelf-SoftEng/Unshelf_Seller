@@ -4,213 +4,124 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/services/product_service.dart';
+import 'package:http/http.dart' as http;
 
 class ProductViewModel extends ChangeNotifier {
-  final TextEditingController nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController discountController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
-
-  String? productId;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  Uint8List? _mainImageData;
-  Uint8List? get mainImageData => _mainImageData;
+  ImageState _mainImageState = ImageState();
+  ImageState get mainImageState => _mainImageState;
 
-  List<Uint8List?> _additionalImageDataList = [];
-  List<Uint8List?> get additionalImageDataList => _additionalImageDataList;
+  List<ImageState> _additionalImages = [];
+  List<ImageState> get additionalImages => _additionalImages;
 
-  bool _isMainImageNew = false;
-  List<bool> _isAdditionalImageNewList = List.generate(4, (_) => false);
-
-  bool _errorFound = false;
-  bool get errorFound => _errorFound;
+  ProductModel? _selectedProduct;
+  ProductModel? get selectedProduct => _selectedProduct;
 
   String selectedCategory = '';
-  List<String> categories = [
-    'Grocery',
-    'Fruits',
-    'Vegetables',
-    'Baked Goods',
-  ];
+  List<String> categories = ['Grocery', 'Fruits', 'Vegetables', 'Baked Goods'];
+
+  bool errorFound = false;
 
   final ProductService _productService = ProductService();
 
-  ProductViewModel({required this.productId}) {
-    if (productId != null) fetchProductData();
-  }
-
-  Future<void> fetchProductData() async {
+  Future<void> loadProduct(ProductModel product) async {
     _isLoading = true;
     notifyListeners();
+    nameController.text = product.name;
+    descriptionController.text = product.description;
+    selectedCategory = product.category;
 
-    try {
-      final product = await _productService.getProduct(productId!);
+    // Load main image
 
-      if (product != null) {
-        nameController.text = product.name;
-        descriptionController.text = product.description;
-        selectedCategory = product.category;
-        String? _mainImageUrl = product.mainImageUrl;
-        List<String>? _additionalImageUrls = product.additionalImageUrls;
+    _mainImageState = ImageState(url: product.mainImageUrl);
+    await _mainImageState.loadImageData();
 
-        await loadImageFromUrl(_mainImageUrl, true);
-
-        // Load additional images if available
-        if (_additionalImageUrls != null) {
-          for (int i = 0; i < _additionalImageUrls.length; i++) {
-            if (i < _additionalImageDataList.length) {
-              await loadImageFromUrl(_additionalImageUrls[i], false, index: i);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      // Handle errors
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    if (product.additionalImageUrls != null &&
+        product.additionalImageUrls!.isNotEmpty) {
+      _additionalImages =
+          await Future.wait(product.additionalImageUrls!.map((url) async {
+        final imageState = ImageState(url: url);
+        await imageState.loadImageData();
+        return imageState;
+      }).toList());
+    } else {
+      _additionalImages = []; // Explicitly set to empty list if no images
     }
+    _selectedProduct = product;
+
+    print('Product loaded: $product');
+    _isLoading = false;
+    notifyListeners();
   }
 
-  Future<void> loadImageFromUrl(String imageUrl, bool isMainImage,
-      {int? index}) async {
-    try {
-      final response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
-        if (isMainImage) {
-          _mainImageData = response.bodyBytes;
-        } else if (index != null) {
-          _additionalImageDataList![index] = response.bodyBytes;
-        }
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Error loading image: $e');
-    }
-  }
-
-  Future<void> pickImage(bool isMainImage, {int? index}) async {
+  // Pick and add image to the respective list
+  Future<void> pickImage(bool isMainImage) async {
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       final Uint8List imageData = await image.readAsBytes();
-      print('Picked Image Data: $imageData'); // Debugging
 
       if (isMainImage) {
-        _mainImageData = imageData;
-        _isMainImageNew = true;
-      } else if (index != null) {
-        _additionalImageDataList.add(imageData);
-        _isAdditionalImageNewList.add(true);
+        _mainImageState = ImageState(data: imageData, isNew: true);
+      } else {
+        _additionalImages.add(ImageState(data: imageData, isNew: true));
       }
-
-      print('Updated Additional Image Data List: $_additionalImageDataList');
 
       notifyListeners();
     }
   }
 
-  Future<List<String>> uploadImages() async {
-    List<String> downloadUrls = [];
+  // Upload image and return URL
+  Future<String> uploadImage(Uint8List imageData, int? index) async {
+    final Reference imageRef;
 
-    if (_mainImageData != null && _isMainImageNew) {
-      try {
-        final mainImageRef = FirebaseStorage.instance.ref().child(
-            'product_images/main_${DateTime.now().millisecondsSinceEpoch}.jpg');
-        await mainImageRef.putData(_mainImageData!);
-        final mainImageUrl = await mainImageRef.getDownloadURL();
-        downloadUrls.add(mainImageUrl);
-      } catch (e) {
-        // Handle error
-      }
+    if (index == null) {
+      imageRef = FirebaseStorage.instance.ref().child(
+          'product_images/main_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    } else {
+      imageRef = FirebaseStorage.instance.ref().child(
+          'product_images/additional_${DateTime.now().millisecondsSinceEpoch}_$index.jpg');
     }
 
-    for (int i = 0; i < _additionalImageDataList!.length; i++) {
-      if (_additionalImageDataList![i] != null &&
-          _isAdditionalImageNewList[i]) {
-        try {
-          final additionalImageRef = FirebaseStorage.instance.ref().child(
-              'product_images/additional_${DateTime.now().millisecondsSinceEpoch}_$i.jpg');
-          await additionalImageRef.putData(_additionalImageDataList![i]!);
-          final additionalImageUrl = await additionalImageRef.getDownloadURL();
-          downloadUrls.add(additionalImageUrl);
-        } catch (e) {
-          // Handle error
-        }
-      }
-    }
-
-    return downloadUrls;
+    await imageRef.putData(imageData);
+    return await imageRef.getDownloadURL();
   }
 
-  Future<void> addOrUpdateProductImages() async {
-    if (_mainImageData == null) {
-      _errorFound = true;
-      notifyListeners();
-      return;
+  void deleteImage(bool isMainImage, int? index) {
+    if (isMainImage) {
+      _mainImageState = ImageState(isNew: true);
+    } else if (index != null && index < _additionalImages.length) {
+      _additionalImages.removeAt(index);
     }
 
-    try {
-      _isLoading = true;
-      notifyListeners();
-
-      User? user = FirebaseAuth.instance.currentUser;
-      List<String> imageUrls = await uploadImages();
-
-      final mainImageUrl = imageUrls.isNotEmpty ? imageUrls.removeAt(0) : null;
-
-      await FirebaseFirestore.instance
-          .collection('products')
-          .doc(productId)
-          .update({
-        'mainImageUrl': mainImageUrl,
-        'additionalImageUrls': imageUrls,
-      });
-    } on FirebaseAuthException catch (e) {
-      // Handle authentication error
-    } catch (e) {
-      // Handle other errors
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  void deleteMainImage() {
-    _mainImageData = null;
-    _isMainImageNew = false;
     notifyListeners();
   }
 
-  void deleteAdditionalImage(int index) {
-    _additionalImageDataList.removeAt(index);
-    _isAdditionalImageNewList.removeAt(index);
-    notifyListeners();
-  }
-
+  // Add or update product with the uploaded images
   Future<void> addProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       _isLoading = true;
       notifyListeners();
+
       try {
         User? user = FirebaseAuth.instance.currentUser;
 
         if (user != null) {
-          List<String> images = await uploadImages();
-
           ProductModel product = ProductModel(
             id: '',
             name: nameController.text,
             description: descriptionController.text,
             category: selectedCategory,
-            mainImageUrl: images[0],
-            additionalImageUrls: images.sublist(1),
+            mainImageUrl: await uploadImage(_mainImageState.data!, null),
+            additionalImageUrls: [],
           );
 
           await _productService.addProduct(product);
@@ -224,42 +135,113 @@ class ProductViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateProduct(BuildContext context, String productId) async {
+  // Update product with the uploaded images
+  Future<bool> updateProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       _isLoading = true;
       notifyListeners();
+
+      if (mainImageState.isNew && mainImageState.data == null) {
+        errorFound = true;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
       try {
         User? user = FirebaseAuth.instance.currentUser;
 
         if (user != null) {
-          List<String> images = await uploadImages();
-
-          await FirebaseFirestore.instance
+          final productRef = FirebaseFirestore.instance
               .collection('products')
-              .doc(productId)
-              .update({
-            'name': nameController.text,
-            'description': descriptionController.text,
-            'category': selectedCategory,
-            'discount': int.parse(discountController.text),
-            'mainImageUrl': images[0],
-            'additionalImageUrls': images.sublist(1),
+              .doc(_selectedProduct?.id);
+
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            final snapshot = await transaction.get(productRef);
+            if (!snapshot.exists) {
+              throw Exception("Product does not exist!");
+            }
+
+            final currentData = snapshot.data() as Map<String, dynamic>;
+
+            Map<String, dynamic> updatedFields = {};
+
+            if (nameController.text != currentData['name']) {
+              updatedFields['name'] = nameController.text;
+            }
+            if (descriptionController.text != currentData['description']) {
+              updatedFields['description'] = descriptionController.text;
+            }
+            if (selectedCategory != currentData['category']) {
+              updatedFields['category'] = selectedCategory;
+            }
+
+            if (_mainImageState.isNew) {
+              updatedFields['mainImageUrl'] =
+                  await uploadImage(_mainImageState.data!, null);
+            }
+
+            for (int i = 0; i < _additionalImages.length; i++) {
+              if (_additionalImages[i].isNew) {
+                additionalImages[i].url =
+                    await uploadImage(_additionalImages[i].data!, i);
+              }
+            }
+
+            updatedFields['additionalImageUrls'] =
+                _additionalImages.map((imageState) => imageState.url).toList();
+
+            if (updatedFields.isNotEmpty) {
+              transaction.update(productRef, updatedFields);
+            }
           });
-        } else {}
+
+          return true;
+        }
       } catch (e) {
-        // Handle errors
-      } finally {
-        _isLoading = false;
-        notifyListeners();
+        print('Error updating product: $e');
+        return false;
       }
     }
+
+    return false;
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    descriptionController.dispose();
-    discountController.dispose();
-    super.dispose();
+  // Clear all data
+  void clearData() {
+    nameController.clear();
+    descriptionController.clear();
+    selectedCategory = '';
+    _mainImageState = ImageState();
+    _additionalImages.clear();
+  }
+}
+
+class ImageState {
+  Uint8List? data;
+  String? url;
+  bool isNew;
+  bool isDeleted;
+
+  ImageState({
+    this.data,
+    this.url,
+    this.isNew = false,
+    this.isDeleted = false,
+  });
+
+  Future<void> loadImageData() async {
+    if (url != null) {
+      try {
+        final response = await http.get(Uri.parse(url!));
+        if (response.statusCode == 200) {
+          data = response.bodyBytes;
+        } else {
+          print("Failed to load image from URL.");
+        }
+      } catch (e) {
+        print("Error loading image: $e");
+      }
+    }
   }
 }

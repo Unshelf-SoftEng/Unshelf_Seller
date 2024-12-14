@@ -3,16 +3,29 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/wallet_viewmodel.dart';
 import 'package:unshelf_seller/views/withdraw_request_view.dart';
 
-class WalletView extends StatelessWidget {
+class BalanceOverviewView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final walletViewModel = Provider.of<WalletViewModel>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wallet'),
-        centerTitle: true,
+        title: Text('Balance Overview'),
         backgroundColor: const Color(0xFF6A994E),
+        foregroundColor: const Color(0xFFFFFFFF),
+        titleTextStyle: TextStyle(
+            color: const Color(0xFFFFFFFF),
+            fontSize: 20,
+            fontWeight: FontWeight.bold),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Color(0xFF386641),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

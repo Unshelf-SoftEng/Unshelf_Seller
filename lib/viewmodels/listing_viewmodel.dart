@@ -65,7 +65,6 @@ class ListingViewModel extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        // Fetch products
         final productSnapshot = await FirebaseFirestore.instance
             .collection('products')
             .where('sellerId', isEqualTo: user.uid)

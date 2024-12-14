@@ -49,7 +49,7 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit User Profile'),
+        title: Text('Edit Store Location'),
         backgroundColor: const Color(0xFF6A994E),
         foregroundColor: const Color(0xFFFFFFFF),
         titleTextStyle: TextStyle(

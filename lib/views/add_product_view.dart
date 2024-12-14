@@ -6,15 +6,14 @@ import 'package:unshelf_seller/views/image_delete_view.dart';
 
 class AddProductView extends StatelessWidget {
   final VoidCallback onProductAdded;
-  final String? productId;
 
-  const AddProductView({Key? key, required this.onProductAdded, this.productId})
+  const AddProductView({Key? key, required this.onProductAdded})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProductViewModel(productId: productId),
+      create: (_) => ProductViewModel(),
       child: Consumer<ProductViewModel>(builder: (context, viewModel, child) {
         return Scaffold(
           appBar: AppBar(
@@ -87,10 +86,11 @@ class AddProductView extends StatelessWidget {
                           width: double.infinity,
                           height: 350,
                           color: const Color(0xFF386641),
-                          child: viewModel.mainImageData != null
+                          child: viewModel.mainImageState.data != null
                               ? ImageWithDelete(
-                                  imageData: viewModel.mainImageData!,
-                                  onDelete: viewModel.deleteMainImage,
+                                  imageData: viewModel.mainImageState.data!,
+                                  onDelete: () =>
+                                      viewModel.deleteImage(true, null),
                                   width: 400.0,
                                   height: 400.0,
                                   margin: const EdgeInsets.all(0),
@@ -127,7 +127,7 @@ class AddProductView extends StatelessWidget {
                                 (constraints.maxWidth - 10 * 2.0) / 4 - 10.0;
 
                             // Retrieve the image list from the view model
-                            var imageList = viewModel.additionalImageDataList;
+                            var imageList = viewModel.additionalImages;
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +148,7 @@ class AddProductView extends StatelessWidget {
                                     ),
                                     itemCount: imageList.length,
                                     itemBuilder: (context, index) {
-                                      final imageData = imageList[index];
+                                      final imageData = imageList[index].data;
                                       return Container(
                                         width: itemWidth,
                                         height: itemWidth,
@@ -169,8 +169,7 @@ class AddProductView extends StatelessWidget {
                                                 width: itemWidth,
                                                 height: itemWidth,
                                                 onDelete: () => viewModel
-                                                    .deleteAdditionalImage(
-                                                        index),
+                                                    .deleteImage(false, index),
                                               )
                                             : Center(
                                                 child: Icon(
@@ -200,9 +199,8 @@ class AddProductView extends StatelessWidget {
                                 else
                                   Center(
                                     child: ElevatedButton(
-                                      onPressed: () => viewModel.pickImage(
-                                          false,
-                                          index: imageList.indexOf(null)),
+                                      onPressed: () =>
+                                          viewModel.pickImage(false),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFFA7C957),
@@ -214,7 +212,7 @@ class AddProductView extends StatelessWidget {
                                         ),
                                       ),
                                       child: const Text(
-                                        'Add Image',
+                                        'Add Additional Image',
                                         style:
                                             TextStyle(color: Color(0xFF386641)),
                                       ),
@@ -349,12 +347,7 @@ class AddProductView extends StatelessWidget {
                                 height: 30,
                                 child: ElevatedButton(
                                   onPressed: () async {
-                                    if (productId == null) {
-                                      await viewModel.addProduct(context);
-                                    } else {
-                                      await viewModel.updateProduct(
-                                          context, productId!);
-                                    }
+                                    await viewModel.addProduct(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content:

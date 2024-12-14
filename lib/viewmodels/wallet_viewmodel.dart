@@ -61,6 +61,8 @@ class WalletViewModel extends ChangeNotifier {
     }
 
     _balance -= amount;
+
+    notifyListeners();
   }
 
   // Method to update balance based on the transactions

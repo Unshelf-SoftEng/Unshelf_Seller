@@ -97,11 +97,13 @@ class _StoreViewState extends State<StoreView> {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        leading: CircleAvatar(
-          radius: 30,
-          backgroundImage: viewModel.storeDetails?.storeImageUrl != null
-              ? NetworkImage(viewModel.storeDetails!.storeImageUrl!)
-              : null,
+        leading: ClipOval(
+          child: Image.network(
+            viewModel.storeDetails?.storeImageUrl ?? '',
+            width: 60.0,
+            height: 60.0,
+            fit: BoxFit.cover,
+          ),
         ),
         title: Text(viewModel.storeDetails?.storeName ?? 'Store Name'),
         subtitle: Column(

@@ -6,7 +6,7 @@ import 'package:unshelf_seller/views/dashboard_view.dart';
 import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
-import 'package:unshelf_seller/views/wallet_view.dart';
+import 'package:unshelf_seller/views/balance_overview_view.dart';
 import 'package:unshelf_seller/views/notifications_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -95,15 +95,13 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: Color(0xFF6A994E),
         automaticallyImplyLeading: _buildLeadingIcon() == null,
         leading: Padding(
-          padding: const EdgeInsets.only(
-              left: 16.0), // Adjust left padding if needed
+          padding: const EdgeInsets.only(left: 16.0),
           child: _buildLeadingIcon(), // Custom leading icon
         ),
-        title: null, // Remove the default title
+        title: null,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(
-                right: 16.0), // Adjust right padding for notifications
+            padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -115,7 +113,8 @@ class _HomeViewState extends State<HomeView> {
               },
               child: Stack(
                 children: [
-                  const Icon(Icons.notifications, size: 30),
+                  const Icon(Icons.notifications,
+                      size: 30, color: Colors.black),
                   if (_notifications.any((n) => !n['seen']))
                     Positioned(
                       right: 0,
@@ -146,22 +145,24 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
         ],
-        flexibleSpace: Align(
-          alignment: Alignment.center, // Center the title within the AppBar
-          child: Text(
-            _titles[_selectedIndex],
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(4.0),
           child: Container(
             color: Color(0xFFC8DD96),
             height: 4.0,
+          ),
+        ),
+        flexibleSpace: SafeArea(
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              _titles[_selectedIndex],
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
       ),
@@ -214,8 +215,8 @@ class _HomeViewState extends State<HomeView> {
         return IconButton(
           icon: Icon(Icons.account_balance_wallet, size: 30),
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => WalletView()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => BalanceOverviewView()));
           },
         );
       default:
