@@ -89,8 +89,7 @@ class _LoginViewState extends State<LoginView> {
 
           bool isApproved = userDoc['isApproved'];
           if (isApproved == false) {
-            await FirebaseAuth.instance
-                .signOut(); // Sign out the unapproved user
+            await FirebaseAuth.instance.signOut();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                   content: Text(
@@ -105,22 +104,10 @@ class _LoginViewState extends State<LoginView> {
               const SnackBar(content: Text('Sign in successful')),
             );
 
-            if (userDoc['isNew']) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeView(),
-                ),
-              );
-            } else {
-              // Redirect to home page
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeView(),
-                ),
-              );
-            }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeView()),
+            );
           } else {
             await FirebaseAuth.instance.signOut();
             ScaffoldMessenger.of(context).showSnackBar(

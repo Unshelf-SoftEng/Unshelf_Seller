@@ -56,7 +56,6 @@ class StoreModel {
           var updatedValue = (value as Map<String, dynamic>).map(
             (k, v) {
               if (k == 'isOpen') {
-                // Cast isOpen value as boolean
                 return MapEntry(k, v as bool);
               }
               // Otherwise, keep the existing string value
@@ -67,11 +66,11 @@ class StoreModel {
           return MapEntry(key, updatedValue);
         },
       ),
-      storeLongitude: storeData['longitude'] ?? 0.0,
-      storeLatitude: storeData['latitude'] ?? 0.0,
+      storeLongitude: (storeData['longitude'] ?? 0.0).toDouble(),
+      storeLatitude: (storeData['latitude'] ?? 0.0).toDouble(),
       storeImageUrl: storeData['storeImageUrl'] ?? '',
-      storeRating: storeData['rating'] ?? 0.0,
-      storeFollowers: storeData['followerCount'] ?? 0,
+      storeRating: (storeData['rating'] ?? 0.0).toDouble(),
+      storeFollowers: (storeData['followerCount'] ?? 0).toInt(),
     );
   }
 }
