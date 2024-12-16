@@ -36,7 +36,7 @@ class _DashboardViewState extends State<DashboardView> {
                     children: [
                       _buildDailyAnalyticsCard(viewModel),
                       const SizedBox(height: 16.0),
-                      _buildAnalyticsNavigation(),
+                      // _buildAnalyticsNavigation(),
                     ],
                   ),
                 );
@@ -47,7 +47,7 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildDailyAnalyticsCard(DashboardViewModel viewModel) {
     return Card(
-      color: AppColors.palmLeaf,
+      color: AppColors.primaryColor,
       elevation: 8.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
@@ -87,37 +87,37 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  Widget _buildAnalyticsNavigation() {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 16.0,
-      mainAxisSpacing: 16.0,
-      children: [
-        _buildNavigationCard(
-          title: 'Store Analytics',
-          icon: Icons.store,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => StoreAnalyticsView()),
-            );
-          },
-        ),
-        _buildNavigationCard(
-          title: 'Product Analytics',
-          icon: Icons.analytics,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProductAnalyticsView()),
-            );
-          },
-        ),
-      ],
-    );
-  }
+  // Widget _buildAnalyticsNavigation() {
+  //   return GridView.count(
+  //     crossAxisCount: 2,
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     crossAxisSpacing: 16.0,
+  //     mainAxisSpacing: 16.0,
+  //     children: [
+  //       _buildNavigationCard(
+  //         title: 'Store Analytics',
+  //         icon: Icons.store,
+  //         onTap: () {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(builder: (context) => StoreAnalyticsView()),
+  //           );
+  //         },
+  //       ),
+  //       _buildNavigationCard(
+  //         title: 'Product Analytics',
+  //         icon: Icons.analytics,
+  //         onTap: () {
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(builder: (context) => ProductAnalyticsView()),
+  //           );
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildNavigationCard(
       {required String title,

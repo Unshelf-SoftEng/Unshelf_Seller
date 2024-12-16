@@ -228,10 +228,14 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                       ] else if (viewModel.selectedOrder!.status ==
                           'Cancelled') ...[
                         _buildDetailRow(
-                            'Cancelled At',
-                            DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                .selectedOrder!.cancelledAt!
-                                .toDate())),
+                          'Cancelled At',
+                          viewModel.selectedOrder?.cancelledAt != null
+                              ? DateFormat('yyyy-MM-dd HH:mm').format(
+                                  viewModel.selectedOrder!.cancelledAt!
+                                      .toDate(),
+                                )
+                              : 'N/A',
+                        ),
                       ],
                     ],
                   ),

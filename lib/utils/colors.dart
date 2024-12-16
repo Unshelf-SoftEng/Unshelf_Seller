@@ -7,4 +7,11 @@ class AppColors {
   static const Color watermelonRed = Color(0xFFBC4749);
   static const Color lightGreen = Color(0xFFC8DD96);
   static const Color saffronYellow = Color(0xFFFFDC5F);
+
+  // Updated color scheme
+  static const Color primaryColor = Color(0xFF0AB68D);
+  static const Color darkColor = Color(0xFF028174);
+  static const Color lightColor = Color(0xFF92DE8B);
+  static const Color highlightColor = Color(0xFFFFE3B3);
+  static const Color warningColor = Color(0XFFD9534F);
 }

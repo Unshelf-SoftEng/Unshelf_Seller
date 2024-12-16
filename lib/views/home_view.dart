@@ -2,12 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/components/chat_screen.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/views/dashboard_view.dart';
 import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
-import 'package:unshelf_seller/views/balance_overview_view.dart';
 import 'package:unshelf_seller/views/notifications_view.dart';
+
+import 'package:unshelf_seller/utils/colors.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -94,7 +96,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6A994E),
+        backgroundColor: AppColors.primaryColor,
         automaticallyImplyLeading: _buildLeadingIcon() == null,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0),
@@ -150,7 +152,7 @@ class _HomeViewState extends State<HomeView> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: Container(
-            color: const Color(0xFFC8DD96),
+            color: AppColors.lightColor,
             height: 4.0,
           ),
         ),
@@ -170,6 +172,7 @@ class _HomeViewState extends State<HomeView> {
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
@@ -189,8 +192,8 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
         currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.black,
-        selectedItemColor: const Color(0xFF6A994E),
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primaryColor,
         onTap: _onItemTapped,
       ),
     );
@@ -211,16 +214,6 @@ class _HomeViewState extends State<HomeView> {
                 builder: (context) => ChatScreen(),
               ),
             );
-          },
-        );
-      case 3: // Store
-        return IconButton(
-          icon: const Icon(Icons.account_balance_wallet, size: 30),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const BalanceOverviewView()));
           },
         );
       default:

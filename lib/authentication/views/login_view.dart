@@ -134,7 +134,7 @@ class _LoginViewState extends State<LoginView> {
       appBar: AppBar(
         title: const Text('Log In'),
         titleTextStyle: const TextStyle(
-            color: AppColors.deepMossGreen,
+            color: AppColors.darkColor,
             fontSize: 20,
             fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
@@ -155,12 +155,10 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.middleGreenYellow),
+                      borderSide: BorderSide(color: AppColors.lightColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.middleGreenYellow),
+                      borderSide: BorderSide(color: AppColors.lightColor),
                     ),
                   ),
                   validator: (value) {
@@ -176,12 +174,10 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.middleGreenYellow),
+                      borderSide: BorderSide(color: AppColors.lightColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppColors.middleGreenYellow),
+                      borderSide: BorderSide(color: AppColors.lightColor),
                     ),
                   ),
                   obscureText: true,
@@ -203,7 +199,7 @@ class _LoginViewState extends State<LoginView> {
                     },
                     child: const Text(
                       'Forgot Password?',
-                      style: TextStyle(color: AppColors.palmLeaf),
+                      style: TextStyle(color: AppColors.primaryColor),
                     ),
                   ),
                 ),
@@ -217,8 +213,8 @@ class _LoginViewState extends State<LoginView> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(200, 45),
                         backgroundColor:
-                            AppColors.middleGreenYellow, // backgroundColor
-                        foregroundColor: Colors.black, // foregroundColor
+                            AppColors.primaryColor, // backgroundColor
+                        foregroundColor: Colors.white, // foregroundColor
                         alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -247,8 +243,8 @@ class _LoginViewState extends State<LoginView> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(200, 45),
                         backgroundColor:
-                            AppColors.middleGreenYellow, // backgroundColor
-                        foregroundColor: Colors.black, // foregroundColor
+                            AppColors.primaryColor, // backgroundColor
+                        foregroundColor: Colors.white, // foregroundColor
                         alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -271,7 +267,7 @@ class _LoginViewState extends State<LoginView> {
                       },
                       child: const Text(
                         'Sign Up',
-                        style: TextStyle(color: AppColors.palmLeaf),
+                        style: TextStyle(color: AppColors.primaryColor),
                       ),
                     ),
                   ],

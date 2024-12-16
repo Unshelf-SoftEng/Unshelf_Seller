@@ -12,8 +12,6 @@ class OrdersView extends StatefulWidget {
 }
 
 class _OrdersViewState extends State<OrdersView> {
-  String? _selectedStatus = 'All';
-
   @override
   void initState() {
     super.initState();
@@ -105,8 +103,8 @@ class _OrdersViewState extends State<OrdersView> {
                             },
                             child: Container(
                               color: isDarkBackground
-                                  ? Colors.grey[200]
-                                  : Colors.grey[100],
+                                  ? Colors.grey[300]
+                                  : Colors.grey[150],
                               padding: const EdgeInsets.symmetric(
                                   vertical: 8.0, horizontal: 16.0),
                               child: Row(
@@ -125,7 +123,7 @@ class _OrdersViewState extends State<OrdersView> {
                                           Text(
                                             'Order ID: ${order.orderId}',
                                             style: const TextStyle(
-                                              fontSize: 14.0,
+                                              fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black87,
                                             ),
@@ -142,14 +140,15 @@ class _OrdersViewState extends State<OrdersView> {
                                               color: Colors.grey[600],
                                             ),
                                           ),
-                                          const SizedBox(height: 4.0),
-                                          Text(
-                                            'Status: ${order.status}',
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors.grey[600],
+                                          if (ordersViewModel.currentStatus ==
+                                              'All')
+                                            Text(
+                                              'Status: ${order.status}',
+                                              style: TextStyle(
+                                                fontSize: 12.0,
+                                                color: Colors.grey[600],
+                                              ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -163,7 +162,7 @@ class _OrdersViewState extends State<OrdersView> {
                                         text: TextSpan(
                                           style: const TextStyle(
                                             fontSize: 18.0,
-                                            color: AppColors.palmLeaf,
+                                            color: AppColors.primaryColor,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           children: [
@@ -185,8 +184,8 @@ class _OrdersViewState extends State<OrdersView> {
                                             vertical: 4.0, horizontal: 12.0),
                                         decoration: BoxDecoration(
                                           color: order.isPaid
-                                              ? AppColors.palmLeaf
-                                              : AppColors.watermelonRed,
+                                              ? AppColors.lightColor
+                                              : AppColors.warningColor,
                                           borderRadius:
                                               BorderRadius.circular(12.0),
                                         ),
@@ -194,7 +193,7 @@ class _OrdersViewState extends State<OrdersView> {
                                           order.isPaid ? 'Paid' : 'Unpaid',
                                           style: const TextStyle(
                                             fontSize: 12.0,
-                                            color: Colors.white,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ),
@@ -222,9 +221,9 @@ class _OrdersViewState extends State<OrdersView> {
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: TextButton(
         style: TextButton.styleFrom(
-          minimumSize: const Size(50, 30),
+          minimumSize: const Size(40, 20),
           backgroundColor: viewModel.currentStatus == status
-              ? AppColors.deepMossGreen
+              ? AppColors.darkColor
               : Colors.grey[200],
           foregroundColor:
               viewModel.currentStatus == status ? Colors.white : Colors.black,

@@ -41,9 +41,9 @@ class CustomButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.middleGreenYellow, // backgroundColor
-          foregroundColor: Colors.black, // foregroundColor
-          alignment: alignment, // alignment
+          backgroundColor: AppColors.primaryColor,
+          foregroundColor: Colors.white,
+          alignment: alignment,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

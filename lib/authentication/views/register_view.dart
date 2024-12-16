@@ -166,7 +166,7 @@ class _RegisterViewState extends State<RegisterView> {
       appBar: AppBar(
         title: const Text('Register'),
         titleTextStyle: const TextStyle(
-            color: AppColors.deepMossGreen,
+            color: AppColors.darkColor,
             fontSize: 20,
             fontWeight: FontWeight.bold),
         automaticallyImplyLeading: false,
@@ -179,17 +179,17 @@ class _RegisterViewState extends State<RegisterView> {
             children: <Widget>[
               Image.asset(
                 'assets/images/logo.png',
-                height: 100,
+                height: 150,
               ),
               TextFormField(
                 controller: _sellerNameController,
                 decoration: const InputDecoration(
                   labelText: 'Name',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFA7C957)),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                 ),
                 validator: (value) {
@@ -205,10 +205,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                 ),
                 validator: (value) {
@@ -224,10 +224,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Password',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                 ),
                 obscureText: true,
@@ -244,10 +244,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Password Confirmation',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                 ),
                 obscureText: true,
@@ -266,10 +266,10 @@ class _RegisterViewState extends State<RegisterView> {
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.lightColor),
                   ),
                 ),
                 validator: (value) {
@@ -288,9 +288,8 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: _register,
                 style: const ButtonStyle(
                   backgroundColor:
-                      WidgetStatePropertyAll(AppColors.middleGreenYellow),
-                  foregroundColor:
-                      WidgetStatePropertyAll(AppColors.deepMossGreen),
+                      WidgetStatePropertyAll(AppColors.primaryColor),
+                  foregroundColor: WidgetStatePropertyAll(Colors.white),
                 ),
                 child: const Text('Sign Up'),
               ),
@@ -299,38 +298,38 @@ class _RegisterViewState extends State<RegisterView> {
                 "By signing up, you agree to Unshelf's Terms of Use and Privacy Policy.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF6A994E),
+                  color: AppColors.primaryColor,
                   fontSize: 11,
                 ),
               ),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(child: Divider(color: Colors.grey[400])),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text('or', style: TextStyle(color: Colors.grey)),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey[400])),
-                ],
-              ),
-              const SizedBox(height: 15),
-              ElevatedButton.icon(
-                onPressed: _registerWithGoogle,
-                label: const Text('Log in with Google'),
-                icon: Image.asset('assets/images/google_logo.png',
-                    width: 24, height: 24, fit: BoxFit.contain),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  backgroundColor: AppColors.middleGreenYellow,
-                  foregroundColor: AppColors.deepMossGreen,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                ),
-              ),
+              // const SizedBox(height: 15),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Expanded(child: Divider(color: Colors.grey[400])),
+              //     const Padding(
+              //       padding: EdgeInsets.symmetric(horizontal: 10.0),
+              //       child: Text('or', style: TextStyle(color: Colors.grey)),
+              //     ),
+              //     Expanded(child: Divider(color: Colors.grey[400])),
+              //   ],
+              // ),
+              // const SizedBox(height: 15),
+              // ElevatedButton.icon(
+              //   onPressed: _registerWithGoogle,
+              //   label: const Text('Log in with Google'),
+              //   icon: Image.asset('assets/images/google_logo.png',
+              //       width: 24, height: 24, fit: BoxFit.contain),
+              //   style: ElevatedButton.styleFrom(
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     backgroundColor: AppColors.lightColor,
+              //     foregroundColor: AppColors.deepMossGreen,
+              //     padding:
+              //         const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              //   ),
+              // ),
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -345,7 +344,7 @@ class _RegisterViewState extends State<RegisterView> {
                     },
                     child: const Text(
                       'Sign In',
-                      style: TextStyle(color: AppColors.palmLeaf),
+                      style: TextStyle(color: AppColors.primaryColor),
                     ),
                   ),
                 ],

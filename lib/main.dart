@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Unshelf',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.deepMossGreen),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
         useMaterial3: true,
         textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),

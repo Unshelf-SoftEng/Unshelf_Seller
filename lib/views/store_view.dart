@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+// ViewModels
 import 'package:unshelf_seller/viewmodels/store_viewmodel.dart';
-import 'package:unshelf_seller/views/restock_selection_view.dart';
+import 'package:unshelf_seller/views/balance_overview_view.dart';
+
+// Views
 import 'package:unshelf_seller/views/edit_store_schedule_view.dart';
 import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
@@ -10,9 +14,10 @@ import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/views/order_history_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/edit_user_profile_view.dart';
-import 'package:unshelf_seller/models/user_model.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart' as lat_lng2;
+import 'package:unshelf_seller/views/store_analytics_view.dart';
+import 'package:unshelf_seller/views/inventory_view.dart';
+
+// Utils
 import 'package:unshelf_seller/utils/colors.dart';
 
 class StoreView extends StatefulWidget {
@@ -23,6 +28,8 @@ class StoreView extends StatefulWidget {
 }
 
 class _StoreViewState extends State<StoreView> {
+  bool _isGeneralActionsExpanded = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,20 +44,29 @@ class _StoreViewState extends State<StoreView> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<StoreViewModel>(context);
 
-    if (viewModel.isLoading) {
-      return Scaffold(
-        body: _buildLoading(),
-      );
-    }
-
-    if (viewModel.storeDetails == null || viewModel.userProfile == null) {
-      return Scaffold(
-        body: _buildLoading(),
-      );
+    if (viewModel.isLoading ||
+        viewModel.storeDetails == null ||
+        viewModel.userProfile == null) {
+      return Scaffold(body: _buildLoading());
     }
 
     return Scaffold(
-      body: _buildContent(context, viewModel),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStoreCard(viewModel),
+              const SizedBox(height: 16),
+              _buildSectionTitle('Store Management'),
+              _buildStoreManagementSection(context, viewModel),
+              const SizedBox(height: 20),
+              _buildExpandableGeneralActions(context),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -58,60 +74,15 @@ class _StoreViewState extends State<StoreView> {
     return const Center(child: CircularProgressIndicator());
   }
 
-  Widget _buildContent(BuildContext context, StoreViewModel viewModel) {
-    if (viewModel.isLoading) {
-      return _buildLoading();
-    }
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildStoreCard(viewModel, context),
-            const SizedBox(height: 16.0),
-            _buildSectionTitle('Store Information'),
-            _buildDetailsAndActionsSection(context, viewModel),
-            const SizedBox(height: 20),
-            _buildSectionTitle('General'),
-            _buildGeneralActions(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStoreCard(StoreViewModel viewModel, BuildContext context) {
+  Widget _buildStoreCard(StoreViewModel viewModel) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
         leading: ClipOval(
           child: viewModel.storeDetails?.storeImageUrl == ''
-              ? Container(
-                  color: Colors
-                      .grey, // Set the background color to gray if no image is available
-                  width: 60.0,
-                  height: 60.0,
-                  child: const Icon(
-                    Icons.store, // Optional: Show a default icon if no image
-                    color: Colors.white,
-                    size: 30.0,
-                  ),
-                )
+              ? _buildDefaultStoreIcon()
               : Image.network(
                   viewModel.storeDetails?.storeImageUrl ?? '',
                   width: 60.0,
@@ -119,218 +90,146 @@ class _StoreViewState extends State<StoreView> {
                   fit: BoxFit.cover,
                 ),
         ),
-        title: Text(viewModel.storeDetails?.storeName ?? 'Store Name'),
+        title: Text(
+          viewModel.storeDetails?.storeName ?? 'Store Name',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Followers: ${viewModel.storeDetails?.storeFollowers ?? 0}'),
             Text(
-                'Rating: ${viewModel.storeDetails?.storeRating?.toString() ?? 0.0}'),
+                'Rating: ${viewModel.storeDetails?.storeRating?.toString() ?? '0.0'}'),
           ],
         ),
         trailing: IconButton(
           icon: const Icon(Icons.edit),
-          onPressed: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    EditStoreProfileView(storeDetails: viewModel.storeDetails!),
-              ),
-            );
-
-            if (result == true) {
-              final viewModel =
-                  Provider.of<StoreViewModel>(context, listen: false);
-              viewModel.fetchStoreDetails(); // Refresh store details
-            }
-          },
+          onPressed: () => _navigateTo(
+              EditStoreProfileView(storeDetails: viewModel.storeDetails!)),
         ),
       ),
     );
   }
 
-  Widget _buildDetailsAndActionsSection(
+  Widget _buildDefaultStoreIcon() {
+    return Container(
+      color: Colors.grey,
+      width: 60.0,
+      height: 60.0,
+      child: const Icon(Icons.store, color: Colors.white, size: 30.0),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildStoreManagementSection(
       BuildContext context, StoreViewModel viewModel) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Column(
         children: [
-          ListTile(
-            title: const Text('User Profile'),
-            subtitle: const Text('View and edit your profile'),
-            leading: const Icon(Icons.person),
-            onTap: () async {
-              final updatedProfile = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      EditUserProfileView(userProfile: viewModel.userProfile!),
-                ),
-              );
+          // Performance
+          _buildListTile(
+            Icons.analytics,
+            'Store Analytics',
+            'View store performance',
+            () => _navigateTo(const StoreAnalyticsView()),
+          ),
 
-              if (updatedProfile != null &&
-                  updatedProfile is UserProfileModel) {
-                setState(() {
-                  viewModel.userProfile!.name = updatedProfile.name;
-                  viewModel.userProfile!.email = updatedProfile.email;
-                  viewModel.userProfile!.phoneNumber =
-                      updatedProfile.phoneNumber;
-                });
-              }
-            },
+          // Orders
+          _buildListTile(
+            Icons.history,
+            'Order History',
+            'View store orders',
+            () => _navigateTo(OrderHistoryView()),
           ),
-          ListTile(
-            title: const Text('Order History'),
-            subtitle: const Text('View all orders placed in your store'),
-            leading: const Icon(Icons.history),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => OrderHistoryView()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Store Inventory'),
-            subtitle: const Text('View and edit your store inventory'),
-            leading: const Icon(Icons.inventory),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RestockSelectionView(),
-                ),
-              );
 
-              if (result == true) {
-                final viewModel =
-                    Provider.of<StoreViewModel>(context, listen: false);
-                viewModel.fetchStoreDetails(); // Refresh store details
-              }
-            },
+          // Inventory
+          _buildListTile(
+            Icons.inventory,
+            'Store Inventory',
+            'Manage products and stocks',
+            () => _navigateTo(InventoryView()),
           ),
-          ListTile(
-            title: const Text('Business Hours'),
-            subtitle: const Text('View and edit your business hours'),
-            leading: const Icon(Icons.access_time),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditStoreScheduleView(
-                      storeDetails: viewModel.storeDetails!),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Store Location'),
-            subtitle: const Text('View and edit your store location'),
-            leading: const Icon(Icons.location_on),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditStoreLocationView(
-                      storeDetails: viewModel.storeDetails!),
-                ),
-              );
 
-              if (result == true) {
-                final viewModel =
-                    Provider.of<StoreViewModel>(context, listen: false);
-                viewModel.fetchStoreDetails(); // Refresh store details
-              }
-            },
+          // Store Settings
+          _buildListTile(
+            Icons.access_time,
+            'Business Hours',
+            'Manage business hours',
+            () => _navigateTo(
+                EditStoreScheduleView(storeDetails: viewModel.storeDetails!)),
           ),
-          SizedBox(
-            height: 100.0,
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: lat_lng2.LatLng(
-                    viewModel.storeDetails!.storeLatitude!,
-                    viewModel.storeDetails!.storeLongitude!),
-                initialZoom: 15.0,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.none,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c'],
-                ),
-                if (viewModel.storeDetails?.storeLatitude != null)
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: lat_lng2.LatLng(
-                          viewModel.storeDetails!.storeLatitude!,
-                          viewModel.storeDetails!.storeLongitude!,
-                        ),
-                        child: const Icon(
-                          Icons.location_pin,
-                          color: AppColors.watermelonRed,
-                          size: 40.0,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          )
+          _buildListTile(
+            Icons.location_on,
+            'Store Location',
+            'Edit store location',
+            () => _navigateTo(
+                EditStoreLocationView(storeDetails: viewModel.storeDetails!)),
+          ),
+
+          // Financials
+          _buildListTile(
+            Icons.wallet,
+            'Wallet',
+            'Manage your earnings',
+            () => _navigateTo(const BalanceOverviewView()),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildGeneralActions(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: const Text('Settings'),
-            leading: const Icon(Icons.settings),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsView(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Help Center'),
-            leading: const Icon(Icons.help_outline),
-            onTap: () {},
-          ),
-          ListTile(
-            title: const Text('Customer Support'),
-            leading: const Icon(Icons.support_agent),
-            onTap: () {},
-          ),
-          ListTile(
-            title: const Text('Privacy Notice'),
-            leading: const Icon(Icons.privacy_tip),
-            onTap: () {},
-          ),
-          ListTile(
-            title: const Text('Log Out'),
-            leading: const Icon(Icons.logout),
-            onTap: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => LoginView(),
-                ),
-                (Route<dynamic> route) => false,
-              );
-            },
-          ),
-        ],
-      ),
+  Widget _buildExpandableGeneralActions(BuildContext context) {
+    return ExpansionTile(
+      initiallyExpanded: _isGeneralActionsExpanded,
+      onExpansionChanged: (value) {
+        setState(() => _isGeneralActionsExpanded = value);
+      },
+      leading: const Icon(Icons.settings, color: Colors.black54),
+      title: const Text('General Actions',
+          style: TextStyle(fontWeight: FontWeight.bold)),
+      children: [
+        _buildListTile(
+            Icons.person,
+            'User Profile',
+            'View and edit your profile',
+            () => _navigateTo(EditUserProfileView(
+                userProfile: Provider.of<StoreViewModel>(context, listen: false)
+                    .userProfile!))),
+        _buildListTile(Icons.settings, 'Settings', 'Manage app settings',
+            () => _navigateTo(const SettingsView())),
+        _buildListTile(Icons.logout, 'Log Out', 'Sign out from your account',
+            () async {
+          await FirebaseAuth.instance.signOut();
+          _navigateTo(LoginView(), clearStack: true);
+        }),
+      ],
+    );
+  }
+
+  Widget _buildListTile(
+      IconData icon, String title, String subtitle, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.primaryColor),
+      title: Text(title,
+          style: const TextStyle(
+              color: Colors.black, fontWeight: FontWeight.w500)),
+      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
+      onTap: onTap,
+    );
+  }
+
+  void _navigateTo(Widget page, {bool clearStack = false}) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => page),
+      (route) => !clearStack,
     );
   }
 }

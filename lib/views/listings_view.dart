@@ -10,6 +10,7 @@ import 'package:unshelf_seller/views/edit_product_view.dart';
 import 'package:unshelf_seller/views/edit_bundle_view.dart';
 import 'package:unshelf_seller/views/bundle_details_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:flutter/cupertino.dart';
 
 class ListingsView extends StatefulWidget {
   @override
@@ -208,7 +209,7 @@ class _ListingsViewState extends State<ListingsView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: const Icon(Icons.edit, color: AppColors.palmLeaf),
+          icon: const Icon(Icons.edit, color: AppColors.darkColor),
           onPressed: () {
             if (item is ProductModel) {
               Navigator.push(
@@ -234,7 +235,7 @@ class _ListingsViewState extends State<ListingsView> {
           },
         ),
         IconButton(
-          icon: const Icon(Icons.delete, color: AppColors.watermelonRed),
+          icon: const Icon(Icons.delete, color: AppColors.warningColor),
           onPressed: () async {
             final confirmDelete = await showDialog(
               context: context,
@@ -251,7 +252,7 @@ class _ListingsViewState extends State<ListingsView> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       child: const Text("Delete",
-                          style: TextStyle(color: AppColors.watermelonRed)),
+                          style: TextStyle(color: AppColors.warningColor)),
                     ),
                   ],
                 );
@@ -270,56 +271,67 @@ class _ListingsViewState extends State<ListingsView> {
   Widget _buildFloatingActionButton(BuildContext context) {
     return Consumer<ListingViewModel>(
       builder: (context, viewModel, _) {
-        return FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.add_circle_outline),
-                      title: const Text('Add Product'),
-                      onTap: () async {
-                        Navigator.pop(context); // Close the bottom sheet
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddProductView(
-                              onProductAdded: () {
-                                Provider.of<ListingViewModel>(context,
-                                        listen: false)
-                                    .fetchItems();
-                              },
-                            ),
-                          ),
-                        );
-                        viewModel.fetchItems();
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.pages_outlined),
-                      title: const Text('Add Bundle'),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SelectProductsView(),
-                          ),
-                        );
-                        viewModel.fetchItems();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
+        return FloatingActionButton.extended(
+          onPressed: () => _showAddItemOptions(context, viewModel),
           tooltip: 'Add Item',
-          backgroundColor: AppColors.middleGreenYellow,
-          child: const Icon(Icons.add, color: Colors.black),
+          backgroundColor: AppColors.primaryColor,
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text('Add Item', style: TextStyle(color: Colors.white)),
+        );
+      },
+    );
+  }
+
+  void _showAddItemOptions(BuildContext context, ListingViewModel viewModel) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading:
+                  const Icon(Icons.add_circle, color: AppColors.primaryColor),
+              title: const Text(
+                'Add Product',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+              onTap: () async {
+                Navigator.pop(context); // Close bottom sheet
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddProductView(
+                      onProductAdded: () {
+                        Provider.of<ListingViewModel>(context, listen: false)
+                            .fetchItems();
+                      },
+                    ),
+                  ),
+                );
+                viewModel.fetchItems();
+              },
+            ),
+            ListTile(
+              leading: const Icon(CupertinoIcons.gift,
+                  color: AppColors.primaryColor),
+              title: const Text(
+                'Add Product Bundle',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SelectProductsView()),
+                );
+                viewModel.fetchItems();
+              },
+            ),
+          ],
         );
       },
     );
