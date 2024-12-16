@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/viewmodels/dashboard_viewmodel.dart';
-import 'package:unshelf_seller/views/store_analytics_view.dart';
-import 'package:unshelf_seller/views/product_analytics_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class DashboardView extends StatefulWidget {

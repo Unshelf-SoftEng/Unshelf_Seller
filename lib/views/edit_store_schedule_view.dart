@@ -48,7 +48,7 @@ class EditStoreScheduleView extends StatelessWidget {
                                             fontWeight: FontWeight.bold)),
                                     Switch(
                                       value: isActive,
-                                      activeColor: const Color(0xFF6A994E),
+                                      activeColor: AppColors.primaryColor,
                                       onChanged: (value) =>
                                           viewModel.toggleDay(day),
                                     ),
@@ -98,7 +98,7 @@ class EditStoreScheduleView extends StatelessWidget {
                                   const Text(
                                     'Closed all day',
                                     style: TextStyle(
-                                        color: Colors.red, fontSize: 14),
+                                        color: Colors.black, fontSize: 14),
                                   ),
                               ],
                             ),
@@ -147,7 +147,7 @@ class _TimePickerButton extends StatelessWidget {
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.palmLeaf,
+            backgroundColor: AppColors.primaryColor,
             foregroundColor: Colors.white,
           ),
           child: Text(time.isEmpty ? 'Set Time' : time),

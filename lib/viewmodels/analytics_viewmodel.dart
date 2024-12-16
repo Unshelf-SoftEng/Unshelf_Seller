@@ -194,7 +194,7 @@ class AnalyticsViewModel extends ChangeNotifier {
     switch (period) {
       case 'Daily':
         for (int i = 0; i < 14; i++) {
-          DateTime date = today.subtract(Duration(days: 14 - i));
+          DateTime date = today.subtract(Duration(days: i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
           _dailyOrdersMap[saveDate] = 0;
         }
@@ -242,7 +242,7 @@ class AnalyticsViewModel extends ChangeNotifier {
     switch (period) {
       case 'Daily':
         for (int i = 0; i < 14; i++) {
-          DateTime date = today.subtract(Duration(days: 14 - i));
+          DateTime date = today.subtract(Duration(days: i));
           DateTime saveDate = DateTime(date.year, date.month, date.day);
           _dailySalesMap[saveDate] = 0.0;
         }

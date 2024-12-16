@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class Chart extends StatefulWidget {
   const Chart({
@@ -20,8 +21,8 @@ class Chart extends StatefulWidget {
 
 class _ChartState extends State<Chart> {
   List<Color> gradientColors = [
-    Colors.greenAccent,
-    Colors.green,
+    AppColors.lightColor,
+    AppColors.primaryColor,
   ];
 
   @override

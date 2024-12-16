@@ -28,6 +28,18 @@ class BatchService {
         .toList();
   }
 
+  Future<List<BatchModel>> getBatchesByProductId(String productId) async {
+    var snapshot = await _firestore
+        .collection('batches')
+        .where('productId', isEqualTo: productId)
+        .orderBy('expiryDate', descending: false)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => BatchModel.fromSnapshot(doc, null))
+        .toList();
+  }
+
   Future<List<BatchModel>> getAllBatches() async {
     User? user = FirebaseAuth.instance.currentUser;
     var snapshot = await _firestore

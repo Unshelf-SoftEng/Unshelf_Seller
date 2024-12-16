@@ -5,12 +5,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBackPressed;
   final Widget? actionWidget;
+  final PreferredSizeWidget? bottom;
 
   const CustomAppBar({
     Key? key,
     required this.title,
     this.onBackPressed,
     this.actionWidget,
+    this.bottom,
   }) : super(key: key);
 
   @override
@@ -32,13 +34,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onBackPressed ?? () => Navigator.pop(context),
       ),
       actions: actionWidget != null ? [actionWidget!] : null,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(4.0),
-        child: Container(
-          color: AppColors.lightColor,
-          height: 4.0,
-        ),
-      ),
+      bottom: bottom != null
+          ? bottom
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(4.0),
+              child: Container(
+                color: AppColors.lightColor,
+                height: 4.0,
+              ),
+            ),
     );
   }
 

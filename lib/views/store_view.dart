@@ -12,6 +12,7 @@ import 'package:unshelf_seller/views/edit_store_location_view.dart';
 import 'package:unshelf_seller/views/edit_store_profile_view.dart';
 import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/views/order_history_view.dart';
+import 'package:unshelf_seller/views/product_analytics_view.dart';
 import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/edit_user_profile_view.dart';
 import 'package:unshelf_seller/views/store_analytics_view.dart';
@@ -139,7 +140,14 @@ class _StoreViewState extends State<StoreView> {
             Icons.analytics,
             'Store Analytics',
             'View store performance',
-            () => _navigateTo(const StoreAnalyticsView()),
+            () => _navigateTo(StoreAnalyticsView()),
+          ),
+
+          _buildListTile(
+            Icons.analytics,
+            'Product Analytics',
+            'View product performance',
+            () => _navigateTo(ProductAnalyticsView()),
           ),
 
           // Orders
