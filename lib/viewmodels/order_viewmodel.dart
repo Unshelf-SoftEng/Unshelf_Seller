@@ -17,29 +17,54 @@ class OrderViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  String get sortOrder => _sortOrder;
+  set sortOrder(String order) {
+    _sortOrder = order;
+
+    notifyListeners();
+  }
+
+  String _sortOrder = 'Descending';
+
   bool get isLoading => _isLoading;
   bool _isLoading = false;
 
-  late Future<void> fetchOrdersFuture;
   final OrderService _orderService = OrderService();
 
-  OrderViewModel() {
-    fetchOrdersFuture = fetchOrders();
-  }
-
   List<OrderModel> get filteredOrders {
+    List<OrderModel> ordersToReturn;
+
+    // Filter by status
     if (_currentStatus == 'All') {
-      return _orders;
+      ordersToReturn = _orders;
+    } else {
+      ordersToReturn =
+          _orders.where((order) => order.status == _currentStatus).toList();
     }
-    return _orders.where((order) => order.status == _currentStatus).toList();
+
+    // Sort by createdAt in the specified order
+    if (_sortOrder == 'Ascending') {
+      ordersToReturn.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+    } else if (_sortOrder == 'Descending') {
+      ordersToReturn.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+    }
+
+    return ordersToReturn;
   }
 
   Future<void> fetchOrders() async {
-    print('Fetching orders...');
     _isLoading = true;
     notifyListeners();
-    _orders = await _orderService.getOrders();
-    print('Orders fetched: ${_orders.length}');
+    print('Fetching orders for today...');
+    _orders = await _orderService.getOrders(true);
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchOrdersHistory() async {
+    _isLoading = true;
+    notifyListeners();
+    _orders = await _orderService.getOrders(false);
     _isLoading = false;
     notifyListeners();
   }
@@ -77,6 +102,8 @@ class OrderViewModel extends ChangeNotifier {
       });
 
       _selectedOrder!.status = 'Processing';
+      _orders.firstWhere((order) => order.id == _selectedOrder?.id).status =
+          'Processing';
 
       notifyListeners();
     } catch (e) {
@@ -91,6 +118,8 @@ class OrderViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    var now = Timestamp.now();
+
     try {
       if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
         throw Exception("Order or buyer information is missing.");
@@ -103,11 +132,18 @@ class OrderViewModel extends ChangeNotifier {
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.update(orderRef, {
           'status': 'Cancelled',
-          'cancelledAt': FieldValue.serverTimestamp(),
+          'cancelledAt': now,
         });
       });
 
       _selectedOrder!.status = 'Cancelled';
+      _selectedOrder!.cancelledAt = now;
+      var updateOrder =
+          _orders.firstWhere((order) => order.id == _selectedOrder?.id);
+
+      updateOrder.status = 'Cancelled';
+      updateOrder.cancelledAt = now;
+
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -136,36 +172,69 @@ class OrderViewModel extends ChangeNotifier {
       // Split item processing into smaller transactions if necessary
       for (var item in _selectedOrder!.items) {
         await FirebaseFirestore.instance.runTransaction((transaction) async {
-          print('Processing item: ${item.batchId}');
-          final batchRef = FirebaseFirestore.instance
-              .collection('batches')
-              .doc(item.batchId);
+          if (item.isBundle!) {
+            print('Processing item: ${item.batchId}');
+            final bundleRef = FirebaseFirestore.instance
+                .collection('bundles')
+                .doc(item.batchId);
 
-          DocumentSnapshot batchSnapshot = await transaction.get(batchRef);
+            DocumentSnapshot bundleSnapshot = await transaction.get(bundleRef);
 
-          print('Batch snapshot: ${batchSnapshot.data()}');
+            print('Batch snapshot: ${bundleSnapshot.data()}');
 
-          if (!batchSnapshot.exists) {
-            print('Batch ${item.batchId} does not exist.');
-            throw Exception("Batch ${item.batchId} does not exist.");
+            if (!bundleSnapshot.exists) {
+              print('Bundle ${item.batchId} does not exist.');
+              throw Exception("Bundle ${item.batchId} does not exist.");
+            }
+
+            double currentStock = bundleSnapshot['stock']?.toDouble() ?? 0.0;
+            int quantity = item.quantity;
+            double newStockValue = currentStock - quantity;
+
+            if (newStockValue < 0) {
+              print('Insufficient stock for batch ${item.batchId}.');
+              throw Exception(
+                  "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
+            }
+
+            transaction.update(bundleRef, {
+              'stock': newStockValue,
+              'isListed': newStockValue > 0,
+            });
+
+            print('Stock updated for bundle ${item.batchId}.');
+          } else {
+            print('Processing item: ${item.batchId}');
+            final batchRef = FirebaseFirestore.instance
+                .collection('batches')
+                .doc(item.batchId);
+
+            DocumentSnapshot batchSnapshot = await transaction.get(batchRef);
+
+            print('Batch snapshot: ${batchSnapshot.data()}');
+
+            if (!batchSnapshot.exists) {
+              print('Batch ${item.batchId} does not exist.');
+              throw Exception("Batch ${item.batchId} does not exist.");
+            }
+
+            double currentStock = batchSnapshot['stock']?.toDouble() ?? 0.0;
+            int quantity = item.quantity;
+            double newStockValue = currentStock - quantity;
+
+            if (newStockValue < 0) {
+              print('Insufficient stock for batch ${item.batchId}.');
+              throw Exception(
+                  "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
+            }
+
+            transaction.update(batchRef, {
+              'stock': newStockValue,
+              'isListed': newStockValue > 0,
+            });
+
+            print('Stock updated for batch ${item.batchId}.');
           }
-
-          double currentStock = batchSnapshot['stock']?.toDouble() ?? 0.0;
-          int quantity = item.quantity;
-          double newStockValue = currentStock - quantity;
-
-          if (newStockValue < 0) {
-            print('Insufficient stock for batch ${item.batchId}.');
-            throw Exception(
-                "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
-          }
-
-          transaction.update(batchRef, {
-            'stock': newStockValue,
-            'isListed': newStockValue > 0,
-          });
-
-          print('Stock updated for batch ${item.batchId}.');
         });
       }
 
@@ -180,6 +249,13 @@ class OrderViewModel extends ChangeNotifier {
       });
 
       _selectedOrder!.status = 'Ready';
+      _selectedOrder!.pickupCode = pickupCode;
+
+      var updateOrder =
+          _orders.firstWhere((order) => order.id == _selectedOrder?.id);
+
+      updateOrder.status = 'Ready';
+      updateOrder.pickupCode = pickupCode;
 
       notifyListeners();
     } catch (e) {
@@ -197,7 +273,7 @@ class OrderViewModel extends ChangeNotifier {
 
   Future<void> completeOrder() async {
     try {
-      DateTime now = DateTime.now();
+      Timestamp now = Timestamp.now();
       DocumentReference orderRef = FirebaseFirestore.instance
           .collection('orders')
           .doc(_selectedOrder?.id);
@@ -257,8 +333,15 @@ class OrderViewModel extends ChangeNotifier {
         print(
             'Order completed. Seller earnings: ₱$sellerEarnings. User earned $earnedPoints points.');
         _selectedOrder!.status = 'Completed';
-        _selectedOrder!.completedAt = Timestamp.fromDate(now);
+        _selectedOrder!.completedAt = now;
         _selectedOrder!.isPaid = true;
+
+        var updateOrder =
+            _orders.firstWhere((order) => order.id == _selectedOrder?.id);
+
+        updateOrder.status = 'Completed';
+        updateOrder.completedAt = now;
+        updateOrder.isPaid = true;
       });
 
       notifyListeners();

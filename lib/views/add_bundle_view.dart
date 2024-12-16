@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
-import 'package:unshelf_seller/components/image_delete.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
@@ -51,99 +50,139 @@ class _AddBundleViewState extends State<AddBundleView> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    GestureDetector(
-                      onTap: () => viewModel.pickImage(),
-                      child: Container(
-                        width: double.infinity,
-                        height: 300,
-                        color: const Color(0xFF386641),
-                        child: viewModel.mainImageData != null
-                            ? ImageWithDelete(
-                                imageData: viewModel.mainImageData!,
-                                onDelete: viewModel.deleteMainImage,
-                                width: 400.0,
-                                height: 400.0, // Add border
-                                margin: EdgeInsets.all(0),
-                              )
-                            : const Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.add_a_photo,
-                                        color: Colors.white),
-                                    Text(
-                                      'Add Main Image',
-                                      style: TextStyle(color: Colors.white),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Bundle Image',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => viewModel.pickImage(),
+                          child: Container(
+                            width: double.infinity,
+                            height: 350,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: viewModel.errorFound
+                                    ? AppColors.warningColor
+                                    : AppColors.lightColor,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                  8.0), // Optional: rounded corners
+                            ),
+                            child: viewModel.mainImageData != null
+                                ? Stack(
+                                    children: [
+                                      // Display the image
+                                      Center(
+                                        child: Image.memory(
+                                          viewModel.mainImageData!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo,
+                                            color: Colors.black),
+                                        Text(
+                                          'Click to Add Main Image',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
+                          ),
+                        ),
+                        if (viewModel.mainImageData != null)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.warningColor,
+                                  foregroundColor: Colors.white,
+                                  alignment: Alignment.center,
+                                  minimumSize: const Size(50, 30),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  viewModel.deleteImage();
+                                },
+                                child: const Text(
+                                  'Remove',
+                                  style:
+                                      TextStyle(fontSize: 12), // Smaller text
                                 ),
                               ),
-                      ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'You can change the main image by clicking on the image',
+                                style:
+                                    TextStyle(fontSize: 10, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Name',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                    if (viewModel.errorFound)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          'Main image is required',
+                          style: TextStyle(
+                            color: AppColors.warningColor,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 15.0),
                     TextFormField(
                       controller: viewModel.bundleNameController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
+                      decoration: const InputDecoration(
+                        labelText: 'Bundle Name',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 10.0),
-                        labelStyle: const TextStyle(color: Colors.black),
-                        errorStyle: const TextStyle(
-                          color: AppColors.watermelonRed,
-                          fontSize: 10,
-                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppColors.lightColor, width: 2.0)),
+                        errorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.warningColor)),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter bundle name';
+                          return 'Please enter a bundle name';
                         }
                         return null;
                       },
                       style: const TextStyle(fontSize: 12),
                     ),
-                    const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Description',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 15.0),
                     TextFormField(
                       controller: viewModel.bundleDescriptionController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 10.0),
-                        labelStyle: const TextStyle(color: Colors.black),
-                        errorStyle: const TextStyle(
-                          color: Color(0xFFBC4749),
-                          fontSize: 10,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: AppColors.lightColor, width: 2.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.warningColor),
                         ),
                       ),
                       maxLines: 3,
@@ -155,18 +194,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                       },
                       style: const TextStyle(fontSize: 12),
                     ),
-                    const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Category',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 15.0),
                     DropdownButtonFormField<String>(
                       value: viewModel.selectedCategory.isEmpty
                           ? null
@@ -177,16 +205,18 @@ class _AddBundleViewState extends State<AddBundleView> {
                           child: Text(category),
                         );
                       }).toList(),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 12.0),
-                        labelStyle: const TextStyle(color: Colors.black),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: AppColors.lightColor, width: 2.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.warningColor),
+                        ),
                       ),
                       onChanged: (String? newValue) {
                         viewModel.selectedCategory = newValue!;
@@ -199,125 +229,92 @@ class _AddBundleViewState extends State<AddBundleView> {
                       },
                       style: const TextStyle(fontSize: 12, color: Colors.black),
                     ),
-                    const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Price',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 15.0),
                     TextFormField(
                       controller: viewModel.bundlePriceController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
+                      decoration: const InputDecoration(
+                        labelText: 'Price',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 12.0),
-                        labelStyle: const TextStyle(color: Colors.black),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: AppColors.lightColor, width: 2.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.warningColor),
+                        ),
                       ),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d*\.?\d*$')),
-                      ],
+                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter a price';
+                          return 'Please enter price of the bundle';
                         }
-                        try {
-                          double.parse(value);
-                        } catch (e) {
-                          return 'Invalid price format';
+                        if (double.tryParse(value) == null ||
+                            double.parse(value) <= 0) {
+                          return 'Please enter a valid price';
                         }
                         return null;
                       },
-                      style: TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Quantity',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
                     TextFormField(
                       controller: viewModel.bundleStockController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
+                      decoration: const InputDecoration(
+                        labelText: 'Stock',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 12.0),
-                        labelStyle: const TextStyle(color: Colors.black),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: AppColors.lightColor, width: 2),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.warningColor),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter the bundle stock';
                         }
                         final stock = int.tryParse(value);
                         if (stock == null || stock <= 0) {
-                          return 'Please enter a valid stock number';
+                          return 'Please enter a valid stock quantity';
                         }
-                        // if (stock > viewModel.maxStock) {
-                        //   return 'Max Stock is ${viewModel.maxStock}. Stock cannot be greater than the lowest stock of the products in the bundle';
-                        // }
                         return null;
                       },
                       style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 20.0),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Discount (%)',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Discount (%)',
+                        hintText: 'e.g. 10 for 10%, 0 for no discount',
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.lightColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: AppColors.lightColor, width: 2),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.warningColor),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 5),
-                    TextFormField(
                       controller: viewModel.bundleDiscountController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color.fromARGB(255, 228, 228, 228),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 12.0),
-                        labelStyle: const TextStyle(color: Colors.black),
-                      ),
                       validator: (value) {
-                        final intValue = int.tryParse(value ?? '');
-                        if (intValue == null ||
-                            intValue < 0 ||
-                            intValue > 100) {
-                          return 'Please enter a valid percentage between 0 and 100';
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the discount percentage';
                         }
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid discount percentage';
+                        }
+                        if (int.parse(value) < 0 || int.parse(value) > 100) {
+                          return 'Please enter a valid discount percentage';
+                        }
+
                         return null;
                       },
                       inputFormatters: [

@@ -16,20 +16,18 @@ class _OrdersViewState extends State<OrdersView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ordersViewModel =
-          Provider.of<OrderViewModel>(context, listen: false);
-      ordersViewModel.fetchOrdersFuture;
+      final viewModel = Provider.of<OrderViewModel>(context, listen: false);
+      viewModel.fetchOrders();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ordersViewModel = Provider.of<OrderViewModel>(context);
+    final viewModel = Provider.of<OrderViewModel>(context);
 
     return Scaffold(
       body: Column(
         children: [
-          // Filter Buttons
           Container(
             alignment: Alignment.center,
             width: double.infinity,
@@ -39,178 +37,157 @@ class _OrdersViewState extends State<OrdersView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _buildFilterButton('All', ordersViewModel),
-                  _buildFilterButton('Pending', ordersViewModel),
-                  _buildFilterButton('Processing', ordersViewModel),
-                  _buildFilterButton('Ready', ordersViewModel),
-                  _buildFilterButton('Completed', ordersViewModel),
-                  _buildFilterButton('Cancelled', ordersViewModel),
+                  _buildFilterButton('All', viewModel),
+                  _buildFilterButton('Pending', viewModel),
+                  _buildFilterButton('Processing', viewModel),
+                  _buildFilterButton('Ready', viewModel),
+                  _buildFilterButton('Completed', viewModel),
+                  _buildFilterButton('Cancelled', viewModel),
                 ],
               ),
             ),
           ),
 
+          // Orders List
           Expanded(
-            child: FutureBuilder<void>(
-              future: ordersViewModel.fetchOrdersFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: Consumer<OrderViewModel>(
+              builder: (context, viewModel, child) {
+                if (viewModel.isLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  return Consumer<OrderViewModel>(
-                    builder: (context, ordersViewModel, child) {
-                      final filteredOrders = ordersViewModel.filteredOrders;
+                }
 
-                      if (filteredOrders.isEmpty) {
-                        final statusMessages = {
-                          'Pending': 'No pending orders for today.',
-                          'Processing':
-                              'No orders currently being processed today.',
-                          'Ready': 'No orders ready for pickup today.',
-                          'Completed': 'No completed orders today.',
-                          'Cancelled': 'No cancelled orders today.',
-                        };
+                final filteredOrders = viewModel.filteredOrders;
 
-                        // Retrieve message for the current status, or use a default message
-                        String message =
-                            statusMessages[ordersViewModel.currentStatus] ??
-                                'No orders found.';
+                if (filteredOrders.isEmpty) {
+                  final statusMessages = {
+                    'Pending': 'No pending orders',
+                    'Processing': 'No orders in processing.',
+                    'Ready': 'No orders that are ready',
+                    'Completed': 'No completed orders.',
+                    'Cancelled': 'No cancelled orders',
+                  };
 
-                        return Center(
-                          child: Text(message),
+                  String message = statusMessages[viewModel.currentStatus] ??
+                      'No orders found.';
+                  return Center(child: Text(message));
+                }
+
+                return ListView.builder(
+                  itemCount: filteredOrders.length,
+                  itemBuilder: (context, index) {
+                    final order = filteredOrders[index];
+                    final isDarkBackground = index % 2 == 0;
+
+                    return GestureDetector(
+                      onTap: () {
+                        viewModel.selectOrder(order.id);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OrderDetailsView(orderId: order.id),
+                          ),
                         );
-                      }
-
-                      return ListView.builder(
-                        itemCount: ordersViewModel.filteredOrders.length,
-                        itemBuilder: (context, index) {
-                          final order = ordersViewModel.filteredOrders[index];
-                          final isDarkBackground = index % 2 == 0;
-
-                          return GestureDetector(
-                            onTap: () {
-                              ordersViewModel.selectOrder(order.id);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OrderDetailsView(
-                                    orderId: order.id,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              color: isDarkBackground
-                                  ? Colors.grey[300]
-                                  : Colors.grey[150],
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Middle Section: Order Info
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Order ID: ${order.orderId}',
-                                            style: const TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4.0),
-                                          Text(
-                                            order.createdAt
-                                                .toDate()
-                                                .toLocal()
-                                                .toString()
-                                                .split(' ')[0],
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                          if (ordersViewModel.currentStatus ==
-                                              'All')
-                                            Text(
-                                              'Status: ${order.status}',
-                                              style: TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.grey[600],
-                                              ),
-                                            ),
-                                        ],
+                      },
+                      child: Container(
+                        color: isDarkBackground
+                            ? Colors.grey[200]
+                            : Colors.grey[100],
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Order ID: ${order.orderId}',
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
                                       ),
                                     ),
-                                  ),
-
-                                  // Right Section: Price and Payment Status
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      RichText(
-                                        text: TextSpan(
-                                          style: const TextStyle(
-                                            fontSize: 18.0,
-                                            color: AppColors.primaryColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          children: [
-                                            const TextSpan(
-                                              text: '\u20B1 ', // Peso symbol
-                                              style: TextStyle(
-                                                fontFamily: 'Roboto',
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: '${order.totalPrice}',
-                                            ),
-                                          ],
-                                        ),
+                                    const SizedBox(height: 4.0),
+                                    Text(
+                                      order.createdAt
+                                          .toDate()
+                                          .toLocal()
+                                          .toString()
+                                          .split(' ')[0],
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[600],
                                       ),
-                                      const SizedBox(height: 8.0),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0, horizontal: 12.0),
-                                        decoration: BoxDecoration(
-                                          color: order.isPaid
-                                              ? AppColors.lightColor
-                                              : AppColors.warningColor,
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                        child: Text(
-                                          order.isPaid ? 'Paid' : 'Unpaid',
-                                          style: const TextStyle(
-                                            fontSize: 12.0,
-                                            color: Colors.black,
-                                          ),
-                                        ),
+                                    ),
+                                    const SizedBox(height: 4.0),
+                                    Text(
+                                      'Status: ${order.status}',
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      color: AppColors.palmLeaf,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text: '\u20B1 ', // Peso symbol
+                                        style: TextStyle(fontFamily: 'Roboto'),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            '${order.totalPrice.toStringAsFixed(2)}',
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 8.0),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 4.0, horizontal: 12.0),
+                                  decoration: BoxDecoration(
+                                    color: order.isPaid
+                                        ? AppColors.palmLeaf
+                                        : AppColors.watermelonRed,
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: Text(
+                                    order.isPaid ? 'Paid' : 'Unpaid',
+                                    style: const TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                }
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
               },
             ),
-          ),
+          )
         ],
       ),
     );

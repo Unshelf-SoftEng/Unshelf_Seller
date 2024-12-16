@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/models/order_model.dart';
 import 'package:unshelf_seller/services/batch_service.dart';
-import 'package:unshelf_seller/models/batch_model.dart';
+import 'package:unshelf_seller/services/bundle_service.dart';
 
 class OrderService extends ChangeNotifier {
   final BatchService _batchService = BatchService();
+  final BundleService _bundleService = BundleService();
 
   Future<OrderModel?> getOrder(String orderId) async {
     final orderDoc = await FirebaseFirestore.instance
@@ -28,47 +29,48 @@ class OrderService extends ChangeNotifier {
     order.buyerName = buyerDoc['name'];
 
     for (var item in order.items) {
-      final batchDoc = await _batchService.getBatchById(item.batchId!);
-      order.products.add(batchDoc!);
+      if (item.isBundle!) {
+        final bundleDoc = await _bundleService.getBundle(item.batchId!);
+        order.bundles!.add(bundleDoc!);
+        continue;
+      } else {
+        final batchDoc = await _batchService.getBatchById(item.batchId!);
+        order.products!.add(batchDoc!);
+      }
     }
 
     return order;
   }
 
-  Future<List<OrderModel>> getOrders() async {
+  Future<List<OrderModel>> getOrders(bool forToday) async {
     User? user = FirebaseAuth.instance.currentUser;
 
-    final orderDocs = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('sellerId', isEqualTo: user!.uid)
-        .where('createdAt',
-            isGreaterThan: DateTime.now().subtract(const Duration(days: 13)))
-        .get();
+    var orderDoc;
 
-    var orders =
-        orderDocs.docs.map((doc) => OrderModel.fromFirestore(doc)).toList();
+    if (forToday) {
+      orderDoc = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('sellerId', isEqualTo: user!.uid)
+          .where('createdAt',
+              isGreaterThan: DateTime.now().subtract(const Duration(hours: 24)))
+          .orderBy('createdAt', descending: false)
+          .get();
+    } else {
+      orderDoc = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('sellerId', isEqualTo: user!.uid)
+          .where('createdAt',
+              isGreaterThan: DateTime.now().subtract(const Duration(days: 17)))
+          .orderBy('createdAt', descending: false)
+          .get();
+    }
 
-    return orders;
-  }
+    print('Orders today: ${orderDoc.docs.length}');
 
-  Future<List<OrderModel>> getOrdersToday() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    // Get the current time
-    DateTime now = DateTime.now();
-
-    // Calculate the time 24 hours ago
-    DateTime twentyFourHoursAgo = now.subtract(const Duration(days: 1));
-
-    // Fetch orders from Firestore
-    final orderDocs = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('sellerId', isEqualTo: user!.uid)
-        .where('createdAt', isGreaterThan: twentyFourHoursAgo)
-        .get();
-
-    var orders =
-        orderDocs.docs.map((doc) => OrderModel.fromFirestore(doc)).toList();
+    List<OrderModel> orders = orderDoc.docs
+        .map((doc) => OrderModel.fromFirestore(doc))
+        .toList()
+        .cast<OrderModel>();
 
     return orders;
   }

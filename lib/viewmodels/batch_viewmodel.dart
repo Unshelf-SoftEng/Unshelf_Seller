@@ -34,21 +34,28 @@ class BatchViewModel extends ChangeNotifier {
   }
 
   // Add batch using BatchService
-  Future<void> addBatch(String productId) async {
+  Future<bool> addBatch(String productId) async {
     setLoading(true);
-
-    await _batchService.addBatch(
-      productId: productId,
-      batchNumber: batchNumberController.text,
-      price: double.tryParse(priceController.text) ?? 0.0,
-      stock: int.tryParse(stockController.text) ?? 0,
-      quantifier: quantifierController.text,
-      expiryDate: expiryDate!,
-      discount: discountController.text.isNotEmpty
-          ? int.tryParse(discountController.text) ?? 0
-          : 0,
-    );
-    setLoading(false);
+    try {
+      await _batchService.addBatch(
+        productId: productId,
+        batchNumber: batchNumberController.text,
+        price: double.tryParse(priceController.text) ?? 0.0,
+        stock: int.tryParse(stockController.text) ?? 0,
+        quantifier: quantifierController.text,
+        expiryDate: expiryDate!,
+        discount: discountController.text.isNotEmpty
+            ? int.tryParse(discountController.text) ?? 0
+            : 0,
+      );
+      setLoading(false);
+      return true;
+    }
+    // Catch any errors
+    catch (e) {
+      setLoading(false);
+      return false;
+    }
   }
 
   Future<void> fetchBatch(String batchNumber) async {

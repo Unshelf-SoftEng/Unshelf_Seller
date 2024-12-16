@@ -33,6 +33,7 @@ class BatchService {
     var snapshot = await _firestore
         .collection('batches')
         .where('sellerId', isEqualTo: user!.uid)
+        .orderBy('expiryDate', descending: false)
         .get();
 
     return snapshot.docs

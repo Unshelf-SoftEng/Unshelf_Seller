@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/models/bundle_model.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
 
 class OrderHistoryDetailsView extends StatefulWidget {
   final String orderId;
@@ -20,7 +22,7 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final viewModel = context.read<OrderViewModel>();
+      final viewModel = Provider.of<OrderViewModel>(context, listen: false);
       viewModel.selectOrder(widget.orderId);
     });
   }
@@ -28,11 +30,9 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Consumer<OrderViewModel>(builder: (context, viewModel, child) {
-      final order = viewModel.selectedOrder;
-
       return Scaffold(
         appBar: CustomAppBar(
-            title: 'Order Details',
+            title: 'Order History Details',
             onBackPressed: () {
               Navigator.pop(context);
             }),
@@ -46,129 +46,176 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Order Overview Card (First Half with Details)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.0),
-                            child: Text(
-                              'Order Information',
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.palmLeaf,
-                              ),
-                            ),
-                          ),
-                          _buildDetailCard('Order ID', order!.orderId),
-                          _buildDetailCard('Buyer Name', order.buyerName),
-                          _buildDetailCard(
-                            'Order Date',
-                            DateFormat('MM-dd-yyyy HH:mm')
-                                .format(order.createdAt.toDate()),
-                          ),
-                          _buildDetailCard('Price', '${order.totalPrice}'),
-                          _buildDetailCard('Status', order.status),
-                          _buildDetailCard(
-                              'Paid', order.isPaid ? 'Paid' : 'Not Paid'),
-                          _buildDetailCard(
-                            'Pickup Time',
-                            DateFormat('MM-dd-yyyy HH:mm').format(
-                                order.pickupTime?.toDate() ?? DateTime.now()),
-                          ),
-                          _buildDetailCard(
-                              'Pickup Code', order.pickupCode ?? 'N/A'),
-                          _buildDetailCard(
-                            'Completed At',
-                            DateFormat('MM-dd-yyy HH:mm').format(
-                                order.completedAt?.toDate() ?? DateTime.now()),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(
-                          'Order Items',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.palmLeaf,
-                          ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Order ID: ${viewModel.selectedOrder!.orderId}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Products List View (no Expanded around it)
+                      _buildDetailCard(
+                          'Buyer Name', viewModel.selectedOrder!.buyerName),
+                      _buildDetailCard(
+                          'Order Date',
+                          DateFormat('MMMM dd, yyyy hh:mm a').format(
+                              viewModel.selectedOrder!.createdAt.toDate())),
+
+                      if (!viewModel.selectedOrder!.isPaid) ...[
+                        _buildDetailCard('Payment Mode', 'Cash'),
+                      ] else ...[
+                        _buildDetailCard('Payment Mode', 'Paid Online'),
+                      ],
+
+                      _buildDetailCard('Subtotal',
+                          viewModel.selectedOrder!.subtotal.toStringAsFixed(2)),
+                      _buildDetailCard('Discount',
+                          viewModel.selectedOrder!.pointsDiscount.toString()),
+                      _buildDetailCard(
+                          'Total Price',
+                          viewModel.selectedOrder!.totalPrice
+                              .toStringAsFixed(2)),
+                      _buildDetailCard(
+                          'Status', viewModel.selectedOrder!.status),
+                      const SizedBox(height: 6),
+
+                      _buildDetailCard(
+                          'Pickup Time',
+                          DateFormat('MMMM dd, yyyy hh:mm a').format(
+                              viewModel.selectedOrder!.pickupTime!.toDate())),
+
+                      if (viewModel.currentStatus == 'Cancelled') ...[
+                        _buildDetailCard(
+                            'Cancelled At',
+                            DateFormat('MMMM dd, yyyy hh:mm a').format(viewModel
+                                .selectedOrder!.cancelledAt!
+                                .toDate())),
+                      ],
+
+                      if (viewModel.selectedOrder!.status == 'Ready' ||
+                          viewModel.selectedOrder!.status == 'Completed') ...[
+                        _buildDetailCard('Pickup Code',
+                            viewModel.selectedOrder!.pickupCode!),
+                      ],
+
+                      if (viewModel.selectedOrder!.status == 'Completed') ...[
+                        _buildDetailCard(
+                            'Completed At',
+                            DateFormat('MMMM dd, yyyy hh:mm a').format(viewModel
+                                .selectedOrder!.completedAt!
+                                .toDate())),
+                      ],
+
+                      const SizedBox(height: 10),
+
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Items in Order',
+                          style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
                       ListView.builder(
-                        itemCount: order.items.length,
-                        shrinkWrap:
-                            true, // Important for ListView inside scrollable widget
-                        physics:
-                            NeverScrollableScrollPhysics(), // Disable internal scrolling
+                        itemCount: viewModel.selectedOrder!.items
+                            .length, // Use items length here
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
+                          final item = viewModel.selectedOrder!.items[index];
+                          Widget? leadingImage;
+                          BundleModel? bundle;
+                          BatchModel? product;
+
+                          // Check if the item is a bundle or a product
+                          if (item.isBundle ?? false) {
+                            // Fetch bundle information
+                            bundle =
+                                viewModel.selectedOrder!.bundles!.firstWhere(
+                              (bundle) => bundle.id == item.batchId,
+                            );
+                            leadingImage = bundle.mainImageUrl.isNotEmpty
+                                ? Image.network(
+                                    bundle.mainImageUrl,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/images/placeholder.png',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  );
+                          } else {
+                            product = viewModel.selectedOrder!.products!
+                                .firstWhere(
+                                    (product) =>
+                                        product.batchNumber ==
+                                        item.batchId // Handle if not found
+                                    );
+
+                            leadingImage =
+                                product.product!.mainImageUrl.isNotEmpty
+                                    ? Image.network(
+                                        product.product!.mainImageUrl,
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/placeholder.png',
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      );
+                          }
+
                           return Card(
                             elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.horizontal(
-                                      left: Radius.circular(10)),
-                                  child: Image.network(
-                                    order.products[index].product!.mainImageUrl,
-                                    width: 80, // Reduced the size of the image
-                                    height: 80, // Reduced the size of the image
-                                    fit: BoxFit.cover,
-                                  ),
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: const BorderRadius.horizontal(
+                                    left: Radius.circular(10)),
+                                child: leadingImage,
+                              ),
+                              title: Text(
+                                item.isBundle ?? false
+                                    ? bundle!.name
+                                    : product!.product!.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          order.products[index].product!.name,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                      ],
-                                    ),
-                                  ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                'x ${item.quantity} ${item.isBundle ?? false ? '' : product!.quantifier}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
                                 ),
-                                // Spacer for right-alignment
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        'x ${order.items[index].quantity} ${order.products[index].quantifier}',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: Text(
+                                '\u20B1 ${item.price!.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
+                              ),
                             ),
                           );
                         },
                       ),
-                      const SizedBox(height: 20),
+                      // Order Details Section
                     ],
                   ),
                 ),
@@ -197,17 +244,7 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                 ),
               ),
             ),
-            if (title != 'Price')
-              Expanded(
-                flex: 2,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              )
-            else
+            if (title == 'Price') ...[
               Expanded(
                 flex: 2,
                 child: RichText(
@@ -230,6 +267,38 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                   ),
                 ),
               ),
+            ] else if (title == 'Order Date') ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ] else if (title == 'Pending Payment') ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.warningColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+            ] else ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

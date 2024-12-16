@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
+import 'package:unshelf_seller/models/bundle_model.dart';
 
 class OrderModel {
   final String id;
@@ -9,7 +10,10 @@ class OrderModel {
   String status;
   final Timestamp createdAt;
   bool isPaid;
-  List<BatchModel> products = [];
+  List<BatchModel>? products;
+  List<BundleModel>? bundles;
+  double subtotal;
+  double pointsDiscount;
   double totalPrice;
   String buyerName;
   Timestamp? completedAt;
@@ -25,14 +29,20 @@ class OrderModel {
     required this.status,
     required this.createdAt,
     required this.isPaid,
+    this.subtotal = 0,
+    this.pointsDiscount = 0,
     this.totalPrice = 0,
-    this.products = const [],
     this.buyerName = '',
     this.completedAt,
     this.cancelledAt,
     this.pickupCode = '',
     this.pickupTime,
-  });
+    List<BatchModel>? products, // Add as optional parameters
+    List<BundleModel>? bundles, // Add as optional parameters
+  })  : products =
+            products ?? <BatchModel>[], // Initialize with empty list if null
+        bundles =
+            bundles ?? <BundleModel>[]; // Initialize with empty list if null
 
   factory OrderModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -50,7 +60,9 @@ class OrderModel {
       items: List<OrderItem>.from(
         data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
-      totalPrice: (data['totalPrice'] as num).toDouble(),
+      totalPrice: (data['totalPrice'] ?? 0 as num).toDouble(),
+      pointsDiscount: (data['pointsDiscount'] ?? 0 as num).toDouble(),
+      subtotal: (data['subTotal'] ?? 0 as num).toDouble(),
       isPaid: data['isPaid'] ?? false,
       products: [],
     );
@@ -60,14 +72,14 @@ class OrderModel {
 class OrderItem {
   final int quantity;
   final String? batchId;
-  final String? bundleId;
   final double? price;
+  final bool? isBundle;
   String? name;
 
   OrderItem({
     required this.quantity,
     this.batchId,
-    this.bundleId,
+    this.isBundle,
     this.price,
     this.name,
   });
@@ -76,7 +88,7 @@ class OrderItem {
     return OrderItem(
       quantity: map['quantity'] as int,
       batchId: map['batchId'] ?? '',
-      bundleId: map['bundleId'] ?? '',
+      isBundle: map['isBundle'] ?? false,
       price: (map['price'] as num?)?.toDouble(),
       name: map['name'] ?? '',
     );

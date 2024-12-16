@@ -33,7 +33,7 @@ class BundleModel extends ItemModel {
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       price: (data['price'] ?? 0.0).toDouble(),
-      stock: data['stock'] ?? 0,
+      stock: (data['stock'] ?? 0 as num).toInt(),
       discount: data['discount'] ?? 0,
       items: (data['items'] as List<dynamic>?)
               ?.map((item) => {

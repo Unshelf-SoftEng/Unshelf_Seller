@@ -16,22 +16,30 @@ class SelectProductsViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchProducts() async {
+  String _sortBy = 'expiryDate';
+  String get sortBy => _sortBy;
+
+  Future<void> fetchAllBatches() async {
     _isLoading = true;
     notifyListeners();
 
-    // Fetch all batches
     _items = await batchService.getAllBatches();
 
-    // Fetch all products in parallel
-    final productFutures = _items.map((item) async {
-      item.product = await productService.getProduct(item.productId);
-    });
+    final List<Future<void>> productFutures = _items.map((item) async {
+      if (item.productId != null) {
+        item.product = await productService.getProduct(item.productId);
+      } else {
+        return item;
+      }
+    }).toList();
 
     await Future.wait(productFutures);
 
+    _items.removeWhere((item) => item.product == null);
+
     _filteredItems = _items;
     _isLoading = false;
+
     notifyListeners();
   }
 
@@ -57,6 +65,17 @@ class SelectProductsViewModel extends ChangeNotifier {
   void updateSearchQuery(String query) {
     _searchQuery = query;
     _filterItems();
+    notifyListeners();
+  }
+
+  void sortItems(String sortBy) {
+    if (sortBy == 'name') {
+      _sortBy = 'name';
+      filteredItems.sort((a, b) => a.product!.name.compareTo(b.product!.name));
+    } else if (sortBy == 'expiryDate') {
+      _sortBy = 'expiryDate';
+      filteredItems.sort((a, b) => a.expiryDate.compareTo(b.expiryDate));
+    }
     notifyListeners();
   }
 

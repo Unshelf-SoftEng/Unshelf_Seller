@@ -64,7 +64,7 @@ class _EditBundleViewState extends State<EditBundleView> {
                               child: viewModel.mainImageData != null
                                   ? ImageWithDelete(
                                       imageData: viewModel.mainImageData!,
-                                      onDelete: viewModel.deleteMainImage,
+                                      onDelete: viewModel.deleteImage,
                                       width: 400.0,
                                       height: 400.0,
                                       margin: EdgeInsets.all(0),

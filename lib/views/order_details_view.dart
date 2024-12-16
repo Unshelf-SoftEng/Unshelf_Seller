@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/models/bundle_model.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
 
 class OrderDetailsView extends StatefulWidget {
   final String orderId;
@@ -44,149 +45,123 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Order Overview Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.grey.shade300), // Border color
-                          borderRadius:
-                              BorderRadius.circular(8), // Rounded corners
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Order ID: ${viewModel.selectedOrder!.orderId}',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Buyer Name: ${viewModel.selectedOrder!.buyerName}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Order Date: ${DateFormat('MM-dd-yyyy').format(viewModel.selectedOrder!.createdAt.toDate())}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.grey[700],
-                                  fontFamily: GoogleFonts.jost().fontFamily,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: 'Total Price: ',
-                                  ),
-                                  const TextSpan(
-                                    text: '\u20B1 ',
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: viewModel.selectedOrder!.totalPrice
-                                        .toStringAsFixed(2),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 4.0, horizontal: 12.0),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.middleGreenYellow,
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: Text(
-                                    viewModel.selectedOrder!.status,
-                                    style: const TextStyle(
-                                      fontSize: 12.0,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 4.0, horizontal: 12.0),
-                                  decoration: BoxDecoration(
-                                    color: viewModel.selectedOrder!.isPaid
-                                        ? AppColors.palmLeaf
-                                        : AppColors.watermelonRed,
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: Text(
-                                    viewModel.selectedOrder!.isPaid
-                                        ? 'Paid'
-                                        : 'Unpaid',
-                                    style: const TextStyle(
-                                      fontSize: 12.0,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                      const SizedBox(height: 10),
+                      Text(
+                        'Order ID: ${viewModel.selectedOrder!.orderId}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      _buildDetailCard(
+                          'Buyer Name', viewModel.selectedOrder!.buyerName),
+                      _buildDetailCard(
+                          'Order Date',
+                          DateFormat('MMMM dd, yyyy hh:mm a').format(viewModel
+                              .selectedOrder!.createdAt
+                              .toDate()
+                              .toLocal())),
+
+                      // _buildDetailCard('Subtotal',
+                      //     viewModel.selectedOrder!.subtotal.toStringAsFixed(2)),
+                      // _buildDetailCard('Discount',
+                      //     viewModel.selectedOrder!.pointsDiscount.toString()),
+                      _buildDetailCard(
+                          'Total Price',
+                          viewModel.selectedOrder!.totalPrice
+                              .toStringAsFixed(2)),
+                      _buildDetailCard(
+                          'Status', viewModel.selectedOrder!.status),
+                      const SizedBox(height: 6),
+
+                      if (viewModel.selectedOrder!.status != 'Pending' &&
+                          viewModel.selectedOrder!.status != 'Processing') ...[
+                        _buildImportantDetailCard(viewModel),
+                      ],
+
+                      const SizedBox(height: 10),
+
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(
                           'Items in Order',
                           style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.palmLeaf,
-                          ),
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor),
                         ),
                       ),
                       const SizedBox(height: 10),
 
                       ListView.builder(
-                        itemCount: viewModel.selectedOrder!.items.length,
+                        itemCount: viewModel.selectedOrder!.items
+                            .length, // Use items length here
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
+                          final item = viewModel.selectedOrder!.items[index];
+                          Widget? leadingImage;
+                          BundleModel? bundle;
+                          BatchModel? product;
+
+                          // Check if the item is a bundle or a product
+                          if (item.isBundle ?? false) {
+                            // Fetch bundle information
+                            bundle =
+                                viewModel.selectedOrder!.bundles!.firstWhere(
+                              (bundle) => bundle.id == item.batchId,
+                            );
+                            leadingImage = bundle.mainImageUrl.isNotEmpty
+                                ? Image.network(
+                                    bundle.mainImageUrl,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/images/placeholder.png',
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                  );
+                          } else {
+                            product = viewModel.selectedOrder!.products!
+                                .firstWhere(
+                                    (product) =>
+                                        product.batchNumber ==
+                                        item.batchId // Handle if not found
+                                    );
+
+                            leadingImage =
+                                product.product!.mainImageUrl.isNotEmpty
+                                    ? Image.network(
+                                        product.product!.mainImageUrl,
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        'assets/images/placeholder.png',
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      );
+                          }
+
                           return Card(
                             elevation: 2,
                             child: ListTile(
                               leading: ClipRRect(
                                 borderRadius: const BorderRadius.horizontal(
                                     left: Radius.circular(10)),
-                                child: Image.network(
-                                  viewModel.selectedOrder!.products[index]
-                                      .product!.mainImageUrl,
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: leadingImage,
                               ),
                               title: Text(
-                                viewModel.selectedOrder!.products[index]
-                                    .product!.name,
+                                item.isBundle ?? false
+                                    ? bundle!.name
+                                    : product!.product!.name,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -194,49 +169,26 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               subtitle: Text(
-                                'x ${viewModel.selectedOrder!.items[index].quantity} ${viewModel.selectedOrder!.products[index].quantifier}',
+                                'x ${item.quantity} ${item.isBundle ?? false ? '' : product!.quantifier}',
                                 style: const TextStyle(
-                                    fontSize: 14, color: Colors.grey),
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
                                 overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: Text(
+                                '\u20B1 ${item.price!.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           );
                         },
                       ),
                       // Order Details Section
-                      if (viewModel.selectedOrder!.status == 'Ready') ...[
-                        _buildDetailRow('Pickup Code',
-                            viewModel.selectedOrder!.pickupCode!),
-                        if (viewModel.selectedOrder!.pickupTime != null) ...[
-                          _buildDetailRow(
-                              'Pickup Time',
-                              DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                  .selectedOrder!.pickupTime!
-                                  .toDate())),
-                        ],
-                        if (!viewModel.selectedOrder!.isPaid) ...[
-                          _buildDetailRow('Payment',
-                              viewModel.selectedOrder!.totalPrice.toString()),
-                        ],
-                      ] else if (viewModel.selectedOrder!.status ==
-                          'Completed') ...[
-                        _buildDetailRow(
-                            'Completed At',
-                            DateFormat('yyyy-MM-dd HH:mm').format(viewModel
-                                .selectedOrder!.completedAt!
-                                .toDate())),
-                      ] else if (viewModel.selectedOrder!.status ==
-                          'Cancelled') ...[
-                        _buildDetailRow(
-                          'Cancelled At',
-                          viewModel.selectedOrder?.cancelledAt != null
-                              ? DateFormat('yyyy-MM-dd HH:mm').format(
-                                  viewModel.selectedOrder!.cancelledAt!
-                                      .toDate(),
-                                )
-                              : 'N/A',
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -262,7 +214,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
+                                  builder: (BuildContext dialogContext) {
                                     return AlertDialog(
                                       title: const Text('Cancel Order'),
                                       content: const Text(
@@ -270,39 +222,48 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                       actions: [
                                         TextButton(
                                           onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close dialog
+                                            Navigator.of(dialogContext).pop();
                                           },
                                           child: const Text('No'),
                                         ),
                                         TextButton(
                                           onPressed: () async {
-                                            try {
-                                              await viewModel.cancelOrder();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                      "Order has been canceled successfully."),
-                                                  backgroundColor:
-                                                      AppColors.watermelonRed,
-                                                ),
-                                              );
-                                            } catch (e) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      "Failed to cancel order: ${e.toString()}"),
-                                                  backgroundColor:
-                                                      AppColors.watermelonRed,
-                                                ),
-                                              );
+                                            Navigator.of(dialogContext).pop();
+
+                                            if (mounted) {
+                                              try {
+                                                await viewModel.cancelOrder();
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          "Order has been cancelled successfully!"),
+                                                      backgroundColor: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          "Failed to cancel order: ${e.toString()}"),
+                                                      backgroundColor: AppColors
+                                                          .warningColor,
+                                                    ),
+                                                  );
+                                                }
+                                              }
                                             }
-                                            Navigator.of(context)
-                                                .pop(); // Close dialog
                                           },
-                                          child: const Text('Yes, Cancel'),
+                                          child: const Text(
+                                            'Yes, Cancel',
+                                            style: TextStyle(
+                                                color: AppColors.warningColor),
+                                          ),
                                         ),
                                       ],
                                     );
@@ -310,7 +271,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.watermelonRed,
+                                backgroundColor: AppColors.warningColor,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 12),
@@ -322,28 +283,70 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                try {
-                                  await viewModel.approveOrder();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          "Order has been approved successfully!"),
-                                      backgroundColor:
-                                          AppColors.middleGreenYellow,
-                                    ),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          "Failed to approve order: ${e.toString()}"),
-                                      backgroundColor: AppColors.watermelonRed,
-                                    ),
-                                  );
-                                }
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext dialogContext) {
+                                    return AlertDialog(
+                                      title: const Text('Approve Order?'),
+                                      content: const Text(
+                                          'Are you sure you want to approve this order?'),
+                                      actions: [
+                                        // Cancel button
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(dialogContext).pop();
+                                          },
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                                color: AppColors.warningColor),
+                                          ),
+                                        ),
+                                        // Confirm button
+                                        TextButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+
+                                            if (mounted) {
+                                              try {
+                                                await viewModel.approveOrder();
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          "Order has been approved successfully!"),
+                                                      backgroundColor: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                  );
+                                                  Navigator.pop(
+                                                      context); // Pop the current view if necessary
+                                                }
+                                              } catch (e) {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          "Failed to approve order: ${e.toString()}"),
+                                                      backgroundColor: AppColors
+                                                          .warningColor,
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            }
+                                          },
+                                          child: const Text('Approve'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.middleGreenYellow,
+                                backgroundColor: AppColors.primaryColor,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 12),
@@ -364,7 +367,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 const SnackBar(
                                   content:
                                       Text("Order marked as ready for pickup!"),
-                                  backgroundColor: AppColors.middleGreenYellow,
+                                  backgroundColor: AppColors.primaryColor,
                                 ),
                               );
                             } catch (e) {
@@ -372,13 +375,13 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 SnackBar(
                                   content: Text(
                                       "Failed to fulfill order: ${e.toString()}"),
-                                  backgroundColor: AppColors.watermelonRed,
+                                  backgroundColor: AppColors.warningColor,
                                 ),
                               );
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFA7C957),
+                            backgroundColor: AppColors.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
@@ -390,27 +393,8 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                         ),
                       if (viewModel.selectedOrder!.status == 'Ready')
                         ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              await viewModel.completeOrder();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Order has been completed!"),
-                                  backgroundColor: AppColors.middleGreenYellow,
-                                ),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      "Failed to complete order: ${e.toString()}"),
-                                  backgroundColor: AppColors.watermelonRed,
-                                ),
-                              );
-                            }
-                          },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.middleGreenYellow,
+                            backgroundColor: AppColors.primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
@@ -419,6 +403,71 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                             ),
                           ),
                           child: const Text('Complete Order'),
+                          onPressed: () {
+                            // Show confirmation dialog
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext dialogContext) {
+                                return AlertDialog(
+                                  title: const Text('Confirm Order?'),
+                                  content: viewModel.selectedOrder!.isPaid
+                                      ? Text(
+                                          'Are you sure you want to complete this order?')
+                                      : Text(
+                                          'Confirming order means you have accepted the money from the buyer.'),
+                                  actions: [
+                                    // Cancel button
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                            color: AppColors.warningColor),
+                                      ),
+                                    ),
+                                    // Confirm button
+                                    TextButton(
+                                      onPressed: () async {
+                                        // Add your order completion logic here
+                                        Navigator.of(dialogContext).pop();
+                                        if (mounted) {
+                                          try {
+                                            await viewModel.completeOrder();
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      "Order has been completed!"),
+                                                  backgroundColor:
+                                                      AppColors.primaryColor,
+                                                ),
+                                              );
+                                            }
+                                          } catch (e) {
+                                            if (mounted) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      "Failed to complete order: ${e.toString()}"),
+                                                  backgroundColor:
+                                                      AppColors.warningColor,
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        }
+                                      },
+                                      child: const Text('Confirm'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         ),
                     ],
                   ),
@@ -428,53 +477,166 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
     });
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Conditional for Price label
-          if (label == 'Payment')
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.grey[700],
-                  fontFamily: GoogleFonts.jost().fontFamily,
-                ),
-                children: [
-                  const TextSpan(
-                    text: '\u20B1 ', // PHP symbol
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
-                  TextSpan(
-                    text: value,
-                  ),
-                ],
-              ),
-            )
-          else
+  Widget _buildDetailCard(String title, String value) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Expanded(
               child: Text(
-                value,
+                title,
                 style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
                 ),
               ),
             ),
+            if (title == 'Price') ...[
+              Expanded(
+                flex: 2,
+                child: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      const TextSpan(
+                        text: '\u20B1 ', // Peso symbol
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                      TextSpan(
+                        text: value,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ] else if (title == 'Order Date') ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ] else if (title == 'Pending Payment') ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.warningColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+            ] else ...[
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImportantDetailCard(viewModel) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0), // Space between boxes
+      padding: const EdgeInsets.all(16.0), // Padding around the entire card
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: AppColors.lightColor, // Border color
+          width: 1.0, // Border width
+        ),
+        borderRadius: BorderRadius.circular(8), // Rounded corners
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (viewModel.selectedOrder!.status == 'Ready') ...[
+            _buildDetailRow(
+                'Pickup Code', viewModel.selectedOrder!.pickupCode!),
+            if (viewModel.selectedOrder!.pickupTime != null) ...[
+              _buildDetailRow(
+                'Pickup Time',
+                DateFormat('MMMM dd, yyyy hh:mm a').format(
+                  viewModel.selectedOrder!.pickupTime!.toDate(),
+                ),
+              ),
+            ],
+            if (!viewModel.selectedOrder!.isPaid) ...[
+              _buildDetailRow(
+                'Pending Payment',
+                viewModel.selectedOrder!.totalPrice.toStringAsFixed(2),
+              ),
+            ],
+          ] else if (viewModel.selectedOrder!.status == 'Completed') ...[
+            _buildDetailRow(
+              'Completed At',
+              DateFormat('MMMM dd, yyyy hh:mm a').format(
+                viewModel.selectedOrder!.completedAt!.toDate(),
+              ),
+            ),
+          ] else if (viewModel.selectedOrder!.status == 'Cancelled') ...[
+            _buildDetailRow(
+              'Cancelled At',
+              viewModel.selectedOrder?.cancelledAt != null
+                  ? DateFormat('MMMM dd, yyyy hh:mm a').format(
+                      viewModel.selectedOrder!.cancelledAt!.toDate(),
+                    )
+                  : 'N/A',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          vertical: 4.0), // Space between title and value
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontFamily: 'Roboto',
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'Roboto',
+              ),
+              overflow: TextOverflow.ellipsis, // In case text overflows
+              textAlign: TextAlign.end, // Align value to the right
+            ),
+          ),
         ],
       ),
     );

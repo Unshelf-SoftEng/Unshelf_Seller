@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:unshelf_seller/main.dart';
-import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/services/bundle_service.dart';
 import 'package:unshelf_seller/services/batch_service.dart';
@@ -19,12 +17,6 @@ class BundleViewModel extends ChangeNotifier {
       TextEditingController();
   final formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
-
-  List<ProductModel> _products = [];
-  int _maxStock = 0;
-
-  List<ProductModel> get products => _products;
-  int get maxStock => _maxStock;
 
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
@@ -45,6 +37,9 @@ class BundleViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _errorFound = false;
+  bool get errorFound => _errorFound;
 
   void initializeControllers(BundleModel bundle) {
     bundleNameController.text = bundle.name;
@@ -125,7 +120,7 @@ class BundleViewModel extends ChangeNotifier {
     }
   }
 
-  void deleteMainImage() {
+  void deleteImage() {
     _mainImageData = null;
     notifyListeners();
   }

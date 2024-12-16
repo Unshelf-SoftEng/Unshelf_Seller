@@ -102,7 +102,7 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                                     image: NetworkImage(
                                         item['imageUrl'].toString()),
                                     fit: BoxFit.cover)
-                                : null, // No image if it's null
+                                : null,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
