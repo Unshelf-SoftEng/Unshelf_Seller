@@ -50,11 +50,13 @@ class ProductService extends ChangeNotifier {
     return null;
   }
 
-  Future<void> addProduct(ProductModel product) async {
+  Future<String> addProduct(ProductModel product) async {
     User? user = FirebaseAuth.instance.currentUser;
 
     try {
-      await FirebaseFirestore.instance.collection('products').add({
+      // Add the document and get the reference
+      DocumentReference docRef =
+          await FirebaseFirestore.instance.collection('products').add({
         'name': product.name,
         'description': product.description,
         'category': product.category,
@@ -62,6 +64,9 @@ class ProductService extends ChangeNotifier {
         'additionalImageUrls': product.additionalImageUrls,
         'sellerId': user!.uid,
       });
+
+      // Return the document ID
+      return docRef.id;
     } catch (e) {
       print('Error adding product to Firestore: $e');
       rethrow;

@@ -139,6 +139,7 @@ class BundleViewModel extends ChangeNotifier {
     for (var item in _bundle!.items) {
       final batch = await _batchService.getBatchById(item['batchId']);
       item['name'] = batch!.product!.name;
+      item['imageUrl'] = batch.product!.mainImageUrl;
     }
 
     // Load main image

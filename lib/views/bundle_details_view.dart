@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
@@ -25,29 +26,11 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bundle Details'),
-        backgroundColor: AppColors.palmLeaf,
-        foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(
-            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.deepMossGreen,
-          ),
-          onPressed: () {
+      appBar: CustomAppBar(
+          title: 'Bundle Details',
+          onBackPressed: () {
             Navigator.pop(context);
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4.0),
-          child: Container(
-            color: AppColors.lightGreen,
-            height: 4.0,
-          ),
-        ),
-      ),
+          }),
       body: Consumer<BundleViewModel>(
         builder: (context, viewModel, child) {
           final BundleModel? bundle = viewModel.bundle;
@@ -96,7 +79,7 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                       style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.palmLeaf,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ),
@@ -109,13 +92,18 @@ class _BundleDetailsViewState extends State<BundleDetailsView> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF6A994E),
-                          child: Text(
-                            item['quantity'].toString(),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                        leading: Container(
+                          width: 50, // Width of the square
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            image: item['imageUrl'] != null
+                                ? DecorationImage(
+                                    image: NetworkImage(
+                                        item['imageUrl'].toString()),
+                                    fit: BoxFit.cover)
+                                : null, // No image if it's null
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                         title: Text(

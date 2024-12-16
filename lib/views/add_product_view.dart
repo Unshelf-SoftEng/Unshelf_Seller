@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
-import 'package:unshelf_seller/components/image_delete.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/views/product_details_view.dart';
 
 class AddProductView extends StatelessWidget {
   final VoidCallback onProductAdded;
@@ -42,36 +42,29 @@ class AddProductView extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          const SizedBox(height: 10),
                           GestureDetector(
                             onTap: () => viewModel.pickImage(true),
                             child: Container(
                               width: double.infinity,
                               height: 350,
-                              color: AppColors.deepMossGreen,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: viewModel.errorFound
+                                      ? AppColors.warningColor
+                                      : AppColors.lightColor,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Optional: rounded corners
+                              ),
                               child: viewModel.mainImageState.data != null
                                   ? Stack(
                                       children: [
                                         // Display the image
                                         Center(
-                                          child: ImageWithDelete(
-                                            imageData:
-                                                viewModel.mainImageState.data!,
-                                            onDelete: () => viewModel
-                                                .deleteImage(true, null),
-                                            width: 400.0,
-                                            height: 400.0,
-                                            margin: const EdgeInsets.all(0),
-                                          ),
-                                        ),
-                                        // Show remove button overlay if the image is added
-                                        Positioned(
-                                          top: 10,
-                                          right: 10,
-                                          child: IconButton(
-                                            icon: const Icon(Icons.delete,
-                                                color: Colors.white),
-                                            onPressed: () => viewModel
-                                                .deleteImage(true, null),
+                                          child: Image.memory(
+                                            viewModel.mainImageState.data!,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                       ],
@@ -82,26 +75,47 @@ class AddProductView extends StatelessWidget {
                                             MainAxisAlignment.center,
                                         children: [
                                           Icon(Icons.add_a_photo,
-                                              color: Colors.white),
+                                              color: Colors.black),
                                           Text(
                                             'Click to Add Main Image',
                                             style:
-                                                TextStyle(color: Colors.white),
+                                                TextStyle(color: Colors.black),
                                           ),
                                         ],
                                       ),
                                     ),
                             ),
                           ),
-                          // Add a remove button below the image if an image is selected
                           if (viewModel.mainImageState.data != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: ElevatedButton(
-                                onPressed: () =>
-                                    viewModel.deleteImage(true, null),
-                                child: const Text('Remove Image'),
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.warningColor,
+                                    foregroundColor: Colors.white,
+                                    alignment: Alignment.center,
+                                    minimumSize: const Size(50, 30),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    viewModel.deleteImage(true, null);
+                                  },
+                                  child: const Text(
+                                    'Remove',
+                                    style:
+                                        TextStyle(fontSize: 12), // Smaller text
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'You can change the main image by clicking on the image',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.grey),
+                                ),
+                              ],
                             ),
                         ],
                       ),
@@ -201,33 +215,23 @@ class AddProductView extends StatelessWidget {
                           padding: EdgeInsets.only(top: 8.0),
                           child: Text(
                             'Main image is required',
-                            style: TextStyle(color: Color(0xBC4749)),
+                            style: TextStyle(color: AppColors.warningColor),
                           ),
                         ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Name',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       TextFormField(
                         controller: viewModel.nameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 228, 228, 228),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.lightColor),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 10.0),
-                          labelStyle: const TextStyle(color: Colors.black),
-                          errorStyle: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 10,
-                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: AppColors.lightColor, width: 2.0)),
+                          errorBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.warningColor)),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -235,29 +239,25 @@ class AddProductView extends StatelessWidget {
                           }
                           return null;
                         },
-                        style: const TextStyle(fontSize: 12),
                       ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Description',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
+
+                      const SizedBox(height: 15),
+
                       TextFormField(
                         controller: viewModel.descriptionController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 228, 228, 228),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.lightColor),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 12.0),
-                          labelStyle: const TextStyle(color: Colors.black),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppColors.lightColor, width: 2.0),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.warningColor),
+                          ),
                         ),
                         maxLines: 3,
                         validator: (value) {
@@ -269,14 +269,6 @@ class AddProductView extends StatelessWidget {
                         style: const TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Category',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
                       DropdownButtonFormField<String>(
                         value: viewModel.selectedCategory.isEmpty
                             ? null
@@ -287,16 +279,19 @@ class AddProductView extends StatelessWidget {
                             child: Text(category),
                           );
                         }).toList(),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 228, 228, 228),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.lightColor),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 12.0),
-                          labelStyle: const TextStyle(color: Colors.black),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppColors.lightColor, width: 2.0),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: AppColors.warningColor),
+                          ),
                         ),
                         onChanged: (String? newValue) {
                           viewModel.selectedCategory = newValue!;
@@ -313,21 +308,26 @@ class AddProductView extends StatelessWidget {
                       const SizedBox(height: 40),
                       Align(
                         alignment: Alignment.center,
-                        child: viewModel.isLoading
-                            ? const CircularProgressIndicator()
-                            : CustomButton(
-                                text: 'Add Product',
-                                onPressed: () async {
-                                  await viewModel.addProduct(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Product added successfully!'),
-                                    ),
-                                  );
-                                  onProductAdded();
-                                  Navigator.pop(context, true);
-                                }),
+                        child: CustomButton(
+                          text: 'Add Product',
+                          onPressed: () async {
+                            bool success = await viewModel
+                                .addProductWithValidation(context);
+                            if (success) {
+                              onProductAdded(); // Notify the UI or perform any callback.
+                              viewModel
+                                  .clearData(); // Clear the ViewModel data after success.
+
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductDetailsView(
+                                        productId: viewModel.selectedProductId,
+                                        isNew: true)),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),

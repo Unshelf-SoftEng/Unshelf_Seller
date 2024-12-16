@@ -52,39 +52,45 @@ class _ListingsViewState extends State<ListingsView> {
       children: [
         // Search Bar and Filters
         Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.only(
+            top: 10,
+            left: 18,
+            right: 20,
+          ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20), // Circular edges
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    autofocus: false,
-                    decoration: const InputDecoration(
-                      hintText: 'Search...',
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.only(top: 8),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.65,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: false,
+                  decoration: InputDecoration(
+                    hintText: 'Search for products or bundles',
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    style: const TextStyle(fontSize: 14),
-                    onChanged: (query) {
-                      _onSearchChanged();
-                    },
+                    contentPadding: const EdgeInsets.only(top: 8),
                   ),
+                  style: const TextStyle(fontSize: 14),
+                  onChanged: (query) {
+                    _onSearchChanged();
+                  },
                 ),
               ),
-              const SizedBox(width: 8),
               Consumer<ListingViewModel>(
                 builder: (context, viewModel, _) {
                   return DropdownButton<String>(
                     value: viewModel.filter,
                     underline: const SizedBox(),
                     icon: const Icon(Icons.filter_list,
-                        color: AppColors.deepMossGreen),
+                        color: AppColors.darkColor),
                     onChanged: (String? value) {
                       if (value != null) {
                         viewModel.setFilter(value);
@@ -110,7 +116,6 @@ class _ListingsViewState extends State<ListingsView> {
             ],
           ),
         ),
-        // Content List
         Expanded(
           child: Consumer<ListingViewModel>(
             builder: (context, viewModel, _) {

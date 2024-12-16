@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
-import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/viewmodels/product_summary_viewmodel.dart';
 import 'package:unshelf_seller/views/add_batch_view.dart';
-import 'package:unshelf_seller/views/edit_batch_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class ProductDetailsView extends StatefulWidget {
   final String productId;
+  final bool? isNew;
 
-  ProductDetailsView({required this.productId});
+  const ProductDetailsView(
+      {super.key, required this.productId, this.isNew = false});
 
   @override
   State<ProductDetailsView> createState() => _ProductDetailsViewState();
 }
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
+  bool _dialogShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,29 +44,39 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          if (viewModel.product != null &&
+              widget.isNew == true &&
+              !_dialogShown) {
+            _dialogShown = true;
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showAddBatchDialog(viewModel.product!);
+            });
+          }
+
           if (viewModel.product == null) {
             return const Center(child: Text('No product data available.'));
           }
-
-          final mainImageUrl = viewModel.product!.mainImageUrl;
-          final additionalImages = viewModel.product!.additionalImageUrls;
-
-          // Create a list of images to display
-          final images = [mainImageUrl, ...?additionalImages];
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image Gallery
-                _buildImageGallery(images, viewModel),
+                // Product Image
+                Image.network(
+                  viewModel.product!.mainImageUrl,
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
+                ),
+
                 const SizedBox(height: 16.0),
                 _buildProductDetail('Name', viewModel.product!.name),
                 _buildProductDetail(
                     'Description', viewModel.product!.description),
                 _buildProductDetail('Category', viewModel.product!.category),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 5.0),
                 // Batches Section
                 _buildSectionHeader('Batches'),
                 _buildBatchesSection(viewModel),
@@ -73,57 +85,30 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           );
         },
       ),
-    );
-  }
-
-  // Method to build the image gallery
-  Widget _buildImageGallery(
-      List<String> images, ProductSummaryViewModel viewModel) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 250,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: PageView.builder(
-            controller: viewModel.pageController,
-            itemCount: images.length,
-            onPageChanged: viewModel.onPageChanged,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => _showFullImage(images[index]),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: Image.network(
-                    images[index],
-                    width: 200,
-                    height: 200,
+      floatingActionButton: Consumer<ProductSummaryViewModel>(
+        builder: (context, viewModel, child) {
+          return FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddBatchView(
+                    product: viewModel.product!,
                   ),
                 ),
               );
+
+              if (result == true) {
+                viewModel.fetchProductData(widget.productId);
+              }
             },
-          ),
-        ),
-        const SizedBox(height: 8.0),
-        // Dots indicator
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(images.length, (index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              width: 8.0,
-              height: 8.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                    viewModel.currentPage == index ? Colors.black : Colors.grey,
-              ),
-            );
-          }),
-        ),
-      ],
+            icon: const Icon(Icons.add, color: Colors.white),
+            label:
+                const Text('Add Batch', style: TextStyle(color: Colors.white)),
+            backgroundColor: AppColors.primaryColor,
+          );
+        },
+      ),
     );
   }
 
@@ -172,7 +157,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         style: const TextStyle(
           fontSize: 20.0,
           fontWeight: FontWeight.bold,
-          color: AppColors.palmLeaf,
+          color: AppColors.primaryColor,
         ),
       ),
     );
@@ -180,248 +165,88 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
   // Method to build batches section
   Widget _buildBatchesSection(ProductSummaryViewModel viewModel) {
-    final batches = viewModel.batches;
-
     return Column(
       children: [
-        if (batches != null && batches.isNotEmpty)
-          ListView.builder(
-            itemCount: batches.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final batch = batches[index];
-              return Card(
-                elevation: 2.0,
-                margin: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Display batch number directly
-                      Text(
-                        'Batch Number: ${batch.batchNumber}',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .spaceBetween, // Spread text and buttons
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Quantity: ${batch.stock}',
-                                  style: TextStyle(fontSize: 14.0),
-                                ),
-                                RichText(
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                      fontSize: 13.0,
-                                      color: Colors.black,
-                                    ),
-                                    children: [
-                                      const TextSpan(
-                                        text: 'Price: ',
-                                      ),
-                                      const TextSpan(
-                                        text: '\u20B1 ', // Peso symbol
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            '${batch.price.toStringAsFixed(2)}',
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Display price with 2 decimal points
-                                Text(
-                                    'Expiry Date: ${DateFormat('MM-dd-yyyy').format(batch.expiryDate)}'), // Formatted expiry date
-                              ],
-                            ),
-                          ),
-                          // Icons for editing and deleting
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit,
-                                    color: Color(0xFF6A994E)),
-                                onPressed: () async {
-                                  final editResult = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EditBatchView(
-                                        batchNumber: batch.batchNumber,
-                                      ),
-                                    ),
-                                  );
-
-                                  if (editResult == true) {
-                                    viewModel
-                                        .fetchProductData(widget.productId!);
-                                  }
-                                },
-                              ),
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text(
-                                        'Delete Batch',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87, // Title color
-                                        ),
-                                      ),
-                                      content: const Text(
-                                        'Are you sure you want to delete this batch?',
-                                        style: TextStyle(
-                                            color: Colors
-                                                .black54), // Content color
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                          },
-                                          child: const Text(
-                                            'No',
-                                            style: TextStyle(
-                                              color: AppColors
-                                                  .palmLeaf, // Custom color for 'No'
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            viewModel
-                                                .deleteBatch(batch.batchNumber);
-                                            Navigator.of(context)
-                                                .pop(); // Close the dialog
-                                          },
-                                          child: const Text(
-                                            'Yes',
-                                            style: TextStyle(
-                                              color: AppColors
-                                                  .watermelonRed, // Custom color for 'Yes'
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            12.0), // Rounded corners for the dialog
-                                      ),
-                                      backgroundColor: Colors
-                                          .white, // Background color of the dialog
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
+        SizedBox(
+          width: double.infinity,
+          child: Card(
+            elevation: 2.0,
+            margin: const EdgeInsets.symmetric(vertical: 4.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'No batches available.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.grey[600]),
+                    textAlign:
+                        TextAlign.center, // Centers text within the column
                   ),
-                ),
-              );
-            },
-          )
-        else
-          GestureDetector(
-            onTap: () async {
-              final editResult = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddBatchView(
-                    productId: widget.productId,
-                  ),
-                ),
-              );
-
-              if (editResult == true) {
-                viewModel.fetchProductData(widget.productId);
-              }
-            },
-            child: SizedBox(
-              width: double.infinity, // Makes the Card take full screen width
-              child: Card(
-                elevation: 2.0,
-                margin: const EdgeInsets.symmetric(vertical: 4.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment
-                        .center, // Center the icon and text horizontally
-                    children: [
-                      Icon(
-                        Icons.add_circle_outline,
-                        size: 40,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        'No batches available. Tap to add a batch.',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: Colors.grey[600]),
-                        textAlign:
-                            TextAlign.center, // Centers text within the column
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
           ),
-        if (batches != null && batches.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: CustomButton(
-              text: 'Add Batch',
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AddBatchView(productId: viewModel.product!.id),
-                  ),
-                );
-
-                if (result == true) {
-                  // Refresh data
-                  viewModel.fetchProductData(widget.productId!);
-                }
-              },
-            ),
-          ),
+        ),
       ],
     );
   }
 
-  // Method to show full image on tap
-  void _showFullImage(String imageUrl) {
+  void _showAddBatchDialog(ProductModel product) {
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        child: Image.network(imageUrl, fit: BoxFit.cover),
-      ),
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Batch',
+              style: TextStyle(color: AppColors.primaryColor)),
+          content: const Text(
+            'Products need to have batches to be listed.\nDo you want to add a batch now?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Skip',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog first
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddBatchView(product: product),
+                  ),
+                );
+
+                if (result == true) {
+                  if (mounted) {
+                    final viewModel = Provider.of<ProductSummaryViewModel>(
+                        context,
+                        listen: false);
+                    viewModel.fetchProductData(product.id);
+                  }
+                }
+              },
+              child: const Text(
+                'Add Batch',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

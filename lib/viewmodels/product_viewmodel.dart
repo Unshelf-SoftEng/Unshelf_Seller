@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/services/product_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:unshelf_seller/utils/colors.dart';
 
 class ProductViewModel extends ChangeNotifier {
   TextEditingController nameController = TextEditingController();
@@ -26,10 +27,52 @@ class ProductViewModel extends ChangeNotifier {
   ProductModel? _selectedProduct;
   ProductModel? get selectedProduct => _selectedProduct;
 
+  String get selectedProductId => _selectedProductId;
+
+  String _selectedProductId = '';
+
   String selectedCategory = '';
   List<String> categories = ['Grocery', 'Fruits', 'Vegetables', 'Baked Goods'];
 
-  bool errorFound = false;
+  bool _errorFound = false;
+
+  bool get errorFound => _errorFound;
+
+  set errorFound(bool value) {
+    _errorFound = value;
+    notifyListeners(); // Notify the UI about the change
+  }
+
+  Future<bool> addProductWithValidation(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    if (mainImageState.data == null) {
+      errorFound = true;
+      _showSnackBar(context, 'Please add a main image!');
+      return false;
+    }
+
+    if (!(formKey.currentState?.validate() ?? false)) {
+      _showSnackBar(context, 'Please fill out all required fields!');
+      return false;
+    }
+
+    await addProduct(context);
+    _showSnackBar(context, 'Product added successfully!', isSuccess: true);
+    return true;
+  }
+
+  void _showSnackBar(BuildContext context, String message,
+      {bool isSuccess = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            isSuccess ? AppColors.primaryColor : AppColors.warningColor,
+      ),
+    );
+  }
 
   final ProductService _productService = ProductService();
 
@@ -73,6 +116,10 @@ class ProductViewModel extends ChangeNotifier {
         _mainImageState = ImageState(data: imageData, isNew: true);
       } else {
         _additionalImages.add(ImageState(data: imageData, isNew: true));
+      }
+
+      if (errorFound) {
+        errorFound = false;
       }
 
       notifyListeners();
@@ -124,7 +171,7 @@ class ProductViewModel extends ChangeNotifier {
             additionalImageUrls: [],
           );
 
-          await _productService.addProduct(product);
+          _selectedProductId = await _productService.addProduct(product);
         }
       } catch (e) {
         print('Error adding product' + e.toString());
