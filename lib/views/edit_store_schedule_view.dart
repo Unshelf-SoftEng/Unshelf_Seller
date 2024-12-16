@@ -111,9 +111,12 @@ class EditStoreScheduleView extends StatelessWidget {
                   CustomButton(
                       text: 'Save Changes',
                       onPressed: () async {
-                        await viewModel.saveProfile(
+                        bool isSaved = await viewModel.saveProfile(
                             context, storeDetails.userId);
-                        // Do not call Navigator.pop(context) here.
+
+                        if (isSaved) {
+                          Navigator.pop(context);
+                        }
                       }),
                 ],
               ),

@@ -35,15 +35,6 @@ class StoreModel {
     Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
     Map<String, dynamic> storeData = storeDoc.data() as Map<String, dynamic>;
 
-    var printStore = storeData['storeSchedule'];
-
-    printStore.forEach((key, value) {
-      print("Day: $key");
-      (value as Map<String, dynamic>).forEach((k, v) {
-        print("  $k: $v");
-      });
-    });
-
     return StoreModel(
       userId: userDoc.id,
       email: userData['email'] ?? '',

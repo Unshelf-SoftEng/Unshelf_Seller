@@ -5,7 +5,7 @@ import 'package:unshelf_seller/models/store_model.dart';
 
 class StoreScheduleViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final DateFormat _timeFormatter = DateFormat('HH:mm');
+  final DateFormat _timeFormatter = DateFormat('hh:mm a');
   late Map<String, Map<String, dynamic>> _storeSchedule;
 
   StoreScheduleViewModel(StoreModel storeDetails) {
@@ -76,7 +76,7 @@ class StoreScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveProfile(BuildContext context, String userId) async {
+  Future<bool> saveProfile(BuildContext context, String userId) async {
     // Perform validation
     if (!_validateSchedule()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,8 +84,10 @@ class StoreScheduleViewModel extends ChangeNotifier {
             content: Text(
                 'Please set valid opening and closing times for active days.')),
       );
-      return; // Do not proceed if validation fails
+      return false;
     }
+
+    print('Passed validation');
 
     try {
       await _firestore.collection('stores').doc(userId).update({
@@ -99,12 +101,14 @@ class StoreScheduleViewModel extends ChangeNotifier {
         SnackBar(content: Text('Failed to save profile: $e')),
       );
     }
+
+    return true;
   }
 
   /// Validation Method
   bool _validateSchedule() {
     for (var entry in _storeSchedule.entries) {
-      final isOpen = entry.value['isOpen'] == 'true';
+      final isOpen = entry.value['isOpen'];
       final openTime = entry.value['open']?.trim();
       final closeTime = entry.value['close']?.trim();
 
@@ -118,6 +122,6 @@ class StoreScheduleViewModel extends ChangeNotifier {
         }
       }
     }
-    return true; // Passes validation
+    return true;
   }
 }

@@ -74,6 +74,7 @@ class StoreViewModel extends ChangeNotifier {
         errorMessage = "User profile or store not found";
         print(errorMessage);
       } else {
+        print('Getting Store Details Here');
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
       }
     } catch (e) {

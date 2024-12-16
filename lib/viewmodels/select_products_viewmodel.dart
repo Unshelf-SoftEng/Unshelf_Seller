@@ -19,10 +19,17 @@ class SelectProductsViewModel extends ChangeNotifier {
   Future<void> fetchProducts() async {
     _isLoading = true;
     notifyListeners();
+
+    // Fetch all batches
     _items = await batchService.getAllBatches();
-    for (var item in _items) {
+
+    // Fetch all products in parallel
+    final productFutures = _items.map((item) async {
       item.product = await productService.getProduct(item.productId);
-    }
+    });
+
+    await Future.wait(productFutures);
+
     _filteredItems = _items;
     _isLoading = false;
     notifyListeners();

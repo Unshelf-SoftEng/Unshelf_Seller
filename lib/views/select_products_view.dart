@@ -65,12 +65,11 @@ class _SelectProductsViewState extends State<SelectProductsView> {
       ),
       body: Column(
         children: [
-          // Search bar moved to the body
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
-              autofocus: true,
+              autofocus: false,
               decoration: const InputDecoration(
                 hintText: 'Search products...',
                 border: OutlineInputBorder(),

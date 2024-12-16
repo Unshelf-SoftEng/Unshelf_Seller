@@ -88,9 +88,21 @@ class AddBatchView extends StatelessWidget {
                 ),
                 controller: TextEditingController(
                   text: viewModel.expiryDate != null
-                      ? "${viewModel.expiryDate!.day}/${viewModel.expiryDate!.month}/${viewModel.expiryDate!.year}"
+                      ? "${viewModel.expiryDate!.month}-${viewModel.expiryDate!.day}-${viewModel.expiryDate!.year}"
                       : '',
                 ),
+                readOnly: true,
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2100),
+                  );
+                  if (date != null) {
+                    viewModel.expiryDate = date;
+                  }
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Expiration date is required';

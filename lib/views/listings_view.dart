@@ -18,7 +18,6 @@ class ListingsView extends StatefulWidget {
 
 class _ListingsViewState extends State<ListingsView> {
   final TextEditingController _searchController = TextEditingController();
-  bool _isSearching = false;
 
   @override
   void initState() {
@@ -39,96 +38,100 @@ class _ListingsViewState extends State<ListingsView> {
         .updateSearchQuery(searchQuery);
   }
 
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-      if (!_isSearching) _searchController.clear();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
       body: _buildBody(context),
       floatingActionButton: _buildFloatingActionButton(context),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: _isSearching
-          ? TextField(
-              controller: _searchController,
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Search...',
-                border: InputBorder.none,
-              ),
-              style: const TextStyle(color: Colors.white),
-              textInputAction: TextInputAction.search,
-            )
-          : const Text('Listings'),
-      actions: [
-        IconButton(
-          icon: Icon(_isSearching ? Icons.cancel : Icons.search),
-          onPressed: _toggleSearch,
-        ),
-        const SizedBox(width: 8),
-        Consumer<ListingViewModel>(
-          builder: (context, viewModel, _) {
-            return DropdownButton<String>(
-              value: viewModel.filter,
-              dropdownColor: Colors.white,
-              underline: const SizedBox(),
-              icon:
-                  const Icon(Icons.filter_list, color: AppColors.deepMossGreen),
-              onChanged: (String? value) {
-                if (value != null) {
-                  viewModel.setFilter(value);
-                }
-              },
-              items: const [
-                DropdownMenuItem(
-                  value: 'All',
-                  child: Text('All'),
-                ),
-                DropdownMenuItem(
-                  value: 'Bundles',
-                  child: Text('Bundles'),
-                ),
-                DropdownMenuItem(
-                  value: 'Products',
-                  child: Text('Products'),
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-      ],
-    );
-  }
-
   Widget _buildBody(BuildContext context) {
-    return Consumer<ListingViewModel>(
-      builder: (context, viewModel, _) {
-        if (viewModel.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return Column(
+      children: [
+        // Search Bar and Filters
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20), // Circular edges
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    autofocus: false,
+                    decoration: const InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.only(top: 8),
+                    ),
+                    style: const TextStyle(fontSize: 14),
+                    onChanged: (query) {
+                      _onSearchChanged();
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Consumer<ListingViewModel>(
+                builder: (context, viewModel, _) {
+                  return DropdownButton<String>(
+                    value: viewModel.filter,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.filter_list,
+                        color: AppColors.deepMossGreen),
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        viewModel.setFilter(value);
+                      }
+                    },
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'All',
+                        child: Text('All'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Bundles',
+                        child: Text('Bundles'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Products',
+                        child: Text('Products'),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        // Content List
+        Expanded(
+          child: Consumer<ListingViewModel>(
+            builder: (context, viewModel, _) {
+              if (viewModel.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        if (viewModel.filteredItems.isEmpty) {
-          return _buildEmptyState(viewModel.filter);
-        }
+              if (viewModel.filteredItems.isEmpty) {
+                return _buildEmptyState(viewModel.filter);
+              }
 
-        return ListView.builder(
-          itemCount: viewModel.filteredItems.length,
-          itemBuilder: (context, index) {
-            final item = viewModel.filteredItems[index];
-            return _buildItemCard(context, item);
-          },
-        );
-      },
+              return ListView.builder(
+                itemCount: viewModel.filteredItems.length,
+                itemBuilder: (context, index) {
+                  final item = viewModel.filteredItems[index];
+                  return _buildItemCard(context, item);
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

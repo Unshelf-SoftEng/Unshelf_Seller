@@ -121,16 +121,8 @@ class _LoginViewState extends State<LoginView> {
           );
         }
       } on FirebaseAuthException catch (e) {
-        String message;
-        if (e.code == 'user-not-found') {
-          message = 'No user found for that email.';
-        } else if (e.code == 'wrong-password') {
-          message = 'Wrong password provided.';
-        } else {
-          message = 'Sign in failed. Please try again.';
-        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
+          SnackBar(content: Text(e.message!)),
         );
       }
     }

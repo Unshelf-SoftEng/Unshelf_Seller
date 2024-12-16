@@ -30,7 +30,7 @@ class BatchModel {
       productId: data['productId'],
       product: product,
       price: (data['price'] as num).toDouble(),
-      stock: data['stock'] ?? 0,
+      stock: (data['stock'] as num).toInt(),
       quantifier: data['quantifier'] ?? '',
       expiryDate: data['expiryDate'] != null
           ? (data['expiryDate'] as Timestamp).toDate()
