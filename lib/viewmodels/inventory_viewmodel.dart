@@ -20,9 +20,6 @@ class InventoryViewModel extends ChangeNotifier {
       for (var product in products) {
         var batches = await BatchService().getBatchesByProductId(product.id);
 
-        print('Batches for ${product.name}: $batches');
-        print('Product Id: ${product.id}');
-
         _inventoryItems.add(InventoryProductModel(
           id: product.id,
           name: product.name,
@@ -37,6 +34,11 @@ class InventoryViewModel extends ChangeNotifier {
     }
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void clearData() {
+    _inventoryItems = [];
     notifyListeners();
   }
 }

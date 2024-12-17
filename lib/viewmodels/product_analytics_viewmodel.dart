@@ -19,7 +19,6 @@ class ProductAnalyticsViewModel extends ChangeNotifier {
   Future<void> fetchProductAnalytics() async {
     _isLoading = true;
     notifyListeners();
-    await Future.delayed(Duration(milliseconds: 10));
     // Fetch products from the service
     _products = await _productService.getProducts();
 

@@ -17,6 +17,7 @@ import 'package:unshelf_seller/views/settings_view.dart';
 import 'package:unshelf_seller/views/edit_user_profile_view.dart';
 import 'package:unshelf_seller/views/store_analytics_view.dart';
 import 'package:unshelf_seller/views/inventory_view.dart';
+import 'package:unshelf_seller/views/report_view.dart';
 
 // Utils
 import 'package:unshelf_seller/utils/colors.dart';
@@ -213,6 +214,8 @@ class _StoreViewState extends State<StoreView> {
                     .userProfile!))),
         _buildListTile(Icons.settings, 'Settings', 'Manage app settings',
             () => _navigateTo(const SettingsView())),
+        _buildListTile(Icons.report, 'Report', 'Report an issue',
+            () => _navigateTo(ReportFormView())),
         _buildListTile(Icons.logout, 'Log Out', 'Sign out from your account',
             () async {
           await FirebaseAuth.instance.signOut();

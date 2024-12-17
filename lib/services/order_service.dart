@@ -74,4 +74,25 @@ class OrderService extends ChangeNotifier {
 
     return orders;
   }
+
+  Future<List<OrderModel>> getOrdersWithBatchId() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    var orderDoc = await FirebaseFirestore.instance
+        .collection('orders')
+        .where('sellerId', isEqualTo: user!.uid)
+        .where('createdAt',
+            isGreaterThan: DateTime.now().subtract(const Duration(hours: 24)))
+        .orderBy('createdAt', descending: false)
+        .get();
+
+    print('Orders containing batchId: ${orderDoc.docs.length}');
+
+    List<OrderModel> orders = orderDoc.docs
+        .map((doc) => OrderModel.fromFirestore(doc))
+        .toList()
+        .cast<OrderModel>();
+
+    return orders;
+  }
 }

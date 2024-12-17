@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/order_viewmodel.dart';
-import 'package:unshelf_seller/views/order_details_view.dart';
+import 'package:unshelf_seller/views/order_history_details_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class OrderHistoryView extends StatefulWidget {
@@ -28,7 +28,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: 'Order Details',
+          title: 'Order History',
           onBackPressed: () {
             Navigator.pop(context);
           }),
@@ -154,7 +154,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                OrderDetailsView(orderId: order.id),
+                                OrderHistoryDetailsView(orderId: order.id),
                           ),
                         );
                       },

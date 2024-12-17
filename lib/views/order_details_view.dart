@@ -320,8 +320,6 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                                           .primaryColor,
                                                     ),
                                                   );
-                                                  Navigator.pop(
-                                                      context); // Pop the current view if necessary
                                                 }
                                               } catch (e) {
                                                 if (mounted) {

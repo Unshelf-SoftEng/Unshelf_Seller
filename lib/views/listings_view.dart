@@ -70,7 +70,7 @@ class _ListingsViewState extends State<ListingsView> {
                   controller: _searchController,
                   autofocus: false,
                   decoration: InputDecoration(
-                    hintText: 'Search for products or bundles',
+                    hintText: 'Search',
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),

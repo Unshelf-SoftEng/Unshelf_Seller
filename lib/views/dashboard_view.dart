@@ -34,7 +34,7 @@ class _DashboardViewState extends State<DashboardView> {
                     children: [
                       _buildDailyAnalyticsCard(viewModel),
                       const SizedBox(height: 16.0),
-                      // _buildAnalyticsNavigation(),
+                      _buildSaleSummaryCard(viewModel), // New Static Card
                     ],
                   ),
                 );
@@ -85,69 +85,81 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  // Widget _buildAnalyticsNavigation() {
-  //   return GridView.count(
-  //     crossAxisCount: 2,
-  //     shrinkWrap: true,
-  //     physics: const NeverScrollableScrollPhysics(),
-  //     crossAxisSpacing: 16.0,
-  //     mainAxisSpacing: 16.0,
-  //     children: [
-  //       _buildNavigationCard(
-  //         title: 'Store Analytics',
-  //         icon: Icons.store,
-  //         onTap: () {
-  //           Navigator.push(
-  //             context,
-  //             MaterialPageRoute(builder: (context) => StoreAnalyticsView()),
-  //           );
-  //         },
-  //       ),
-  //       _buildNavigationCard(
-  //         title: 'Product Analytics',
-  //         icon: Icons.analytics,
-  //         onTap: () {
-  //           Navigator.push(
-  //             context,
-  //             MaterialPageRoute(builder: (context) => ProductAnalyticsView()),
-  //           );
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildNavigationCard(
-      {required String title,
-      required IconData icon,
-      required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        color: Colors.white,
-        elevation: 4.0,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 48.0, color: AppColors.palmLeaf),
-              const SizedBox(height: 8.0),
-              Text(
-                title,
-                style: const TextStyle(
+  Widget _buildSaleSummaryCard(viewModel) {
+    return Card(
+      color: AppColors.primaryColor,
+      elevation: 8.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: Text(
+                "Store Insights",
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.palmLeaf,
-                  fontSize: 16.0,
+                  color: Colors.white,
+                  fontSize: 30.0,
                 ),
-                textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            ),
+            Center(
+                child: Text(viewModel.getCurrentMonth(),
+                    style: TextStyle(fontSize: 12.0, color: Colors.white))),
+            const SizedBox(height: 12.0),
+            Center(
+              child: _buildSummaryRow(
+                  title: 'Total Sales',
+                  value: '\u20B1  ${viewModel.totalSales}',
+                  icon: Icons.sell),
+            ),
+            const SizedBox(height: 12.0),
+            Center(
+              child: _buildSummaryRow(
+                  title: 'Inventory Remaining',
+                  value: '${viewModel.totalStockRemaining} Products',
+                  icon: Icons.inventory),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSummaryRow({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center, // Center the Row content
+      children: [
+        Icon(icon, color: Colors.white, size: 32.0),
+        const SizedBox(width: 16.0),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14.0,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                  color: AppColors.saffronYellow,
+                  fontFamily: 'Roboto'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

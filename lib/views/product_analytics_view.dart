@@ -143,6 +143,7 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<ProductAnalyticsViewModel>(context);
+    var dataName = data.keys.toList();
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -183,12 +184,12 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
                             });
                           }
                         },
-                        items: viewModel.products
+                        items: dataName
                             .map<DropdownMenuItem<String>>((var product) {
                           return DropdownMenuItem<String>(
-                            value: product.name,
+                            value: product,
                             child: Text(
-                              product.name,
+                              product,
                               style: const TextStyle(fontSize: 16),
                             ),
                           );

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/batch_history_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/settings_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
 import 'package:unshelf_seller/views/home_view.dart';
@@ -25,6 +26,7 @@ import 'package:unshelf_seller/viewmodels/batch_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/select_products_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/product_analytics_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/inventory_viewmodel.dart';
+import 'package:unshelf_seller/viewmodels/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +62,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SelectProductsViewModel()),
         ChangeNotifierProvider(create: (_) => ProductAnalyticsViewModel()),
         ChangeNotifierProvider(create: (_) => InventoryViewModel()),
+        ChangeNotifierProvider(create: (_) => BatchHistoryViewModel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(create: (_) => HomeViewModel()),
       ],
       child: const MyApp(),
     ),

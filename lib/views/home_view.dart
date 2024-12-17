@@ -1,6 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/chat_screen.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/views/dashboard_view.dart';
@@ -8,8 +7,7 @@ import 'package:unshelf_seller/views/orders_view.dart';
 import 'package:unshelf_seller/views/listings_view.dart';
 import 'package:unshelf_seller/views/store_view.dart';
 import 'package:unshelf_seller/views/notifications_view.dart';
-
-import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/viewmodels/home_viewmodel.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -41,59 +39,16 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _fetchNotifications();
-  }
 
-  Future<void> _fetchNotifications() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    final snapshot = await FirebaseFirestore.instance
-        .collection('notifications')
-        .where('recipient_id', isEqualTo: user.uid)
-        .orderBy('created_at', descending: true) // Optional: Order by timestamp
-        .get();
-
-    final notifications = snapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        'title': doc['title'],
-        'text': doc['message'],
-        'seen': doc['seen'] ?? false,
-      };
-    }).toList();
-
-    // Calculate unseen count
-    final unseenCount = notifications.where((n) => !n['seen']).length;
-
-    setState(() {
-      _notifications = notifications;
-      _unseenCount = unseenCount;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HomeViewModel>(context, listen: false).fetchNotifications();
     });
-  }
-
-  void _markNotificationAsRead(int index) async {
-    // Extract the notification ID
-    final notificationId = _notifications[index]['id'];
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('notifications')
-          .doc(notificationId)
-          .update({'seen': true});
-
-      setState(() {
-        _notifications[index]['seen'] = true;
-        _unseenCount = _unseenCount - 1;
-      });
-    } catch (e) {
-      // Handle errors
-      print('Error updating notification: $e');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<HomeViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
@@ -119,7 +74,7 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   const Icon(Icons.notifications,
                       size: 30, color: Colors.black),
-                  if (_notifications.any((n) => !n['seen']))
+                  if (viewModel.unseenCount > 0)
                     Positioned(
                       right: 0,
                       top: 0,

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/viewmodels/inventory_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/views/batch_history_view.dart';
+import 'package:intl/intl.dart';
 
 class InventoryView extends StatefulWidget {
   @override
@@ -10,12 +12,29 @@ class InventoryView extends StatefulWidget {
 }
 
 class _InventoryViewState extends State<InventoryView> {
-  String? selectedProjectId; // Track the selected project
+  final TextEditingController _searchController = TextEditingController();
+  List<dynamic> filteredItems = [];
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<InventoryViewModel>(context, listen: false).fetchInventory();
+      final viewModel = Provider.of<InventoryViewModel>(context, listen: false);
+      viewModel.fetchInventory();
+      filteredItems = viewModel.inventoryItems;
+    });
+
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    final viewModel = Provider.of<InventoryViewModel>(context, listen: false);
+    setState(() {
+      filteredItems = viewModel.inventoryItems
+          .where((item) => item.name
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
+          .toList();
     });
   }
 
@@ -25,114 +44,125 @@ class _InventoryViewState extends State<InventoryView> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Store Inventory',
-        onBackPressed: () => Navigator.pop(context),
-      ),
-      body: viewModel.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Dropdown to select a project
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    hint: const Text('Select a project'),
-                    value: selectedProjectId,
-                    items: viewModel.inventoryItems.map((item) {
-                      return DropdownMenuItem<String>(
-                        value: item.id, // Unique ID of the project/item
-                        child: Text(item.name),
+          title: 'Store Inventory',
+          onBackPressed: () {
+            viewModel.clearData();
+            Navigator.pop(context);
+          }),
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ),
+          ),
+          // Loading or Inventory List
+          Expanded(
+            child: viewModel.isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    itemCount: filteredItems.length,
+                    itemBuilder: (context, index) {
+                      final item = filteredItems[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 12.0, vertical: 8.0),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: ExpansionTile(
+                          leading: const Icon(Icons.inventory_2,
+                              color: AppColors.primaryColor),
+                          title: Text(
+                            item.name,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          children: [
+                            const Divider(),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Batch Details:',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 6.0),
+                                  if (item.batches.isEmpty) ...[
+                                    const Text(
+                                      'No batches available',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ] else ...[
+                                    Column(
+                                      children:
+                                          item.batches.map<Widget>((batch) {
+                                        return GestureDetector(
+                                          onTap: () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      BatchHistoryView(
+                                                          batchId: batch
+                                                              .batchNumber)),
+                                            );
+                                          },
+                                          child: ListTile(
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 0.0),
+                                            leading: const Icon(
+                                              Icons.check_circle_outline,
+                                              color: AppColors.lightColor,
+                                            ),
+                                            title: Text(
+                                              'Batch: ${batch.batchNumber}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            subtitle: Text(
+                                              'Stock: ${batch.stock} | Expiry: ${DateFormat('MMMM d, y h:mm a').format(batch.expiryDate)}',
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedProjectId = value;
-                      });
                     },
                   ),
-                ),
-                const SizedBox(height: 12.0),
-
-                // Show batches only for the selected project
-                if (selectedProjectId != null)
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        // Find the selected project
-                        for (var item in viewModel.inventoryItems)
-                          if (item.id == selectedProjectId) ...[
-                            item.batches.isEmpty
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12.0),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        'No batches available',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Column(
-                                    children: item.batches.map<Widget>((batch) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0, horizontal: 12.0),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Icon(
-                                              Icons.check_circle_outline,
-                                              color: Colors.green,
-                                            ),
-                                            const SizedBox(width: 8.0),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Batch: ${batch.batchNumber}',
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 14),
-                                                  ),
-                                                  const SizedBox(height: 4.0),
-                                                  Text(
-                                                    'Expiry: ${batch.expiryDate}',
-                                                    style: const TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8.0),
-                                            Text(
-                                              'Stock: ${batch.stock}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                                color: Colors.blueAccent,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                          ],
-                      ],
-                    ),
-                  ),
-              ],
-            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

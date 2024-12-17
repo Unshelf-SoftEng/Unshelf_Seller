@@ -49,7 +49,7 @@ class NotificationsView extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        model.markNotificationAsRead(index);
+                        model.markNotificationAsReadAsync(index);
                         Navigator.pop(context); // Close the notifications page
                       },
                     );

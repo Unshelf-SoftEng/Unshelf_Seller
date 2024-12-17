@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:unshelf_seller/models/notification_model.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   DateTime today;
@@ -13,6 +14,10 @@ class DashboardViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   late String monthYear;
+  List<NotificationModel>? _notifications;
+  List<NotificationModel>? get notifications => _notifications;
+  int? _unseenCount;
+  int? get unseenCount => _unseenCount;
 
   DashboardViewModel()
       : today = DateTime.now(),
@@ -20,7 +25,8 @@ class DashboardViewModel extends ChangeNotifier {
         processedOrders = 0,
         completedOrders = 0,
         totalOrders = 0,
-        totalSales = 0.0 {
+        totalSales = 0.0,
+        _unseenCount = 0 {
     monthYear = getCurrentMonth();
     fetchDashboardData();
   }
@@ -50,34 +56,27 @@ class DashboardViewModel extends ChangeNotifier {
           .where((doc) => doc['status'] == 'Completed')
           .length;
 
-      // // Assuming 'total' field exists in each order document for total price
-      // final startOfMonth = DateTime(now.year, now.month);
+      // Assuming 'total' field exists in each order document for total price
+      final startOfMonth = DateTime(now.year, now.month);
 
-      // QuerySnapshot ordersMonthly = await FirebaseFirestore.instance
-      //     .collection('orders')
-      //     .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
-      //     .where('sellerId', isEqualTo: user?.uid)
-      //     .get();
+      totalSales = 0;
 
-      // totalSales = 0;
+      QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
+          .collection('transactions')
+          .where('date', isGreaterThanOrEqualTo: startOfMonth)
+          .where('sellerId', isEqualTo: user?.uid)
+          .get();
 
-      // QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
-      //     .collection('transactions')
-      //     .where('date', isGreaterThanOrEqualTo: startOfMonth)
-      //     .where('sellerId', isEqualTo: user?.uid)
-      //     .get();
+      double totalEarnings = 0.0;
 
-      // double totalEarnings = 0.0;
+      for (var trans in transactionMonthly.docs) {
+        if (trans['type'] == 'Sale') {
+          double amount = trans['sellerEarnings'];
+          totalEarnings += amount;
+        }
+      }
 
-      // for (var trans in transactionMonthly.docs) {
-      //   if (trans['type'] == 'Sale') {
-      //     double amount = trans['sellerEarnings'];
-      //     totalEarnings += amount;
-      //   }
-      // }
-
-      // totalSales = totalEarnings;
-      // totalOrders = ordersMonthly.docs.length;
+      totalSales = totalEarnings;
     } catch (e) {
       print('Error fetching dashboard data: $e');
     } finally {
@@ -91,4 +90,11 @@ class DashboardViewModel extends ChangeNotifier {
     final dateFormat = DateFormat('MMMM yyyy');
     return dateFormat.format(now);
   }
+
+  double _totalSaleSize = 63961.0;
+
+  double get totalSaleSize => _totalSaleSize;
+
+  int _totalStockRemaining = 40;
+  int get totalStockRemaining => _totalStockRemaining;
 }
