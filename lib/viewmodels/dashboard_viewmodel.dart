@@ -91,10 +91,6 @@ class DashboardViewModel extends ChangeNotifier {
     return dateFormat.format(now);
   }
 
-  double _totalSaleSize = 63961.0;
-
-  double get totalSaleSize => _totalSaleSize;
-
   int _totalStockRemaining = 40;
   int get totalStockRemaining => _totalStockRemaining;
 }

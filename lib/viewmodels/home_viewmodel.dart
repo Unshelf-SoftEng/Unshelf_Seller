@@ -18,8 +18,6 @@ class HomeViewModel extends ChangeNotifier {
         .orderBy('created_at', descending: true)
         .get();
 
-    print('Notifications: $querySnapshot');
-
     final notifications = querySnapshot.docs.map((doc) {
       return NotificationModel.fromFirestore(
         doc.id,
@@ -27,10 +25,8 @@ class HomeViewModel extends ChangeNotifier {
       );
     }).toList();
 
-    // Calculate unseen count
     final unseenCount = notifications.where((n) => !n.seen).length;
 
-    // Update your variables
     _notifications = notifications;
     _unseenCount = unseenCount;
     notifyListeners();

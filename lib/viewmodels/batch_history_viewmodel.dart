@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/order_model.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/services/order_service.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:unshelf_seller/services/product_service.dart';
+import 'package:unshelf_seller/services/batch_service.dart';
 
 class BatchHistoryViewModel extends ChangeNotifier {
   List<OrderModel> _orders = [];
@@ -12,6 +14,9 @@ class BatchHistoryViewModel extends ChangeNotifier {
   OrderModel? get selectedOrder => _selectedOrder;
   List<OrderModel> get orders => _orders;
   String get currentStatus => _currentStatus;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   set currentStatus(String status) {
     _currentStatus = status;
@@ -28,10 +33,8 @@ class BatchHistoryViewModel extends ChangeNotifier {
 
   String _sortOrder = 'Descending';
 
-  bool get isLoading => _isLoading;
-  bool _isLoading = false;
-
   final OrderService _orderService = OrderService();
+  final BatchService _batchService = BatchService();
 
   List<OrderModel> get filteredOrders {
     List<OrderModel> ordersToReturn;
@@ -57,7 +60,30 @@ class BatchHistoryViewModel extends ChangeNotifier {
   Future<void> fetchBatchHistory(batchId) async {
     _isLoading = true;
     notifyListeners();
+
+    BatchModel batch = (await _batchService.getBatchById(batchId))!;
     _orders = await _orderService.getOrdersWithBatchId();
+
+    double totalSaleSize = 0;
+    int totalProductsSold = 0;
+    int totalBatchStock = 0;
+
+    for (var order in _orders) {
+      for (var item in order.items) {
+        if (item.batchId == batchId) {
+          totalSaleSize += (item.price ?? 0) * (item.quantity ?? 0);
+          totalProductsSold += item.quantity;
+        }
+      }
+    }
+
+    batchHistory[batchId] = {
+      'totalSaleSize': totalSaleSize,
+      'totalProductsSold': totalProductsSold,
+      'totalBatchStock': totalBatchStock,
+      'orderHistory': _orders,
+    };
+
     _isLoading = false;
     notifyListeners();
   }
@@ -310,7 +336,6 @@ class BatchHistoryViewModel extends ChangeNotifier {
 
         int earnedPoints = (totalPrice / 200).floor();
 
-        // Update user's points in Firestore
         transaction.update(userRef, {
           'points': FieldValue.increment(earnedPoints),
         });
@@ -371,21 +396,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
         },
       ],
     },
-    'LZOQUrGi4EhT5yV4jyA0_3': {
-      'totalSaleSize': 200.00 * 30,
-      'totalProductsSold': 30,
-      'batchNumber': 'BATCH125',
-      'orderHistory': [
-        {
-          'orderId': '20241216-005',
-          'soldWithBundle': true,
-          'soldQuantity': 30,
-          'soldPrice': 200.00,
-        },
-      ],
-    },
 
-    // New Batches
     '20241031-0': {
       'totalSaleSize': 1500.00 * 5,
       'totalProductsSold': 5,
