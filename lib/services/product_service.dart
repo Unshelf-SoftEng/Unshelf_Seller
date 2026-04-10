@@ -73,5 +73,20 @@ class ProductService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateProduct(String productId, ProductModel product) async {}
+  Future<void> updateProduct(String productId, ProductModel product) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productId)
+          .update({
+        'name': product.name,
+        'description': product.description,
+        'category': product.category,
+        'mainImageUrl': product.mainImageUrl,
+      });
+    } catch (e) {
+      print('Error updating product: $e');
+      rethrow;
+    }
+  }
 }
