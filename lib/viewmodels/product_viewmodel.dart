@@ -1,14 +1,11 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
 import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:unshelf_seller/utils/colors.dart';
 
@@ -65,7 +62,9 @@ class ProductViewModel extends BaseViewModel {
     }
 
     await addProduct(context);
-    _showSnackBar(context, 'Product added successfully!', isSuccess: true);
+    if (context.mounted) {
+      _showSnackBar(context, 'Product added successfully!', isSuccess: true);
+    }
     return true;
   }
 
@@ -154,26 +153,22 @@ class ProductViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  // Add or update product with the uploaded images
+  // Add product with the uploaded images
   Future<void> addProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
       setLoading(true);
 
       try {
-        User? user = FirebaseAuth.instance.currentUser;
+        final ProductModel product = ProductModel(
+          id: '',
+          name: nameController.text,
+          description: descriptionController.text,
+          category: selectedCategory,
+          mainImageUrl: await uploadImage(_mainImageState.data!, null),
+          additionalImageUrls: [],
+        );
 
-        if (user != null) {
-          ProductModel product = ProductModel(
-            id: '',
-            name: nameController.text,
-            description: descriptionController.text,
-            category: selectedCategory,
-            mainImageUrl: await uploadImage(_mainImageState.data!, null),
-            additionalImageUrls: [],
-          );
-
-          _selectedProductId = await _productService.addProduct(product);
-        }
+        _selectedProductId = await _productService.addProduct(product);
       } catch (e) {
         AppLogger.error('Error adding product', e);
       } finally {
@@ -194,55 +189,39 @@ class ProductViewModel extends BaseViewModel {
       }
 
       try {
-        User? user = FirebaseAuth.instance.currentUser;
-
-        if (user != null) {
-          final productRef = FirebaseFirestore.instance
-              .collection(FirestoreConstants.products)
-              .doc(_selectedProduct?.id);
-
-          await FirebaseFirestore.instance.runTransaction((transaction) async {
-            final snapshot = await transaction.get(productRef);
-            if (!snapshot.exists) {
-              throw Exception("Product does not exist!");
-            }
-
-            final currentData = snapshot.data() as Map<String, dynamic>;
-
-            Map<String, dynamic> updatedFields = {};
-
-            if (nameController.text != currentData['name']) {
-              updatedFields['name'] = nameController.text;
-            }
-            if (descriptionController.text != currentData['description']) {
-              updatedFields['description'] = descriptionController.text;
-            }
-            if (selectedCategory != currentData['category']) {
-              updatedFields['category'] = selectedCategory;
-            }
-
-            if (_mainImageState.isNew) {
-              updatedFields['mainImageUrl'] =
-                  await uploadImage(_mainImageState.data!, null);
-            }
-
-            for (int i = 0; i < _additionalImages.length; i++) {
-              if (_additionalImages[i].isNew) {
-                additionalImages[i].url =
-                    await uploadImage(_additionalImages[i].data!, i);
-              }
-            }
-
-            updatedFields['additionalImageUrls'] =
-                _additionalImages.map((imageState) => imageState.url).toList();
-
-            if (updatedFields.isNotEmpty) {
-              transaction.update(productRef, updatedFields);
-            }
-          });
-
-          return true;
+        final productId = _selectedProduct?.id;
+        if (productId == null) {
+          AppLogger.error('Error updating product: no product selected');
+          return false;
         }
+
+        String mainImageUrl = _selectedProduct!.mainImageUrl;
+        if (_mainImageState.isNew) {
+          mainImageUrl = await uploadImage(_mainImageState.data!, null);
+        }
+
+        for (int i = 0; i < _additionalImages.length; i++) {
+          if (_additionalImages[i].isNew) {
+            _additionalImages[i].url =
+                await uploadImage(_additionalImages[i].data!, i);
+          }
+        }
+
+        final List<String?> additionalImageUrls =
+            _additionalImages.map((imageState) => imageState.url).toList();
+
+        final ProductModel updated = ProductModel(
+          id: productId,
+          name: nameController.text,
+          description: descriptionController.text,
+          category: selectedCategory,
+          mainImageUrl: mainImageUrl,
+          additionalImageUrls:
+              additionalImageUrls.whereType<String>().toList(),
+        );
+
+        await _productService.updateProduct(productId, updated);
+        return true;
       } catch (e) {
         AppLogger.error('Error updating product: $e');
         return false;

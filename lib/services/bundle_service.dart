@@ -37,6 +37,23 @@ class BundleService implements IBundleService {
   }
 
   @override
+  Future<List<BundleModel>> getBundles() async {
+    try {
+      final bundleDocs = await _firestore
+          .collection(FirestoreConstants.bundles)
+          .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+          .get();
+
+      return bundleDocs.docs
+          .map((doc) => BundleModel.fromSnapshot(doc))
+          .toList();
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch bundles', e, stackTrace);
+      throw FirestoreException('Failed to fetch bundles', originalError: e);
+    }
+  }
+
+  @override
   Future<void> createBundle(BundleModel bundle) async {
     try {
       final bundleData = {

@@ -1,24 +1,28 @@
 import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_analytics_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/core/constants/status_constants.dart';
 import 'package:unshelf_seller/models/product_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ProductAnalyticsViewModel extends BaseViewModel {
   final IProductService _productService;
+  final IAnalyticsService _analyticsService;
+  final IBatchService _batchService;
 
-  ProductAnalyticsViewModel({required IProductService productService})
-      : _productService = productService;
+  ProductAnalyticsViewModel({
+    required IProductService productService,
+    required IAnalyticsService analyticsService,
+    required IBatchService batchService,
+  })  : _productService = productService,
+        _analyticsService = analyticsService,
+        _batchService = batchService;
 
   List<ProductModel> _products = [];
   List<ProductModel> get products => _products;
 
   List<Map<String, dynamic>> topProducts = [];
-
-  User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> fetchProductAnalytics() async {
     setLoading(true);
@@ -33,44 +37,40 @@ class ProductAnalyticsViewModel extends BaseViewModel {
     // Clear any existing data
     topProducts.clear();
 
-    // Fetch all orders
-    final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
-        .collection(FirestoreConstants.orders)
-        .where('sellerId', isEqualTo: user!.uid)
-        .where('status', isEqualTo: StatusConstants.completed)
-        .where('createdAt',
-            isGreaterThanOrEqualTo: DateTime.now().subtract(const Duration(days: 13)))
-        .get();
+    // Fetch all completed orders from the last 14 days
+    final orderDocs = await _analyticsService.fetchOrders(
+      since: DateTime.now().subtract(const Duration(days: 13)),
+    );
 
     Map<String, int> batchCountMap = {};
-    Map<String, int> bundleCountMap = {};
 
-    for (var orderDoc in ordersSnapshot.docs) {
-      var orderItems = orderDoc['orderItems'];
+    for (var orderDoc in orderDocs) {
+      final data = orderDoc.data() as Map<String, dynamic>;
+
+      // Filter by completed status
+      if (data['status'] != StatusConstants.completed) continue;
+
+      final orderItems = data['orderItems'] as List<dynamic>? ?? [];
       AppLogger.debug('Order items: $orderItems');
 
       for (var item in orderItems) {
-        String batchId = item['batchId'];
-        String bundleId = item['bundleId'];
-        int quantity = item['quantity'];
+        final String batchId = item['batchId'] as String? ?? '';
+        final int quantity = (item['quantity'] as num?)?.toInt() ?? 0;
 
-        batchCountMap[batchId] = (batchCountMap[batchId] ?? 0) + quantity;
-        bundleCountMap[bundleId] = (bundleCountMap[bundleId] ?? 0) + quantity;
+        if (batchId.isNotEmpty) {
+          batchCountMap[batchId] = (batchCountMap[batchId] ?? 0) + quantity;
+        }
       }
     }
 
     Map<String, int> productEntries = {};
 
     for (final entry in batchCountMap.entries) {
-      // Fetch batch details using the key
-      DocumentSnapshot batchDoc = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.batches)
-          .doc(entry.key) // Use 'key' to fetch the document
-          .get();
-
-      if (batchDoc.exists) {
-        String productId = batchDoc['productId'];
-        productEntries[productId] = (productEntries[productId] ?? 0) + entry.value;
+      final batch = await _batchService.getBatchById(entry.key);
+      if (batch != null) {
+        final productId = batch.productId;
+        productEntries[productId] =
+            (productEntries[productId] ?? 0) + entry.value;
       }
     }
 
@@ -78,19 +78,14 @@ class ProductAnalyticsViewModel extends BaseViewModel {
       ..sort((a, b) =>
           b.value.compareTo(a.value)); // Sort by value in descending order
 
-    var top5 = sortedEntries.take(5).toList();
+    final top5 = sortedEntries.take(5).toList();
 
     for (var entry in top5) {
-      // Fetch product details using the productId
-      DocumentSnapshot productDoc = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.products)
-          .doc(entry.key) // Use 'key' to fetch the document
-          .get();
-
-      if (productDoc.exists) {
+      final product = await _productService.getProduct(entry.key);
+      if (product != null) {
         topProducts.add({
-          'productId': productDoc.id,
-          'name': productDoc['name'],
+          'productId': product.id,
+          'name': product.name,
           'quantity': entry.value,
         });
       }
