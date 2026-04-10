@@ -129,7 +129,7 @@ class _ChatViewState extends State<ChatView>
             icon: const Icon(
               Icons.send,
               size: 30,
-              color: AppColors.palmLeaf,
+              color: AppColors.primaryColor,
             ),
           ),
         ],

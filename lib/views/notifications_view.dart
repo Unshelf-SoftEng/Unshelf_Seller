@@ -29,8 +29,8 @@ class NotificationsView extends StatelessWidget {
                             ? Icons.check_circle
                             : Icons.notifications,
                         color: notification.seen
-                            ? AppColors.palmLeaf
-                            : AppColors.deepMossGreen,
+                            ? AppColors.primaryColor
+                            : AppColors.darkColor,
                       ),
                       title: Text(
                         notification.title,

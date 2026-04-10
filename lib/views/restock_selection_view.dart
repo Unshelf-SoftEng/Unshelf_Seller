@@ -67,7 +67,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             color:
-                                isSelected ? AppColors.palmLeaf : Colors.white,
+                                isSelected ? AppColors.primaryColor : Colors.white,
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -142,7 +142,7 @@ class _RestockSelectionViewState extends State<RestockSelectionView> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         backgroundColor: viewModel.selectedProducts.isNotEmpty
-                            ? const Color(0xFF6A994E)
+                            ? AppColors.primaryColor
                             : Colors.grey,
                       ),
                       child: const Text(

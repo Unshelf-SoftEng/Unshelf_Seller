@@ -213,7 +213,7 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                                   text: TextSpan(
                                     style: const TextStyle(
                                       fontSize: 18.0,
-                                      color: AppColors.palmLeaf,
+                                      color: AppColors.primaryColor,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     children: [
@@ -234,8 +234,8 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
                                       vertical: 4.0, horizontal: 12.0),
                                   decoration: BoxDecoration(
                                     color: order.isPaid
-                                        ? AppColors.palmLeaf
-                                        : AppColors.watermelonRed,
+                                        ? AppColors.primaryColor
+                                        : AppColors.error,
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/components/image_delete.dart';
 import 'package:unshelf_seller/models/product_model.dart';
@@ -87,7 +88,7 @@ class _EditProductViewState extends State<EditProductView> {
                       child: Container(
                         width: double.infinity,
                         height: 350,
-                        color: const Color(0xFF386641),
+                        color: AppColors.darkColor,
                         child: viewModel.mainImageState.data != null
                             ? ImageWithDelete(
                                 imageData: viewModel.mainImageState.data!,

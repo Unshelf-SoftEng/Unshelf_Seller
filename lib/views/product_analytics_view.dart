@@ -225,7 +225,7 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF6A994E),
+                                    color: AppColors.primaryColor,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -262,7 +262,7 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
                                     style: const TextStyle(
                                       fontSize: 18.0,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.palmLeaf,
+                                      color: AppColors.primaryColor,
                                     ),
                                     children: [
                                       const TextSpan(

@@ -50,7 +50,7 @@ class EditStoreProfileView extends StatelessWidget {
                               child: const Align(
                                 alignment: Alignment.bottomRight,
                                 child: Icon(Icons.camera_alt,
-                                    color: AppColors.palmLeaf, size: 30),
+                                    color: AppColors.primaryColor, size: 30),
                               ),
                             ),
                           ),

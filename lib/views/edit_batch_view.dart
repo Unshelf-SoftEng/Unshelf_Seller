@@ -50,7 +50,7 @@ class _EditBatchViewState extends State<EditBatchView> {
                       style: const TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.palmLeaf,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                   ),

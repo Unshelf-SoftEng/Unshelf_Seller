@@ -252,7 +252,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                                       content: Text(
                                                           "Failed to cancel order: ${e.toString()}"),
                                                       backgroundColor: AppColors
-                                                          .warningColor,
+                                                          .warning,
                                                     ),
                                                   );
                                                 }
@@ -262,7 +262,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                           child: const Text(
                                             'Yes, Cancel',
                                             style: TextStyle(
-                                                color: AppColors.warningColor),
+                                                color: AppColors.error),
                                           ),
                                         ),
                                       ],
@@ -271,7 +271,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.warningColor,
+                                backgroundColor: AppColors.error,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 12),
@@ -299,7 +299,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                           child: const Text(
                                             'Cancel',
                                             style: TextStyle(
-                                                color: AppColors.warningColor),
+                                                color: AppColors.error),
                                           ),
                                         ),
                                         // Confirm button
@@ -329,7 +329,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                                       content: Text(
                                                           "Failed to approve order: ${e.toString()}"),
                                                       backgroundColor: AppColors
-                                                          .warningColor,
+                                                          .warning,
                                                     ),
                                                   );
                                                 }
@@ -373,7 +373,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                 SnackBar(
                                   content: Text(
                                       "Failed to fulfill order: ${e.toString()}"),
-                                  backgroundColor: AppColors.warningColor,
+                                  backgroundColor: AppColors.error,
                                 ),
                               );
                             }
@@ -422,7 +422,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                       child: const Text(
                                         'Cancel',
                                         style: TextStyle(
-                                            color: AppColors.warningColor),
+                                            color: AppColors.error),
                                       ),
                                     ),
                                     // Confirm button
@@ -452,7 +452,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                                                   content: Text(
                                                       "Failed to complete order: ${e.toString()}"),
                                                   backgroundColor:
-                                                      AppColors.warningColor,
+                                                      AppColors.error,
                                                 ),
                                               );
                                             }
@@ -535,7 +535,7 @@ class _OrderDetailsViewState extends State<OrderDetailsView> {
                   value,
                   style: const TextStyle(
                       fontSize: 16,
-                      color: AppColors.warningColor,
+                      color: AppColors.error,
                       fontWeight: FontWeight.bold),
                 ),
               )

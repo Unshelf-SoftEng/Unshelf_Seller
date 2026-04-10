@@ -230,7 +230,7 @@ class _ProductListTile extends StatelessWidget {
           ],
         ),
         tileColor: isSelected
-            ? AppColors.palmLeaf.withValues(alpha: 0.1)
+            ? AppColors.primaryColor.withValues(alpha: 0.1)
             : Colors.transparent,
         onTap: onTap,
         onLongPress: onLongPress,

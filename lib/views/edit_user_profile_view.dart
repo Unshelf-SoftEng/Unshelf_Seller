@@ -40,11 +40,11 @@ class EditUserProfileView extends StatelessWidget {
                           labelText: 'Name',
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                         ),
                         validator: (value) {
@@ -61,11 +61,11 @@ class EditUserProfileView extends StatelessWidget {
                           labelText: 'Email',
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                         ),
                         validator: (value) {
@@ -84,11 +84,11 @@ class EditUserProfileView extends StatelessWidget {
                           labelText: 'Phone Number',
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                         ),
                         keyboardType: TextInputType.phone,
@@ -109,11 +109,11 @@ class EditUserProfileView extends StatelessWidget {
                           labelText: 'Password',
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                         ),
                         validator: (value) {
@@ -133,11 +133,11 @@ class EditUserProfileView extends StatelessWidget {
                           labelText: 'Confirm Password',
                           enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.middleGreenYellow),
+                                BorderSide(color: AppColors.primaryColor),
                           ),
                         ),
                         validator: (value) {

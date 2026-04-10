@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -13,7 +14,7 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color bubbleColor = (type == 'sender')
-        ? Color(0xFF6E9E57)
+        ? AppColors.primaryColor
         : const Color.fromARGB(255, 226, 226, 226);
     final Color textColor = (type == 'sender') ? Colors.white : Colors.black;
     return Container(

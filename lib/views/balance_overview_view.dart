@@ -31,7 +31,7 @@ class BalanceOverviewView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.palmLeaf,
+                    color: AppColors.primaryColor,
                   ),
                 ),
               ),
@@ -66,7 +66,7 @@ class BalanceOverviewView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.palmLeaf,
+                    color: AppColors.primaryColor,
                   ),
                 ),
               ),
@@ -88,8 +88,8 @@ class BalanceOverviewView extends StatelessWidget {
                               ? Icons.arrow_downward
                               : Icons.arrow_upward,
                           color: isWithdrawal
-                              ? AppColors.watermelonRed
-                              : AppColors.palmLeaf,
+                              ? AppColors.error
+                              : AppColors.primaryColor,
                         ),
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -99,8 +99,8 @@ class BalanceOverviewView extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: isWithdrawal
-                                    ? AppColors.watermelonRed
-                                    : AppColors.palmLeaf,
+                                    ? AppColors.error
+                                    : AppColors.primaryColor,
                               ),
                             ),
                             RichText(
@@ -109,8 +109,8 @@ class BalanceOverviewView extends StatelessWidget {
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,
                                   color: isWithdrawal
-                                      ? AppColors.watermelonRed
-                                      : AppColors.palmLeaf,
+                                      ? AppColors.error
+                                      : AppColors.primaryColor,
                                 ),
                                 children: [
                                   const TextSpan(
@@ -152,7 +152,7 @@ class BalanceOverviewView extends StatelessWidget {
               ),
             );
           },
-          backgroundColor: AppColors.palmLeaf,
+          backgroundColor: AppColors.primaryColor,
           child: Image.asset(
             'assets/icons/withdraw.png',
             width: 24,

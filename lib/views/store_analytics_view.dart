@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/components/chart.dart';
 
@@ -88,7 +89,7 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                                     style: const TextStyle(
                                       fontSize: 36,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF6A994E),
+                                      color: AppColors.primaryColor,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -190,8 +191,7 @@ class _StoreAnalyticsViewState extends State<StoreAnalyticsView> {
                                           'Roboto', // Set font to Roboto
                                       fontSize: 36,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(
-                                          0xFF6A994E), // Green color for sales
+                                      color: AppColors.primaryColor,
                                     ),
                                   ),
                                 ],

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:unshelf_seller/core/interfaces/i_chat_service.dart';
 import 'package:unshelf_seller/core/service_locator.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/views/chats_view.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -22,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text("Chat"),
-        backgroundColor: const Color(0xFF6A994E),
+        backgroundColor: AppColors.primaryColor,
         foregroundColor: const Color(0xFFFFFFFF),
         titleTextStyle: TextStyle(
             color: const Color(0xFFFFFFFF),
@@ -31,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen>
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Color(0xFF386641),
+            color: AppColors.darkColor,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -40,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen>
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(4.0),
           child: Container(
-            color: Color(0xFFC8DD96),
+            color: AppColors.lightColor,
             height: 4.0,
           ),
         ),

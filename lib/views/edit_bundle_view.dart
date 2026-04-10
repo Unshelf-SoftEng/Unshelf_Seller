@@ -60,7 +60,7 @@ class _EditBundleViewState extends State<EditBundleView> {
                             child: Container(
                               width: double.infinity,
                               height: 300,
-                              color: const Color(0xFF386641),
+                              color: AppColors.darkColor,
                               child: viewModel.mainImageData != null
                                   ? ImageWithDelete(
                                       imageData: viewModel.mainImageData!,
@@ -107,7 +107,7 @@ class _EditBundleViewState extends State<EditBundleView> {
                                   vertical: 10.0, horizontal: 10.0),
                               labelStyle: const TextStyle(color: Colors.black),
                               errorStyle: const TextStyle(
-                                  color: AppColors.watermelonRed, fontSize: 10),
+                                  color: AppColors.error, fontSize: 10),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -140,7 +140,7 @@ class _EditBundleViewState extends State<EditBundleView> {
                                   vertical: 10.0, horizontal: 10.0),
                               labelStyle: const TextStyle(color: Colors.black),
                               errorStyle: const TextStyle(
-                                  color: Color(0xFFBC4749), fontSize: 10),
+                                  color: AppColors.error, fontSize: 10),
                             ),
                             maxLines: 3,
                             validator: (value) {

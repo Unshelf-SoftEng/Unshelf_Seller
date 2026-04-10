@@ -154,7 +154,7 @@ class _DashboardViewState extends State<DashboardView> {
               style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16.0,
-                  color: AppColors.saffronYellow,
+                  color: AppColors.warning,
                   fontFamily: 'Roboto'),
             ),
           ],
@@ -185,7 +185,7 @@ class _DashboardViewState extends State<DashboardView> {
                   style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.saffronYellow),
+                      color: AppColors.warning),
                 ),
               ),
               Center(

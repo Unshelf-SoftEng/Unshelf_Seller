@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
+import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/restock_viewmodel.dart';
 
 class RestockDetailsView extends StatefulWidget {
@@ -142,7 +143,7 @@ class _RestockDetailsViewState extends State<RestockDetailsView> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                backgroundColor: const Color(0xFF6A994E),
+                backgroundColor: AppColors.primaryColor,
               ),
               child: const Text(
                 'Submit Restock',

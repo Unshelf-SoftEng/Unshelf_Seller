@@ -56,10 +56,10 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 decoration: InputDecoration(
                   labelText: 'Full Name',
                   enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   errorText:
                       _errorMessage.isNotEmpty && _errorMessage.contains('name')
@@ -73,10 +73,10 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 decoration: const InputDecoration(
                   labelText: 'Select Bank',
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                 ),
                 initialValue: _selectedBank,
@@ -99,10 +99,10 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 decoration: InputDecoration(
                   labelText: 'Bank Account Number',
                   enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   errorText: _errorMessage.isNotEmpty &&
                           _errorMessage.contains('account')
@@ -118,10 +118,10 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                 decoration: InputDecoration(
                   labelText: 'Withdrawal Amount',
                   enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.middleGreenYellow),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                   errorText: _errorMessage.isNotEmpty &&
                           _errorMessage.contains('amount')

@@ -257,7 +257,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete,
-                                    color: AppColors.warningColor),
+                                    color: AppColors.error),
                                 onPressed: () {
                                   showDialog(
                                     context: context,
@@ -284,8 +284,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                           child: const Text(
                                             'No',
                                             style: TextStyle(
-                                              color: AppColors
-                                                  .palmLeaf, // Custom color for 'No'
+                                              color: AppColors.primaryColor,
                                             ),
                                           ),
                                         ),
@@ -299,8 +298,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                           child: const Text(
                                             'Yes',
                                             style: TextStyle(
-                                              color: AppColors
-                                                  .watermelonRed, // Custom color for 'Yes'
+                                              color: AppColors.error,
                                             ),
                                           ),
                                         ),
