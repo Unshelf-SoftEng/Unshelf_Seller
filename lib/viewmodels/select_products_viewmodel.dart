@@ -1,36 +1,40 @@
-import 'package:flutter/material.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
-import 'package:unshelf_seller/services/product_service.dart';
 
-class SelectProductsViewModel extends ChangeNotifier {
+class SelectProductsViewModel extends BaseViewModel {
+  final IBatchService _batchService;
+  final IProductService _productService;
+
+  SelectProductsViewModel({
+    required IBatchService batchService,
+    required IProductService productService,
+  })  : _batchService = batchService,
+        _productService = productService;
+
   Map<String, BatchModel> _selectedItems = {};
   Map<String, BatchModel> get selectedItems => _selectedItems;
 
   List<BatchModel> _items = [];
   List<BatchModel> get items => _items;
 
-  final BatchService batchService = BatchService();
-  final ProductService productService = ProductService();
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
   String _sortBy = 'expiryDate';
   String get sortBy => _sortBy;
 
+  String _searchQuery = '';
+  List<BatchModel> get filteredItems => _filteredItems;
+  List<BatchModel> _filteredItems = [];
+
   Future<void> fetchAllBatches() async {
-    _isLoading = true;
+    setLoading(true);
     notifyListeners();
 
-    _items = await batchService.getAllBatches();
+    _items = await _batchService.getAllBatches();
 
     final List<Future<void>> productFutures = _items.map((item) async {
-      if (item.productId != null) {
-        item.product = await productService.getProduct(item.productId);
-      } else {
-        return item;
-      }
+      item.product = await _productService.getProduct(item.productId);
     }).toList();
 
     await Future.wait(productFutures);
@@ -38,7 +42,7 @@ class SelectProductsViewModel extends ChangeNotifier {
     _items.removeWhere((item) => item.product == null);
 
     _filteredItems = _items;
-    _isLoading = false;
+    setLoading(false);
 
     notifyListeners();
   }
@@ -57,10 +61,6 @@ class SelectProductsViewModel extends ChangeNotifier {
     _selectedItems.remove(batchNumber);
     notifyListeners();
   }
-
-  String _searchQuery = '';
-  List<BatchModel> get filteredItems => _filteredItems;
-  List<BatchModel> _filteredItems = [];
 
   void updateSearchQuery(String query) {
     _searchQuery = query;
@@ -83,7 +83,7 @@ class SelectProductsViewModel extends ChangeNotifier {
     if (_searchQuery.isEmpty) {
       _filteredItems = _items;
     } else {
-      print("Filtering items");
+      AppLogger.debug('Filtering items');
 
       _filteredItems = _items.where((item) {
         final name = item.product?.name.toLowerCase();
@@ -91,7 +91,7 @@ class SelectProductsViewModel extends ChangeNotifier {
         return name!.contains(query);
       }).toList();
 
-      print(_filteredItems);
+      AppLogger.debug('Filtered items: $_filteredItems');
     }
   }
 

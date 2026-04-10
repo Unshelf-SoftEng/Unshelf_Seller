@@ -1,13 +1,26 @@
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
+
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:unshelf_seller/models/bundle_model.dart';
-import 'package:unshelf_seller/services/bundle_service.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
 
-class BundleViewModel extends ChangeNotifier {
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/models/bundle_model.dart';
+
+class BundleViewModel extends BaseViewModel {
+  final IBundleService _bundleService;
+  final IBatchService _batchService;
+
+  BundleViewModel({
+    required IBundleService bundleService,
+    required IBatchService batchService,
+  })  : _bundleService = bundleService,
+        _batchService = batchService;
+
   final TextEditingController bundleNameController = TextEditingController();
   final TextEditingController bundlePriceController = TextEditingController();
   final TextEditingController bundleStockController = TextEditingController();
@@ -21,11 +34,8 @@ class BundleViewModel extends ChangeNotifier {
   Uint8List? _mainImageData;
   Uint8List? get mainImageData => _mainImageData;
 
-  final BundleService _bundleService = BundleService();
   BundleModel? _bundle;
   BundleModel? get bundle => _bundle;
-
-  final BatchService _batchService = BatchService();
 
   String selectedCategory = '';
   List<String> categories = [
@@ -35,10 +45,7 @@ class BundleViewModel extends ChangeNotifier {
     'Baked Goods',
   ];
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  bool _errorFound = false;
+  final bool _errorFound = false;
   bool get errorFound => _errorFound;
 
   void initializeControllers(BundleModel bundle) {
@@ -90,10 +97,10 @@ class BundleViewModel extends ChangeNotifier {
       );
 
       _bundleService.createBundle(bundle);
-      print('Bundle created successfully');
+      AppLogger.debug('Bundle created successfully');
       notifyListeners();
     } catch (e) {
-      print('Failed to create bundle: $e');
+      AppLogger.error('Failed to create bundle: $e');
     }
   }
 
@@ -105,7 +112,7 @@ class BundleViewModel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error loading image: $e');
+      AppLogger.error('Error loading image: $e');
     }
   }
 
@@ -126,7 +133,7 @@ class BundleViewModel extends ChangeNotifier {
   }
 
   Future<void> getBundleDetails(String bundleId) async {
-    _isLoading = true;
+    setLoading(true);
     notifyListeners();
     // Fetch bundle details
     _bundle = await _bundleService.getBundle(bundleId);
@@ -139,12 +146,12 @@ class BundleViewModel extends ChangeNotifier {
 
     // Load main image
     await loadImageFromUrl(_bundle!.mainImageUrl);
-    _isLoading = false;
+    setLoading(false);
     notifyListeners();
   }
 
   Future<void> initializeBundle(String bundleId) async {
-    _isLoading = true;
+    setLoading(true);
     notifyListeners();
     if (bundleId.isNotEmpty) {
       await getBundleDetails(bundleId);
@@ -157,11 +164,10 @@ class BundleViewModel extends ChangeNotifier {
     bundleDiscountController.text = _bundle!.discount.toString();
     selectedCategory = _bundle!.category;
 
-    print('category: $selectedCategory');
+    AppLogger.debug('category: $selectedCategory');
+    AppLogger.debug('Bundle initialized successfully');
 
-    print('Bundle initialized successfully');
-
-    _isLoading = false;
+    setLoading(false);
     notifyListeners();
   }
 
@@ -194,10 +200,10 @@ class BundleViewModel extends ChangeNotifier {
       );
 
       _bundleService.updateBundle(updatedBundle);
-      print('Bundle updated successfully');
+      AppLogger.debug('Bundle updated successfully');
       notifyListeners();
     } catch (e) {
-      print('Failed to update bundle: $e');
+      AppLogger.error('Failed to update bundle: $e');
     }
   }
 

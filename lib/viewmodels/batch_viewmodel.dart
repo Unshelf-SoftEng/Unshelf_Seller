@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
 
-class BatchViewModel extends ChangeNotifier {
-  final BatchService _batchService = BatchService();
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
+
+class BatchViewModel extends BaseViewModel {
+  final IBatchService _batchService;
+
+  BatchViewModel({required IBatchService batchService})
+      : _batchService = batchService;
 
   String? _batchNumber;
   DateTime? _expiryDate;
@@ -11,7 +17,6 @@ class BatchViewModel extends ChangeNotifier {
   int? stock;
   String? quantifier;
   int? discount;
-  bool isLoading = false;
   DateTime? get expiryDate => _expiryDate;
   String? get batchNumber => _batchNumber;
 
@@ -22,18 +27,12 @@ class BatchViewModel extends ChangeNotifier {
   TextEditingController quantifierController = TextEditingController();
   TextEditingController discountController = TextEditingController();
 
-  // Set loading state
-  void setLoading(bool value) {
-    isLoading = value;
-    notifyListeners();
-  }
-
   set expiryDate(DateTime? date) {
     _expiryDate = date;
     notifyListeners();
   }
 
-  // Add batch using BatchService
+  // Add batch using IBatchService
   Future<bool> addBatch(String productId) async {
     setLoading(true);
     try {
@@ -50,9 +49,7 @@ class BatchViewModel extends ChangeNotifier {
       );
       setLoading(false);
       return true;
-    }
-    // Catch any errors
-    catch (e) {
+    } catch (e) {
       setLoading(false);
       return false;
     }
@@ -80,7 +77,7 @@ class BatchViewModel extends ChangeNotifier {
   Future<void> updateBatch() async {
     setLoading(true);
 
-    print('Updating batch');
+    AppLogger.debug('Updating batch');
 
     await _batchService.updateBatch(
       batchNumberController.text,
@@ -96,7 +93,7 @@ class BatchViewModel extends ChangeNotifier {
           ? int.tryParse(discountController.text) ?? 0
           : 0,
     );
-    print('Batch updated');
+    AppLogger.debug('Batch updated');
     setLoading(false);
   }
 
