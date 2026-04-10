@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/authentication/views/forgot_password_viewmodel.dart';
-import 'package:unshelf_seller/services/authentication_service.dart';
-
 import 'package:provider/provider.dart';
+
+import 'package:unshelf_seller/authentication/views/forgot_password_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_auth_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 
 class ForgotPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ForgotPasswordViewModel(authService: AuthService()),
+      create: (_) => ForgotPasswordViewModel(authService: locator<IAuthService>()),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Forgot Password'),

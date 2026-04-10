@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/services/authentication_service.dart';
 
-class ForgotPasswordViewModel extends ChangeNotifier {
-  final AuthService _authService;
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_auth_service.dart';
+
+class ForgotPasswordViewModel extends BaseViewModel {
+  final IAuthService _authService;
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  ForgotPasswordViewModel({required AuthService authService})
+  ForgotPasswordViewModel({required IAuthService authService})
       : _authService = authService;
 
   Future<String> sendPasswordReset() async {
