@@ -1,13 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/item_model.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
 class ListingViewModel extends BaseViewModel {
+  final IProductService _productService;
+  final IBundleService _bundleService;
+
   List<ItemModel> _items = [];
   List<dynamic> _filteredItems = [];
   bool _showingProducts = true;
@@ -18,7 +20,11 @@ class ListingViewModel extends BaseViewModel {
   String _filter = 'All';
   String get filter => _filter;
 
-  ListingViewModel() {
+  ListingViewModel({
+    required IProductService productService,
+    required IBundleService bundleService,
+  })  : _productService = productService,
+        _bundleService = bundleService {
     fetchItems();
   }
 
@@ -61,82 +67,40 @@ class ListingViewModel extends BaseViewModel {
   Future<void> fetchItems() async {
     setLoading(true);
 
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        final productSnapshot = await FirebaseFirestore.instance
-            .collection(FirestoreConstants.products)
-            .where('sellerId', isEqualTo: user.uid)
-            .get();
+    try {
+      final products = await _productService.getProducts();
+      final bundles = await _bundleService.getBundles();
 
-        final products = productSnapshot.docs
-            .map((doc) {
-              try {
-                return ProductModel.fromSnapshot(doc) as ItemModel?;
-              } catch (e) {
-                AppLogger.error('Error mapping product: $e');
-                return null;
-              }
-            })
-            .where((product) => product != null)
-            .toList();
+      _items = [
+        ...products.cast<ItemModel>(),
+        ...bundles.cast<ItemModel>(),
+      ];
 
-        final bundleSnapshot = await FirebaseFirestore.instance
-            .collection(FirestoreConstants.bundles)
-            .where('sellerId', isEqualTo: user.uid)
-            .get();
-
-        final bundles = bundleSnapshot.docs
-            .map((doc) {
-              try {
-                return BundleModel.fromSnapshot(doc) as ItemModel?;
-              } catch (e) {
-                AppLogger.error('Error mapping bundle: $e');
-                return null;
-              }
-            })
-            .where((bundle) => bundle != null)
-            .toList();
-
-        _items = [
-          ...products.whereType<ItemModel>(),
-          ...bundles.whereType<ItemModel>()
-        ];
-
-        _filteredItems = _items;
-      } catch (e) {
-        AppLogger.error('Error fetching items: $e');
-        _items = [];
-      } finally {
-        setLoading(false);
-      }
-    } else {
+      _filteredItems = _items;
+    } catch (e) {
+      AppLogger.error('Error fetching items: $e');
       _items = [];
+    } finally {
       setLoading(false);
     }
   }
 
-  Future<void> addProduct(Map<String, dynamic> productData) async {
-    await FirebaseFirestore.instance
-        .collection(FirestoreConstants.products)
-        .add(productData);
+  Future<void> addProduct(ProductModel product) async {
+    await _productService.addProduct(product);
     fetchItems();
   }
 
-  Future<void> addBundle(Map<String, dynamic> bundleData) async {
-    await FirebaseFirestore.instance
-        .collection(FirestoreConstants.bundles)
-        .add(bundleData);
+  Future<void> addBundle(BundleModel bundle) async {
+    await _bundleService.createBundle(bundle);
     fetchItems();
   }
 
   Future<void> deleteItem(String itemId, bool isProduct) async {
-    final collection =
-        isProduct ? FirestoreConstants.products : FirestoreConstants.bundles;
-    await FirebaseFirestore.instance
-        .collection(collection)
-        .doc(itemId)
-        .delete();
+    if (isProduct) {
+      await _productService.deleteProduct(itemId);
+    } else {
+      await _bundleService.deleteBundle(itemId);
+    }
 
     _items.removeWhere((item) => item.id == itemId);
     notifyListeners();

@@ -7,4 +7,5 @@ abstract class IProductService {
   Future<List<BatchModel>?> getProductBatches(ProductModel product);
   Future<String> addProduct(ProductModel product);
   Future<void> updateProduct(String productId, ProductModel product);
+  Future<void> deleteProduct(String productId);
 }

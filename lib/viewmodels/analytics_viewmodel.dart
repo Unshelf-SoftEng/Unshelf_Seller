@@ -1,24 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_analytics_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/core/constants/status_constants.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 
 class AnalyticsViewModel extends BaseViewModel {
+  final IAnalyticsService _analyticsService;
+
   int totalOrders = 0;
   double totalSales = 0.0;
   int totalCompletedOrders = 0;
   int totalReadyOrders = 0;
   int totalPendingOrders = 0;
 
-  Map<DateTime, int> _dailyOrdersMap = {};
+  final Map<DateTime, int> _dailyOrdersMap = {};
   Map<DateTime, int> get dailyOrdersMap => _dailyOrdersMap;
-  Map<DateTime, int> _weeklyOrdersMap = {};
+  final Map<DateTime, int> _weeklyOrdersMap = {};
   Map<DateTime, int> get weeklyOrdersMap => _weeklyOrdersMap;
-  Map<DateTime, int> _monthlyOrdersMap = {};
+  final Map<DateTime, int> _monthlyOrdersMap = {};
   Map<DateTime, int> get monthlyOrdersMap => _monthlyOrdersMap;
-  Map<DateTime, int> _annualOrdersMap = {};
+  final Map<DateTime, int> _annualOrdersMap = {};
   Map<DateTime, int> get annualOrdersMap => _annualOrdersMap;
 
   double _dailyMaxYOrder = 0.0;
@@ -30,13 +32,13 @@ class AnalyticsViewModel extends BaseViewModel {
   double _annualMaxYOrder = 0.0;
   double get annualMaxYOrder => _annualMaxYOrder;
 
-  Map<DateTime, double> _dailySalesMap = {};
+  final Map<DateTime, double> _dailySalesMap = {};
   Map<DateTime, double> get dailySalesMap => _dailySalesMap;
-  Map<DateTime, double> _weeklySalesMap = {};
+  final Map<DateTime, double> _weeklySalesMap = {};
   Map<DateTime, double> get weeklySalesMap => _weeklySalesMap;
-  Map<DateTime, double> _monthlySalesMap = {};
+  final Map<DateTime, double> _monthlySalesMap = {};
   Map<DateTime, double> get monthlySalesMap => _monthlySalesMap;
-  Map<DateTime, double> _annualSalesMap = {};
+  final Map<DateTime, double> _annualSalesMap = {};
   Map<DateTime, double> get annualSalesMap => _annualSalesMap;
 
   double _dailyMaxYSales = 0.0;
@@ -50,14 +52,15 @@ class AnalyticsViewModel extends BaseViewModel {
 
   List<Map<String, dynamic>> topProducts = [];
 
-  User? user = FirebaseAuth.instance.currentUser;
+  AnalyticsViewModel({IAnalyticsService? analyticsService})
+      : _analyticsService =
+            analyticsService ?? locator<IAnalyticsService>();
 
   Future<void> fetchAnalyticsData() async {
-    setLoading(true);
-    await getTotals();
-    await getOrdersandSalesData();
-
-    setLoading(false);
+    await runBusyFuture(() async {
+      await getTotals();
+      await getOrdersandSalesData();
+    });
   }
 
   Future<void> getOrdersandSalesData() async {
@@ -76,110 +79,69 @@ class AnalyticsViewModel extends BaseViewModel {
   }
 
   Future<void> getTotals() async {
-    setLoading(true);
-    try {
-      totalOrders = 0;
-      totalSales = 0.0;
-      totalCompletedOrders = 0;
-      totalReadyOrders = 0;
-      totalPendingOrders = 0;
+    totalOrders = 0;
+    totalSales = 0.0;
+    totalCompletedOrders = 0;
+    totalReadyOrders = 0;
+    totalPendingOrders = 0;
 
-      // Fetch orders
-      final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.orders)
-          .where('sellerId', isEqualTo: user!.uid)
-          .get();
+    final orderDocs = await _analyticsService.fetchOrders();
 
-      for (var doc in ordersSnapshot.docs) {
-        totalOrders++; // Increment total orders
+    for (var doc in orderDocs) {
+      totalOrders++;
 
-        String status = (doc.data() as Map<String, dynamic>)['status'];
-        if (status == StatusConstants.completed) {
-          totalCompletedOrders++;
-        } else if (status == StatusConstants.ready) {
-          totalReadyOrders++;
-        } else if (status == StatusConstants.pending) {
-          totalPendingOrders++;
-        }
+      String status = doc['status'] as String;
+      if (status == StatusConstants.completed) {
+        totalCompletedOrders++;
+      } else if (status == StatusConstants.ready) {
+        totalReadyOrders++;
+      } else if (status == StatusConstants.pending) {
+        totalPendingOrders++;
       }
-
-      QuerySnapshot transactionSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.transactions)
-          .where('sellerId', isEqualTo: user!.uid)
-          .get();
-
-      for (var transDoc in transactionSnapshot.docs) {
-        if (transDoc['type'] == StatusConstants.sale) {
-          double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
-          totalSales += transAmount;
-        }
-      }
-    } catch (e) {
-      // Handle errors
-      AppLogger.error('Error fetching totals: $e');
     }
 
-    setLoading(false);
+    final transDocs = await _analyticsService.fetchTransactions();
+
+    for (var transDoc in transDocs) {
+      if (transDoc['type'] == StatusConstants.sale) {
+        double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
+        totalSales += transAmount;
+      }
+    }
   }
 
   Future<void> getOrdersMap(String period) async {
-    setLoading(true);
-
     DateTime today = DateTime.now();
     _initializeOrdersMap(period, today);
 
-    try {
-      final db = FirebaseFirestore.instance;
+    final startDate = _getStartDate(period, today);
+    final orderDocs = await _analyticsService.fetchOrders(since: startDate);
 
-      QuerySnapshot orderSnapshot = await db
-          .collection(FirestoreConstants.orders)
-          .where('sellerId', isEqualTo: user!.uid)
-          .where('createdAt',
-              isGreaterThanOrEqualTo: _getStartDate(period, today))
-          .get();
-
-      for (var orderDoc in orderSnapshot.docs) {
-        DateTime orderDate = (orderDoc['createdAt'] as Timestamp).toDate();
-        _updateOrdersMap(period, orderDate);
-      }
-    } catch (e) {
-      AppLogger.error("Error fetching orders data: $e");
+    for (var orderDoc in orderDocs) {
+      DateTime orderDate = (orderDoc['createdAt'] as Timestamp).toDate();
+      _updateOrdersMap(period, orderDate);
     }
 
     _calculateMaxYOrder(period);
-
-    setLoading(false);
   }
 
   Future<void> getSalesMap(String period) async {
-    setLoading(true);
-
     DateTime today = DateTime.now();
     _initializeSalesMap(period, today);
 
-    try {
-      final db = FirebaseFirestore.instance;
+    final startDate = _getStartDate(period, today);
+    final transDocs =
+        await _analyticsService.fetchTransactions(since: startDate);
 
-      QuerySnapshot transactionSnapshot = await db
-          .collection(FirestoreConstants.transactions)
-          .where('sellerId', isEqualTo: user!.uid)
-          .where('date', isGreaterThanOrEqualTo: _getStartDate(period, today))
-          .get();
-
-      for (var transDoc in transactionSnapshot.docs) {
-        if (transDoc['type'] == StatusConstants.sale) {
-          DateTime transDate = (transDoc['date'] as Timestamp).toDate();
-          double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
-          _updateSalesMap(period, transDate, transAmount);
-        }
+    for (var transDoc in transDocs) {
+      if (transDoc['type'] == StatusConstants.sale) {
+        DateTime transDate = (transDoc['date'] as Timestamp).toDate();
+        double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
+        _updateSalesMap(period, transDate, transAmount);
       }
-    } catch (e) {
-      AppLogger.error("Error fetching sales data: $e");
     }
 
     _calculateMaxYSales(period);
-
-    setLoading(false);
   }
 
   void _initializeOrdersMap(String period, DateTime today) {

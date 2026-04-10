@@ -5,10 +5,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:unshelf_seller/core/interfaces/i_analytics_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_notification_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_order_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
 import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
@@ -61,9 +64,21 @@ void main() async {
             productService: locator<IProductService>(),
           ),
         ),
-        ChangeNotifierProvider(create: (_) => StoreViewModel()),
-        ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
-        ChangeNotifierProvider(create: (_) => RestockViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => StoreViewModel(
+            storeService: locator<IStoreService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => StoreLocationViewModel(
+            storeService: locator<IStoreService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => RestockViewModel(
+            productService: locator<IProductService>(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (_) => BundleViewModel(
             bundleService: locator<IBundleService>(),
@@ -73,7 +88,12 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(
             create: (_) => UserProfileViewModel(userProfile: null)),
-        ChangeNotifierProvider(create: (_) => ListingViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => ListingViewModel(
+            productService: locator<IProductService>(),
+            bundleService: locator<IBundleService>(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (_) => ProductSummaryViewModel(
             productService: locator<IProductService>(),
@@ -82,7 +102,11 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => WalletViewModel()),
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
-        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => NotificationViewModel(
+            notificationService: locator<INotificationService>(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (_) => BatchViewModel(
             batchService: locator<IBatchService>(),
@@ -97,6 +121,8 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => ProductAnalyticsViewModel(
             productService: locator<IProductService>(),
+            analyticsService: locator<IAnalyticsService>(),
+            batchService: locator<IBatchService>(),
           ),
         ),
         ChangeNotifierProvider(
@@ -111,7 +137,11 @@ void main() async {
             batchService: locator<IBatchService>(),
           ),
         ),
-        ChangeNotifierProvider(create: (_) => HomeViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(
+            notificationService: locator<INotificationService>(),
+          ),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -130,7 +160,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.jostTextTheme(Theme.of(context).textTheme),
       ),
       home:
-          FirebaseAuth.instance.currentUser != null ? HomeView() : LoginView(),
+          FirebaseAuth.instance.currentUser != null ? const HomeView() : LoginView(),
     );
   }
 }

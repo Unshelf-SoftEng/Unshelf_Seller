@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/models/store_model.dart';
-import 'package:unshelf_seller/viewmodels/store_profile_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/viewmodels/store_profile_viewmodel.dart';
 
 class EditStoreProfileView extends StatelessWidget {
   final StoreModel storeDetails;
@@ -14,7 +18,8 @@ class EditStoreProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<StoreProfileViewModel>(
-      create: (_) => StoreProfileViewModel(storeDetails),
+      create: (_) => StoreProfileViewModel(storeDetails,
+        storeService: locator<IStoreService>()),
       child: Scaffold(
         appBar: CustomAppBar(
             title: 'Edit Store Profile',

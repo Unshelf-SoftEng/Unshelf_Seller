@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/models/report_model.dart';
 
 class ReportFormView extends StatefulWidget {
@@ -35,10 +36,8 @@ class _ReportFormViewState extends State<ReportFormView> {
           createdAt: DateTime.now(),
         );
 
-        // Save report to Firestore
-        await FirebaseFirestore.instance
-            .collection('reports')
-            .add(report.toJson());
+        // Save report via service
+        await locator<IUserProfileService>().submitReport(report);
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(

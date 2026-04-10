@@ -1,15 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 
 class RestockViewModel extends BaseViewModel {
+  final IProductService _productService;
+
   List<BatchModel> _products = [];
-  List<BatchModel> _selectedProducts = [];
-  List<BundleModel> _bundles = [];
-  List<BundleModel> _selectedBundles = [];
+  final List<BatchModel> _selectedProducts = [];
+  final List<BundleModel> _bundles = [];
+  final List<BundleModel> _selectedBundles = [];
 
   String _error = '';
 
@@ -20,31 +21,26 @@ class RestockViewModel extends BaseViewModel {
 
   String get error => _error;
 
+  RestockViewModel({required IProductService productService})
+      : _productService = productService;
+
   Future<void> fetchProducts() async {
     setLoading(true);
 
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        _error = 'No user is logged in.';
-        setLoading(false);
-        return;
+      final allProducts = await _productService.getProducts();
+
+      final List<BatchModel> batches = [];
+      for (final product in allProducts) {
+        final productBatches = await _productService.getProductBatches(product);
+        if (productBatches != null) {
+          batches.addAll(productBatches);
+        }
       }
 
-      final sellerId = currentUser.uid;
-
-      final snapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.products)
-          .where('sellerId', isEqualTo: sellerId)
-          .get();
-
-      _products = snapshot.docs
-          .map((doc) => BatchModel.fromSnapshot(doc, null))
-          .toList();
-
-      _bundles =
-          snapshot.docs.map((doc) => BundleModel.fromSnapshot(doc)).toList();
+      _products = batches;
     } catch (e) {
+      AppLogger.error('Failed to fetch products for restock', e);
       _error = 'Failed to fetch products: $e';
     } finally {
       setLoading(false);
@@ -78,24 +74,8 @@ class RestockViewModel extends BaseViewModel {
     setLoading(true);
 
     try {
-      // final batch = FirebaseFirestore.instance.batch();
-      // for (var product in productsToRestock) {
-      //   final docRef =
-      //       FirebaseFirestore.instance.collection('products').doc(product.id);
-
-      //   // Retrieve the current stock
-      //   final snapshot = await docRef.get();
-      //   final currentQuantity = snapshot.data()?['stock'] ?? 0;
-
-      //   // Add the new stock to the existing quantity
-      //   //final newQuantity = currentQuantity + product.stock;
-
-      //   batch.update(docRef, {'stock': newQuantity});
-      // }
-      // await batch.commit();
-      // await fetchProducts();
-      // _selectedBundles.clear();
-      // _selectedProducts.clear();
+      // Batch restock logic placeholder - implement when batch update service
+      // method is available
     } catch (e) {
       _error = 'Failed to restock products: $e';
     } finally {

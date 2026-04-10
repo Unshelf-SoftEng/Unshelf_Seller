@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/errors/app_exceptions.dart';
 import 'package:unshelf_seller/core/interfaces/i_chat_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/message_model.dart';
 
 class ChatService implements IChatService {
@@ -17,25 +19,30 @@ class ChatService implements IChatService {
 
   @override
   Future<void> sendMessage(String receiverId, String message) async {
-    final String currentUserId = _currentUser.uid;
-    final Timestamp timestamp = Timestamp.now();
+    try {
+      final String currentUserId = _currentUser.uid;
+      final Timestamp timestamp = Timestamp.now();
 
-    Message newMessage = Message(
-        senderId: currentUserId,
-        senderEmail: _currentUser.email ?? '',
-        receiverId: receiverId,
-        timestamp: timestamp,
-        message: message);
+      Message newMessage = Message(
+          senderId: currentUserId,
+          senderEmail: _currentUser.email ?? '',
+          receiverId: receiverId,
+          timestamp: timestamp,
+          message: message);
 
-    List<String> ids = [currentUserId, receiverId];
-    ids.sort();
-    String chatRoomId = ids.join("_");
+      List<String> ids = [currentUserId, receiverId];
+      ids.sort();
+      String chatRoomId = ids.join("_");
 
-    await _firestore
-        .collection(FirestoreConstants.chatRooms)
-        .doc(chatRoomId)
-        .collection(FirestoreConstants.messages)
-        .add(newMessage.toMap());
+      await _firestore
+          .collection(FirestoreConstants.chatRooms)
+          .doc(chatRoomId)
+          .collection(FirestoreConstants.messages)
+          .add(newMessage.toMap());
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to send message', e, stackTrace);
+      throw FirestoreException('Failed to send message', originalError: e);
+    }
   }
 
   @override
@@ -49,6 +56,15 @@ class ChatService implements IChatService {
         .doc(chatRoomId)
         .collection(FirestoreConstants.messages)
         .orderBy(FirestoreConstants.timestamp, descending: false)
+        .snapshots();
+  }
+
+  @override
+  Stream<QuerySnapshot> getBuyers() {
+    return _firestore
+        .collection(FirestoreConstants.users)
+        .where('type', isEqualTo: 'buyer')
+        .orderBy('name')
         .snapshots();
   }
 }

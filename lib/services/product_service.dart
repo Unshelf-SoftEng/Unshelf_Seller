@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/errors/app_exceptions.dart';
 import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
@@ -19,48 +20,64 @@ class ProductService implements IProductService {
 
   @override
   Future<ProductModel?> getProduct(String productId) async {
-    final productDoc = await _firestore
-        .collection(FirestoreConstants.products)
-        .doc(productId)
-        .get();
+    try {
+      final productDoc = await _firestore
+          .collection(FirestoreConstants.products)
+          .doc(productId)
+          .get();
 
-    if (productDoc.exists) {
-      return ProductModel.fromSnapshot(productDoc);
+      if (productDoc.exists) {
+        return ProductModel.fromSnapshot(productDoc);
+      }
+
+      return null;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch product', e, stackTrace);
+      throw FirestoreException('Failed to fetch product', originalError: e);
     }
-
-    return null;
   }
 
   @override
   Future<List<ProductModel>> getProducts() async {
-    final productDocs = await _firestore
-        .collection(FirestoreConstants.products)
-        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
-        .get();
+    try {
+      final productDocs = await _firestore
+          .collection(FirestoreConstants.products)
+          .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+          .get();
 
-    if (productDocs.docs.isNotEmpty) {
-      return productDocs.docs
-          .map((doc) => ProductModel.fromSnapshot(doc))
-          .toList();
+      if (productDocs.docs.isNotEmpty) {
+        return productDocs.docs
+            .map((doc) => ProductModel.fromSnapshot(doc))
+            .toList();
+      }
+
+      return [];
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch products', e, stackTrace);
+      throw FirestoreException('Failed to fetch products', originalError: e);
     }
-
-    return [];
   }
 
   @override
   Future<List<BatchModel>?> getProductBatches(ProductModel product) async {
-    final batchDocs = await _firestore
-        .collection(FirestoreConstants.batches)
-        .where(FirestoreConstants.productId, isEqualTo: product.id)
-        .get();
+    try {
+      final batchDocs = await _firestore
+          .collection(FirestoreConstants.batches)
+          .where(FirestoreConstants.productId, isEqualTo: product.id)
+          .get();
 
-    if (batchDocs.docs.isNotEmpty) {
-      return batchDocs.docs
-          .map((doc) => BatchModel.fromSnapshot(doc, product))
-          .toList();
+      if (batchDocs.docs.isNotEmpty) {
+        return batchDocs.docs
+            .map((doc) => BatchModel.fromSnapshot(doc, product))
+            .toList();
+      }
+
+      return null;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch product batches', e, stackTrace);
+      throw FirestoreException('Failed to fetch product batches',
+          originalError: e);
     }
-
-    return null;
   }
 
   @override
@@ -77,9 +94,9 @@ class ProductService implements IProductService {
       });
 
       return docRef.id;
-    } catch (e, stackTrace) {
-      AppLogger.error('Error adding product to Firestore', e, stackTrace);
-      rethrow;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to add product', e, stackTrace);
+      throw FirestoreException('Failed to add product', originalError: e);
     }
   }
 
@@ -95,9 +112,22 @@ class ProductService implements IProductService {
         'category': product.category,
         'mainImageUrl': product.mainImageUrl,
       });
-    } catch (e, stackTrace) {
-      AppLogger.error('Error updating product', e, stackTrace);
-      rethrow;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to update product', e, stackTrace);
+      throw FirestoreException('Failed to update product', originalError: e);
+    }
+  }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    try {
+      await _firestore
+          .collection(FirestoreConstants.products)
+          .doc(productId)
+          .delete();
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to delete product', e, stackTrace);
+      throw FirestoreException('Failed to delete product', originalError: e);
     }
   }
 }
