@@ -1,16 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/constants/status_constants.dart';
 
-class AnalyticsViewModel extends ChangeNotifier {
+class AnalyticsViewModel extends BaseViewModel {
   int totalOrders = 0;
   double totalSales = 0.0;
   int totalCompletedOrders = 0;
   int totalReadyOrders = 0;
   int totalPendingOrders = 0;
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
 
   Map<DateTime, int> _dailyOrdersMap = {};
   Map<DateTime, int> get dailyOrdersMap => _dailyOrdersMap;
@@ -53,13 +53,11 @@ class AnalyticsViewModel extends ChangeNotifier {
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> fetchAnalyticsData() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     await getTotals();
     await getOrdersandSalesData();
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> getOrdersandSalesData() async {
@@ -73,13 +71,12 @@ class AnalyticsViewModel extends ChangeNotifier {
     await getSalesMap('Monthly');
     await getSalesMap('Annual');
 
-    print('Weekly Orders: $_weeklyOrdersMap');
-    print('Weekly Sales: $_weeklySalesMap');
+    AppLogger.debug('Weekly Orders: $_weeklyOrdersMap');
+    AppLogger.debug('Weekly Sales: $_weeklySalesMap');
   }
 
   Future<void> getTotals() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     try {
       totalOrders = 0;
       totalSales = 0.0;
@@ -89,7 +86,7 @@ class AnalyticsViewModel extends ChangeNotifier {
 
       // Fetch orders
       final QuerySnapshot ordersSnapshot = await FirebaseFirestore.instance
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .where('sellerId', isEqualTo: user!.uid)
           .get();
 
@@ -97,38 +94,36 @@ class AnalyticsViewModel extends ChangeNotifier {
         totalOrders++; // Increment total orders
 
         String status = (doc.data() as Map<String, dynamic>)['status'];
-        if (status == 'Completed') {
+        if (status == StatusConstants.completed) {
           totalCompletedOrders++;
-        } else if (status == 'Ready') {
+        } else if (status == StatusConstants.ready) {
           totalReadyOrders++;
-        } else if (status == 'Pending') {
+        } else if (status == StatusConstants.pending) {
           totalPendingOrders++;
         }
       }
 
       QuerySnapshot transactionSnapshot = await FirebaseFirestore.instance
-          .collection('transactions')
+          .collection(FirestoreConstants.transactions)
           .where('sellerId', isEqualTo: user!.uid)
           .get();
 
       for (var transDoc in transactionSnapshot.docs) {
-        if (transDoc['type'] == 'Sale') {
+        if (transDoc['type'] == StatusConstants.sale) {
           double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
           totalSales += transAmount;
         }
       }
     } catch (e) {
       // Handle errors
-      print('Error fetching totals: $e');
+      AppLogger.error('Error fetching totals: $e');
     }
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> getOrdersMap(String period) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     DateTime today = DateTime.now();
     _initializeOrdersMap(period, today);
@@ -137,7 +132,7 @@ class AnalyticsViewModel extends ChangeNotifier {
       final db = FirebaseFirestore.instance;
 
       QuerySnapshot orderSnapshot = await db
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .where('sellerId', isEqualTo: user!.uid)
           .where('createdAt',
               isGreaterThanOrEqualTo: _getStartDate(period, today))
@@ -148,18 +143,16 @@ class AnalyticsViewModel extends ChangeNotifier {
         _updateOrdersMap(period, orderDate);
       }
     } catch (e) {
-      print("Error fetching orders data: $e");
+      AppLogger.error("Error fetching orders data: $e");
     }
 
     _calculateMaxYOrder(period);
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> getSalesMap(String period) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     DateTime today = DateTime.now();
     _initializeSalesMap(period, today);
@@ -168,26 +161,25 @@ class AnalyticsViewModel extends ChangeNotifier {
       final db = FirebaseFirestore.instance;
 
       QuerySnapshot transactionSnapshot = await db
-          .collection('transactions')
+          .collection(FirestoreConstants.transactions)
           .where('sellerId', isEqualTo: user!.uid)
           .where('date', isGreaterThanOrEqualTo: _getStartDate(period, today))
           .get();
 
       for (var transDoc in transactionSnapshot.docs) {
-        if (transDoc['type'] == 'Sale') {
+        if (transDoc['type'] == StatusConstants.sale) {
           DateTime transDate = (transDoc['date'] as Timestamp).toDate();
           double transAmount = (transDoc['sellerEarnings'] ?? 0).toDouble();
           _updateSalesMap(period, transDate, transAmount);
         }
       }
     } catch (e) {
-      print("Error fetching sales data: $e");
+      AppLogger.error("Error fetching sales data: $e");
     }
 
     _calculateMaxYSales(period);
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   void _initializeOrdersMap(String period, DateTime today) {
@@ -233,7 +225,7 @@ class AnalyticsViewModel extends ChangeNotifier {
         break;
 
       default:
-        print('Invalid time period');
+        AppLogger.warning('Invalid time period');
         break;
     }
   }
@@ -462,10 +454,10 @@ class AnalyticsViewModel extends ChangeNotifier {
   DateTime _getStartDate(String period, DateTime today) {
     switch (period) {
       case 'Daily':
-        return today.subtract(Duration(days: 15));
+        return today.subtract(const Duration(days: 15));
       case 'Weekly':
         DateTime lastMonday = today.subtract(Duration(days: today.weekday - 1));
-        return lastMonday.subtract(Duration(days: 21));
+        return lastMonday.subtract(const Duration(days: 21));
       case 'Monthly':
         return DateTime(today.year, today.month - 11, 1);
       case 'Annual':

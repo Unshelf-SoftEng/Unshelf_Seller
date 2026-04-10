@@ -1,17 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class RestockViewModel extends ChangeNotifier {
+class RestockViewModel extends BaseViewModel {
   List<BatchModel> _products = [];
   List<BatchModel> _selectedProducts = [];
   List<BundleModel> _bundles = [];
   List<BundleModel> _selectedBundles = [];
-
-  bool _isLoading = false;
 
   String _error = '';
 
@@ -20,26 +18,23 @@ class RestockViewModel extends ChangeNotifier {
   List<BundleModel> get bundles => _bundles;
   List<BundleModel> get selectedBundles => _selectedBundles;
 
-  bool get isLoading => _isLoading;
   String get error => _error;
 
   Future<void> fetchProducts() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         _error = 'No user is logged in.';
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
         return;
       }
 
       final sellerId = currentUser.uid;
 
       final snapshot = await FirebaseFirestore.instance
-          .collection('products')
+          .collection(FirestoreConstants.products)
           .where('sellerId', isEqualTo: sellerId)
           .get();
 
@@ -52,8 +47,7 @@ class RestockViewModel extends ChangeNotifier {
     } catch (e) {
       _error = 'Failed to fetch products: $e';
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -81,8 +75,7 @@ class RestockViewModel extends ChangeNotifier {
   }
 
   Future<void> batchRestock(List<BatchModel> productsToRestock) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
       // final batch = FirebaseFirestore.instance.batch();
@@ -106,8 +99,7 @@ class RestockViewModel extends ChangeNotifier {
     } catch (e) {
       _error = 'Failed to restock products: $e';
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
