@@ -56,20 +56,11 @@ class BundleService implements IBundleService {
   @override
   Future<void> createBundle(BundleModel bundle) async {
     try {
-      final bundleData = {
-        'name': bundle.name,
-        'category': bundle.category,
-        'description': bundle.description,
-        'items': bundle.items,
-        FirestoreConstants.price: bundle.price,
-        FirestoreConstants.stock: bundle.stock,
-        FirestoreConstants.discount: bundle.discount,
-        'mainImageUrl': bundle.mainImageUrl,
+      await _firestore.collection(FirestoreConstants.bundles).add({
+        ...bundle.toMap(),
         FirestoreConstants.sellerId: _currentUser.uid,
         'isListed': true,
-      };
-
-      await _firestore.collection(FirestoreConstants.bundles).add(bundleData);
+      });
     } on FirebaseException catch (e, stackTrace) {
       AppLogger.error('Failed to create bundle', e, stackTrace);
       throw FirestoreException('Failed to create bundle', originalError: e);
@@ -79,21 +70,10 @@ class BundleService implements IBundleService {
   @override
   Future<void> updateBundle(BundleModel bundle) async {
     try {
-      final bundleData = {
-        'name': bundle.name,
-        'category': bundle.category,
-        'description': bundle.description,
-        'items': bundle.items,
-        FirestoreConstants.price: bundle.price,
-        FirestoreConstants.stock: bundle.stock,
-        FirestoreConstants.discount: bundle.discount,
-        'mainImageUrl': bundle.mainImageUrl,
-      };
-
       await _firestore
           .collection(FirestoreConstants.bundles)
           .doc(bundle.id)
-          .update(bundleData);
+          .update(bundle.toMap());
     } on FirebaseException catch (e, stackTrace) {
       AppLogger.error('Failed to update bundle', e, stackTrace);
       throw FirestoreException('Failed to update bundle', originalError: e);

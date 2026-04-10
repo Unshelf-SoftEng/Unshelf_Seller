@@ -8,12 +8,12 @@ class StoreModel {
   final String storeName;
   double? storeLongitude;
   double? storeLatitude;
-  String? storeAddress;
-  String? storePhoneNumber;
+  final String? storeAddress;
+  final String? storePhoneNumber;
   final Map<String, Map<String, Object>>? storeSchedule;
   final String? storeImageUrl; // Nullable
-  double? storeRating;
-  int? storeFollowers;
+  final double? storeRating;
+  final int? storeFollowers;
 
   StoreModel({
     required this.userId,
@@ -30,6 +30,18 @@ class StoreModel {
     this.storeRating,
     this.storeFollowers,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'storeName': storeName,
+      'storeAddress': storeAddress,
+      'storePhoneNumber': storePhoneNumber,
+      'storeImageUrl': storeImageUrl,
+      'storeSchedule': storeSchedule,
+      'latitude': storeLatitude,
+      'longitude': storeLongitude,
+    };
+  }
 
   // Factory method to create StoreModel from Firebase document snapshot
   factory StoreModel.fromSnapshot(

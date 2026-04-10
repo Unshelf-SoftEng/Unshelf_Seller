@@ -261,30 +261,4 @@ class _OrderHistoryViewState extends State<OrderHistoryView> {
       ),
     );
   }
-
-  Widget _buildFilterButton(String status, OrderViewModel viewModel) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          minimumSize: const Size(40, 20),
-          backgroundColor: viewModel.currentStatus == status
-              ? AppColors.darkColor
-              : Colors.grey[200],
-          foregroundColor:
-              viewModel.currentStatus == status ? Colors.white : Colors.black,
-        ),
-        onPressed: () {
-          setState(() {
-            viewModel.currentStatus = status;
-            viewModel.filterOrdersByStatus(viewModel.currentStatus);
-          });
-        },
-        child: Text(
-          status,
-          style: const TextStyle(fontSize: 9.0),
-        ),
-      ),
-    );
-  }
 }

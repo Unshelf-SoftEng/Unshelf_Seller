@@ -1,8 +1,8 @@
 abstract class ItemModel {
   final String id;
-  String name;
-  String mainImageUrl;
-  String category;
+  final String name;
+  final String mainImageUrl;
+  final String category;
 
   ItemModel({
     required this.id,

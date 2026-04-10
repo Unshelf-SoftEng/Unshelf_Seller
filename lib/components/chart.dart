@@ -148,7 +148,7 @@ class _ChartState extends State<Chart> {
             show: true,
             gradient: LinearGradient(
               colors: gradientColors
-                  .map((color) => color.withOpacity(0.3))
+                  .map((color) => color.withValues(alpha: 0.3))
                   .toList(),
             ),
           ),

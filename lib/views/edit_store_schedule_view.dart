@@ -53,7 +53,7 @@ class EditStoreScheduleView extends StatelessWidget {
                                             fontWeight: FontWeight.bold)),
                                     Switch(
                                       value: isActive,
-                                      activeColor: AppColors.primaryColor,
+                                      activeThumbColor: AppColors.primaryColor,
                                       onChanged: (value) =>
                                           viewModel.toggleDay(day),
                                     ),

@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/item_model.dart';
 
 class ProductModel extends ItemModel {
-  String description;
-  List<String>? additionalImageUrls;
+  final String description;
+  final List<String>? additionalImageUrls;
 
   ProductModel({
     required super.id,
@@ -28,10 +28,8 @@ class ProductModel extends ItemModel {
     );
   }
 
-  // Method to convert StoreModel to Json
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'productId': id,
       'name': name,
       'description': description,
       'category': category,

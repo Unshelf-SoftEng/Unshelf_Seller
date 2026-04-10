@@ -85,11 +85,7 @@ class ProductService implements IProductService {
     try {
       DocumentReference docRef =
           await _firestore.collection(FirestoreConstants.products).add({
-        'name': product.name,
-        'description': product.description,
-        'category': product.category,
-        'mainImageUrl': product.mainImageUrl,
-        'additionalImageUrls': product.additionalImageUrls,
+        ...product.toMap(),
         FirestoreConstants.sellerId: _currentUser.uid,
       });
 
@@ -106,12 +102,7 @@ class ProductService implements IProductService {
       await _firestore
           .collection(FirestoreConstants.products)
           .doc(productId)
-          .update({
-        'name': product.name,
-        'description': product.description,
-        'category': product.category,
-        'mainImageUrl': product.mainImageUrl,
-      });
+          .update(product.toMap());
     } on FirebaseException catch (e, stackTrace) {
       AppLogger.error('Failed to update product', e, stackTrace);
       throw FirestoreException('Failed to update product', originalError: e);

@@ -288,7 +288,7 @@ class AddProductView extends StatelessWidget {
                             ),
                             const SizedBox(height: 15),
                             DropdownButtonFormField<String>(
-                              value: viewModel.selectedCategory.isEmpty
+                              initialValue: viewModel.selectedCategory.isEmpty
                                   ? null
                                   : viewModel.selectedCategory,
                               items:

@@ -289,7 +289,7 @@ class _EditProductViewState extends State<EditProductView> {
                     ),
                     const SizedBox(height: 5),
                     DropdownButtonFormField<String>(
-                      value: viewModel.selectedCategory.isEmpty
+                      initialValue: viewModel.selectedCategory.isEmpty
                           ? null
                           : viewModel.selectedCategory,
                       items: viewModel.categories.map((String category) {

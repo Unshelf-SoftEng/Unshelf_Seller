@@ -18,7 +18,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 0;
-  List<Map<String, dynamic>> _notifications = [];
   int _unseenCount = 0;
 
   // List of screens to display

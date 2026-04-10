@@ -251,7 +251,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
                                   if (editResult == true) {
                                     viewModel
-                                        .fetchProductData(widget.productId!);
+                                        .fetchProductData(widget.productId);
                                   }
                                 },
                               ),
