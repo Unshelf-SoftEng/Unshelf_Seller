@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:unshelf_seller/services/permission_service.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
+import 'package:unshelf_seller/services/permission_service.dart';
 
 class StoreLocationViewModel extends BaseViewModel {
+  final IStoreService _storeService;
+
+  StoreLocationViewModel({required IStoreService storeService})
+      : _storeService = storeService;
+
   LatLng _chosenLocation = const LatLng(10.3157, 123.8854);
 
   LatLng get chosenLocation => _chosenLocation;
@@ -56,24 +59,12 @@ class StoreLocationViewModel extends BaseViewModel {
   }
 
   Future<void> saveLocation() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      throw Exception('User is not logged in');
-    }
-
-    try {
-      await FirebaseFirestore.instance
-          .collection(FirestoreConstants.stores)
-          .doc(user.uid)
-          .set({
-        'latitude': _chosenLocation.latitude,
-        'longitude': _chosenLocation.longitude,
-      }, SetOptions(merge: true));
-    } catch (error) {
-      throw Exception('Failed to save location: $error');
-    }
-
+    await runBusyFuture(() async {
+      await _storeService.saveStoreLocation(
+        _chosenLocation.latitude,
+        _chosenLocation.longitude,
+      );
+    });
     notifyListeners();
   }
 }

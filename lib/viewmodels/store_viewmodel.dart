@@ -1,138 +1,54 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 import 'package:unshelf_seller/models/user_model.dart';
-import 'package:unshelf_seller/core/base_viewmodel.dart';
-import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
 class StoreViewModel extends BaseViewModel {
+  final IStoreService _storeService;
+
+  StoreViewModel({required IStoreService storeService})
+      : _storeService = storeService;
+
   StoreModel? storeDetails;
   UserProfileModel? userProfile;
 
   Future<void> fetchUserProfile() async {
-    setLoading(true);
-
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      setError("User is not logged in");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.users)
-          .doc(user.uid)
-          .get();
-
-      if (!userDoc.exists) {
-        setError("User profile not found");
-        userProfile = null;
-      } else {
-        userProfile = UserProfileModel.fromSnapshot(userDoc);
+    await runBusyFuture(() async {
+      userProfile = await _storeService.fetchUserProfile();
+      if (userProfile == null) {
+        setError('User profile not found');
       }
-    } catch (e) {
-      setError("Error fetching user profile: ${e.toString()}");
-      userProfile = null;
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   Future<void> fetchStoreDetails() async {
-    setLoading(true);
-
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      setError("User is not logged in");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.users)
-          .doc(user.uid)
-          .get();
-
-      DocumentSnapshot storeDoc = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.stores)
-          .doc(user.uid)
-          .get();
-
-      if (!userDoc.exists || !storeDoc.exists) {
-        storeDetails = null;
-        setError("User profile or store not found");
-        AppLogger.warning(errorMessage ?? '');
+    await runBusyFuture(() async {
+      storeDetails = await _storeService.fetchStoreDetails();
+      if (storeDetails == null) {
+        AppLogger.warning('User profile or store not found');
+        setError('User profile or store not found');
       } else {
         AppLogger.debug('Getting Store Details Here');
-        storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
       }
-    } catch (e) {
-      setError("Error fetching store details: ${e.toString()}");
-      AppLogger.error(errorMessage ?? '');
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   Future<int> fetchStoreFollowers() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      setError("User is not logged in");
-      setLoading(false);
-      return 0;
-    }
-
     try {
-      // Example path to fetch followers from the Firestore database
-      QuerySnapshot followersSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.stores)
-          .doc(user.uid)
-          .collection('followers')
-          .get();
-
-      return followersSnapshot.size;
+      return await _storeService.fetchStoreFollowers();
     } catch (e) {
-      setError("Error fetching store followers");
-      return 0; // or throw an exception if needed
-    } finally {
-      setLoading(false);
+      setError('Error fetching store followers');
+      return 0;
     }
   }
 
   Future<double> fetchStoreRatings() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      setError("User is not logged in");
-      setLoading(false);
-      return 0.0;
-    }
-
     try {
-      // Example path to fetch ratings from the Firestore database
-      DocumentSnapshot ratingsSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.stores)
-          .doc(user.uid)
-          .collection('ratings')
-          .doc('average')
-          .get();
-
-      // Cast the data to a Map<String, dynamic>
-      Map<String, dynamic>? data =
-          ratingsSnapshot.data() as Map<String, dynamic>?;
-
-      return data?['average'] ?? 0.0;
+      return await _storeService.fetchStoreRatings();
     } catch (e) {
-      setError("Error fetching store ratings");
-      return 0.0; // or throw an exception if needed
-    } finally {
-      setLoading(false);
+      setError('Error fetching store ratings');
+      return 0.0;
     }
   }
 
