@@ -56,9 +56,9 @@ class _EditStoreLocationViewState extends State<EditStoreLocationView> {
           Navigator.pop(context);
         },
         actionWidget: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.save,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
           onPressed: () async {
             try {

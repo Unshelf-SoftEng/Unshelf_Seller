@@ -40,7 +40,7 @@ class EditStoreProfileView extends StatelessWidget {
                             onTap: () => viewModel.pickImage(),
                             child: CircleAvatar(
                               radius: 50,
-                              backgroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.surface,
                               backgroundImage: viewModel.profileImage != null
                                   ? MemoryImage(viewModel.profileImage!)
                                   : storeDetails.storeImageUrl != null
