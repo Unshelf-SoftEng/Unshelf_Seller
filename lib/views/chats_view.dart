@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:unshelf_seller/components/chat_bubble.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/my_textfield.dart';
-import 'package:unshelf_seller/services/chat_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_chat_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class ChatView extends StatefulWidget {
@@ -25,7 +26,7 @@ class _ChatViewState extends State<ChatView>
   @override
   bool get wantKeepAlive => true;
   final TextEditingController _messageController = TextEditingController();
-  final ChatService _chatService = ChatService();
+  final IChatService _chatService = locator<IChatService>();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   void sendMessage() async {

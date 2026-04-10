@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/authentication/views/login_view.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
@@ -27,7 +29,7 @@ class _RegisterViewState extends State<RegisterView> {
   Future<void> saveUserData(
       User user, String name, String phoneNumber, String storeName) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      await FirebaseFirestore.instance.collection(FirestoreConstants.users).doc(user.uid).set({
         'name': name,
         'email': user.email,
         'phoneNumber': phoneNumber,
@@ -35,7 +37,7 @@ class _RegisterViewState extends State<RegisterView> {
         'isBanned': false,
       });
 
-      await FirebaseFirestore.instance.collection('stores').doc(user.uid).set({
+      await FirebaseFirestore.instance.collection(FirestoreConstants.stores).doc(user.uid).set({
         'storeSchedule': {
           'Monday': {'open': '', 'close': '', 'isOpen': 'false'},
           'Tuesday': {'open': '', 'close': '', 'isOpen': 'false'},
@@ -151,7 +153,7 @@ class _RegisterViewState extends State<RegisterView> {
       } else {
         // Handle other types of errors, such as network errors
         errorMessage = '${e} Google sign-in failed. Please try again.';
-        print(e);
+        AppLogger.error('Google sign-in error', e);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(

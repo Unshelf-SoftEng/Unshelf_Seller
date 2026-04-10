@@ -1,8 +1,8 @@
 // view_models/settings_view_model.dart
-import 'package:flutter/material.dart';
-import '../models/settings_model.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/models/settings_model.dart';
 
-class SettingsViewModel extends ChangeNotifier {
+class SettingsViewModel extends BaseViewModel {
   SettingsModel _settings = SettingsModel(
     notificationsEnabled: true,
     language: 'English',

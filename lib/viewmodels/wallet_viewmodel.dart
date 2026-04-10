@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/constants/status_constants.dart';
 
 class Transaction {
   final String type; // "withdraw" or "sale"
@@ -15,13 +17,13 @@ class Transaction {
       this.orderId});
 }
 
-class WalletViewModel extends ChangeNotifier {
+class WalletViewModel extends BaseViewModel {
   double _balance = 0;
-  String _error = '';
+  String _walletError = '';
   List<Transaction> _transactions = [];
 
   double get balance => _balance;
-  String get error => _error;
+  String get walletError => _walletError;
   List<Transaction> get transactions => _transactions;
 
   WalletViewModel() {
@@ -33,13 +35,15 @@ class WalletViewModel extends ChangeNotifier {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _error = 'User not logged in';
+      _walletError = 'User not logged in';
       notifyListeners();
       return; // Early return if user is not logged in
     }
 
     try {
-      await FirebaseFirestore.instance.collection('withdrawal_requests').add({
+      await FirebaseFirestore.instance
+          .collection(FirestoreConstants.withdrawalRequests)
+          .add({
         'sellerId': user.uid,
         'amount': amount,
         'date': FieldValue.serverTimestamp(),
@@ -49,14 +53,16 @@ class WalletViewModel extends ChangeNotifier {
         'isApproved': false,
       });
 
-      await FirebaseFirestore.instance.collection('transactions').add({
+      await FirebaseFirestore.instance
+          .collection(FirestoreConstants.transactions)
+          .add({
         'sellerId': user.uid,
         'amount': amount,
-        'type': 'Withdraw',
+        'type': StatusConstants.withdraw,
         'date': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      _error = 'Error saving transaction: $e';
+      _walletError = 'Error saving transaction: $e';
       notifyListeners();
     }
 
@@ -75,7 +81,7 @@ class WalletViewModel extends ChangeNotifier {
 
     // Fetch transactions for the current seller
     final querySnapshot = await FirebaseFirestore.instance
-        .collection('transactions') // Your transactions collection
+        .collection(FirestoreConstants.transactions) // Your transactions collection
         .where('sellerId', isEqualTo: user.uid)
         .orderBy('date', descending: true)
         .get();
@@ -88,11 +94,11 @@ class WalletViewModel extends ChangeNotifier {
     for (var doc in querySnapshot.docs) {
       DateTime date = (doc['date'] as Timestamp).toDate();
 
-      if (doc['type'] == 'Withdraw') {
+      if (doc['type'] == StatusConstants.withdraw) {
         double amount = doc['amount'].toDouble();
 
         _transactions.add(Transaction(
-            type: 'Withdraw',
+            type: StatusConstants.withdraw,
             amount: amount,
             date: date,
             orderId: 'XXXXXX-XXX'));
@@ -104,7 +110,7 @@ class WalletViewModel extends ChangeNotifier {
           double sellerEarnings = doc['sellerEarnings'].toDouble();
 
           _transactions.add(Transaction(
-              type: 'Sale',
+              type: StatusConstants.sale,
               amount: sellerEarnings,
               date: date,
               orderId: orderId));
@@ -127,9 +133,9 @@ class WalletViewModel extends ChangeNotifier {
 
     // Fetch withdrawal transactions and update balance
     final withdrawalSnapshot = await FirebaseFirestore.instance
-        .collection('transactions')
+        .collection(FirestoreConstants.transactions)
         .where('sellerId', isEqualTo: user.uid)
-        .where('type', isEqualTo: 'withdraw')
+        .where('type', isEqualTo: StatusConstants.withdraw)
         .get();
 
     for (var doc in withdrawalSnapshot.docs) {
@@ -137,7 +143,7 @@ class WalletViewModel extends ChangeNotifier {
       newBalance -= withdrawalAmount;
 
       _transactions.add(Transaction(
-        type: 'withdraw',
+        type: StatusConstants.withdraw,
         amount: withdrawalAmount,
         date: (doc['date'] as Timestamp).toDate(),
       ));

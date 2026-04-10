@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class UserProfileViewModel extends ChangeNotifier {
+class UserProfileViewModel extends BaseViewModel {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -13,11 +15,8 @@ class UserProfileViewModel extends ChangeNotifier {
 
   UserProfileViewModel({required this.userProfile});
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
   String? _errorMessage;
-  String? get errorMessage => _errorMessage;
+  String? get errorMessageLocal => _errorMessage;
 
   void initializeControllers(UserProfileModel userProfile) {
     nameController.text = userProfile.name;
@@ -26,8 +25,7 @@ class UserProfileViewModel extends ChangeNotifier {
   }
 
   void updateUserProfile() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
       User user = FirebaseAuth.instance.currentUser!;
@@ -35,15 +33,13 @@ class UserProfileViewModel extends ChangeNotifier {
       if (passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isEmpty) {
         _errorMessage = 'Please confirm your password';
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
         return;
       }
 
       if (passwordController.text != confirmPasswordController.text) {
         _errorMessage = 'Passwords do not match';
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
         return;
       }
 
@@ -63,7 +59,7 @@ class UserProfileViewModel extends ChangeNotifier {
       }
 
       await FirebaseFirestore.instance
-          .collection('users')
+          .collection(FirestoreConstants.users)
           .doc(user.uid)
           .update({
         'name': nameController.text,
@@ -71,15 +67,12 @@ class UserProfileViewModel extends ChangeNotifier {
         'phoneNumber': phoneController.text,
       });
 
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     } catch (error) {
       _errorMessage = 'Failed to update user profile: $error';
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 }

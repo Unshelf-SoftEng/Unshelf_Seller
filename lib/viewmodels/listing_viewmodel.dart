@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/item_model.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class ListingViewModel extends ChangeNotifier {
+class ListingViewModel extends BaseViewModel {
   List<ItemModel> _items = [];
   List<dynamic> _filteredItems = [];
-  bool _isLoading = true;
   bool _showingProducts = true;
   List<ItemModel> get items => _items;
-  bool get isLoading => _isLoading;
   bool get showingProducts => _showingProducts;
   String _searchQuery = '';
   List<dynamic> get filteredItems => _filteredItems;
@@ -59,14 +59,13 @@ class ListingViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchItems() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
         final productSnapshot = await FirebaseFirestore.instance
-            .collection('products')
+            .collection(FirestoreConstants.products)
             .where('sellerId', isEqualTo: user.uid)
             .get();
 
@@ -75,7 +74,7 @@ class ListingViewModel extends ChangeNotifier {
               try {
                 return ProductModel.fromSnapshot(doc) as ItemModel?;
               } catch (e) {
-                print('Error mapping product: $e');
+                AppLogger.error('Error mapping product: $e');
                 return null;
               }
             })
@@ -83,7 +82,7 @@ class ListingViewModel extends ChangeNotifier {
             .toList();
 
         final bundleSnapshot = await FirebaseFirestore.instance
-            .collection('bundles')
+            .collection(FirestoreConstants.bundles)
             .where('sellerId', isEqualTo: user.uid)
             .get();
 
@@ -92,7 +91,7 @@ class ListingViewModel extends ChangeNotifier {
               try {
                 return BundleModel.fromSnapshot(doc) as ItemModel?;
               } catch (e) {
-                print('Error mapping bundle: $e');
+                AppLogger.error('Error mapping bundle: $e');
                 return null;
               }
             })
@@ -106,31 +105,34 @@ class ListingViewModel extends ChangeNotifier {
 
         _filteredItems = _items;
       } catch (e) {
-        print('Error fetching items: $e');
+        AppLogger.error('Error fetching items: $e');
         _items = [];
       } finally {
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
       }
     } else {
       _items = [];
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
   Future<void> addProduct(Map<String, dynamic> productData) async {
-    await FirebaseFirestore.instance.collection('products').add(productData);
+    await FirebaseFirestore.instance
+        .collection(FirestoreConstants.products)
+        .add(productData);
     fetchItems();
   }
 
   Future<void> addBundle(Map<String, dynamic> bundleData) async {
-    await FirebaseFirestore.instance.collection('bundles').add(bundleData);
+    await FirebaseFirestore.instance
+        .collection(FirestoreConstants.bundles)
+        .add(bundleData);
     fetchItems();
   }
 
   Future<void> deleteItem(String itemId, bool isProduct) async {
-    final collection = isProduct ? 'products' : 'bundles';
+    final collection =
+        isProduct ? FirestoreConstants.products : FirestoreConstants.bundles;
     await FirebaseFirestore.instance
         .collection(collection)
         .doc(itemId)
@@ -147,7 +149,6 @@ class ListingViewModel extends ChangeNotifier {
 
   void clear() {
     _items = [];
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
   }
 }

@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/models/product_model.dart';
-import 'package:unshelf_seller/services/product_service.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
 
-class ProductSummaryViewModel extends ChangeNotifier {
-  final ProductService _productService = ProductService();
-  final BatchService _batchService = BatchService();
+class ProductSummaryViewModel extends BaseViewModel {
+  final IProductService _productService;
+  final IBatchService _batchService;
+
+  ProductSummaryViewModel({
+    required IProductService productService,
+    required IBatchService batchService,
+  })  : _productService = productService,
+        _batchService = batchService;
+
   ProductModel? _product;
   ProductModel? get product => _product;
   List<BatchModel>? _batches;
   List<BatchModel>? get batches => _batches;
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
 
   final PageController _pageController = PageController();
   PageController get pageController => _pageController;
@@ -21,17 +28,16 @@ class ProductSummaryViewModel extends ChangeNotifier {
   int get currentPage => _currentPage;
 
   Future<void> fetchProductData(String productId) async {
-    _isLoading = true;
+    setLoading(true);
     notifyListeners();
 
     try {
       _product = await _productService.getProduct(productId);
       _batches = await _productService.getProductBatches(product!);
     } catch (e) {
-      // Handle errors
-      print("Error fetching product data: $e");
+      AppLogger.error('Error fetching product data: $e');
     } finally {
-      _isLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   }

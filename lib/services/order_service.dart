@@ -1,17 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+
+import 'package:unshelf_seller/core/constants/app_constants.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_order_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/order_model.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
-import 'package:unshelf_seller/services/bundle_service.dart';
 
-class OrderService extends ChangeNotifier {
-  final BatchService _batchService = BatchService();
-  final BundleService _bundleService = BundleService();
+class OrderService implements IOrderService {
+  final FirebaseFirestore _firestore;
+  final CurrentUserProvider _currentUser;
+  final IBatchService _batchService;
+  final IBundleService _bundleService;
 
+  OrderService({
+    FirebaseFirestore? firestore,
+    CurrentUserProvider? currentUser,
+    required IBatchService batchService,
+    required IBundleService bundleService,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _currentUser = currentUser ?? CurrentUserProvider(),
+        _batchService = batchService,
+        _bundleService = bundleService;
+
+  @override
   Future<OrderModel?> getOrder(String orderId) async {
-    final orderDoc = await FirebaseFirestore.instance
-        .collection('orders')
+    final orderDoc = await _firestore
+        .collection(FirestoreConstants.orders)
         .doc(orderId)
         .get();
 
@@ -21,8 +38,8 @@ class OrderService extends ChangeNotifier {
 
     var order = OrderModel.fromFirestore(orderDoc);
 
-    var buyerDoc = await FirebaseFirestore.instance
-        .collection('users')
+    var buyerDoc = await _firestore
+        .collection(FirestoreConstants.users)
         .doc(order.buyerId)
         .get();
 
@@ -31,67 +48,60 @@ class OrderService extends ChangeNotifier {
     for (var item in order.items) {
       if (item.isBundle!) {
         final bundleDoc = await _bundleService.getBundle(item.batchId!);
-        order.bundles!.add(bundleDoc!);
+        if (bundleDoc != null) {
+          order.bundles!.add(bundleDoc);
+        }
         continue;
       } else {
         final batchDoc = await _batchService.getBatchById(item.batchId!);
-        order.products!.add(batchDoc!);
+        if (batchDoc != null) {
+          order.products!.add(batchDoc);
+        }
       }
     }
 
     return order;
   }
 
+  @override
   Future<List<OrderModel>> getOrders(bool forToday) async {
-    User? user = FirebaseAuth.instance.currentUser;
+    final duration = forToday
+        ? AppConstants.orderExpiryDuration
+        : AppConstants.orderHistoryDuration;
 
-    var orderDoc;
+    var orderDoc = await _firestore
+        .collection(FirestoreConstants.orders)
+        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+        .where(FirestoreConstants.createdAt,
+            isGreaterThan: DateTime.now().subtract(duration))
+        .orderBy(FirestoreConstants.createdAt, descending: false)
+        .get();
 
-    if (forToday) {
-      orderDoc = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('sellerId', isEqualTo: user!.uid)
-          .where('createdAt',
-              isGreaterThan: DateTime.now().subtract(const Duration(hours: 24)))
-          .orderBy('createdAt', descending: false)
-          .get();
-    } else {
-      orderDoc = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('sellerId', isEqualTo: user!.uid)
-          .where('createdAt',
-              isGreaterThan: DateTime.now().subtract(const Duration(days: 17)))
-          .orderBy('createdAt', descending: false)
-          .get();
-    }
-
-    print('Orders today: ${orderDoc.docs.length}');
+    AppLogger.debug('Orders fetched: ${orderDoc.docs.length}');
 
     List<OrderModel> orders = orderDoc.docs
         .map((doc) => OrderModel.fromFirestore(doc))
-        .toList()
-        .cast<OrderModel>();
+        .toList();
 
     return orders;
   }
 
+  @override
   Future<List<OrderModel>> getOrdersWithBatchId() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    var orderDoc = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('sellerId', isEqualTo: user!.uid)
-        .where('createdAt',
-            isGreaterThan: DateTime.now().subtract(const Duration(hours: 24)))
-        .orderBy('createdAt', descending: false)
+    var orderDoc = await _firestore
+        .collection(FirestoreConstants.orders)
+        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+        .where(FirestoreConstants.createdAt,
+            isGreaterThan:
+                DateTime.now().subtract(AppConstants.orderExpiryDuration))
+        .orderBy(FirestoreConstants.createdAt, descending: false)
         .get();
 
-    print('Orders containing batchId: ${orderDoc.docs.length}');
+    AppLogger.debug('Orders containing batchId: ${orderDoc.docs.length}');
 
     List<OrderModel> orders = orderDoc.docs
         .map((doc) => OrderModel.fromFirestore(doc))
-        .toList()
-        .cast<OrderModel>();
+        .toList();
 
     return orders;
   }

@@ -1,13 +1,26 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:unshelf_seller/models/product_model.dart';
-import 'package:unshelf_seller/models/batch_model.dart';
 
-class ProductService extends ChangeNotifier {
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
+import 'package:unshelf_seller/models/product_model.dart';
+
+class ProductService implements IProductService {
+  final FirebaseFirestore _firestore;
+  final CurrentUserProvider _currentUser;
+
+  ProductService({
+    FirebaseFirestore? firestore,
+    CurrentUserProvider? currentUser,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _currentUser = currentUser ?? CurrentUserProvider();
+
+  @override
   Future<ProductModel?> getProduct(String productId) async {
-    final productDoc = await FirebaseFirestore.instance
-        .collection('products')
+    final productDoc = await _firestore
+        .collection(FirestoreConstants.products)
         .doc(productId)
         .get();
 
@@ -18,12 +31,11 @@ class ProductService extends ChangeNotifier {
     return null;
   }
 
+  @override
   Future<List<ProductModel>> getProducts() async {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    final productDocs = await FirebaseFirestore.instance
-        .collection('products')
-        .where('sellerId', isEqualTo: user!.uid)
+    final productDocs = await _firestore
+        .collection(FirestoreConstants.products)
+        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
         .get();
 
     if (productDocs.docs.isNotEmpty) {
@@ -35,10 +47,11 @@ class ProductService extends ChangeNotifier {
     return [];
   }
 
+  @override
   Future<List<BatchModel>?> getProductBatches(ProductModel product) async {
-    final batchDocs = await FirebaseFirestore.instance
-        .collection('batches')
-        .where('productId', isEqualTo: product.id)
+    final batchDocs = await _firestore
+        .collection(FirestoreConstants.batches)
+        .where(FirestoreConstants.productId, isEqualTo: product.id)
         .get();
 
     if (batchDocs.docs.isNotEmpty) {
@@ -50,33 +63,31 @@ class ProductService extends ChangeNotifier {
     return null;
   }
 
+  @override
   Future<String> addProduct(ProductModel product) async {
-    User? user = FirebaseAuth.instance.currentUser;
-
     try {
-      // Add the document and get the reference
       DocumentReference docRef =
-          await FirebaseFirestore.instance.collection('products').add({
+          await _firestore.collection(FirestoreConstants.products).add({
         'name': product.name,
         'description': product.description,
         'category': product.category,
         'mainImageUrl': product.mainImageUrl,
         'additionalImageUrls': product.additionalImageUrls,
-        'sellerId': user!.uid,
+        FirestoreConstants.sellerId: _currentUser.uid,
       });
 
-      // Return the document ID
       return docRef.id;
-    } catch (e) {
-      print('Error adding product to Firestore: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error adding product to Firestore', e, stackTrace);
       rethrow;
     }
   }
 
+  @override
   Future<void> updateProduct(String productId, ProductModel product) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('products')
+      await _firestore
+          .collection(FirestoreConstants.products)
           .doc(productId)
           .update({
         'name': product.name,
@@ -84,8 +95,8 @@ class ProductService extends ChangeNotifier {
         'category': product.category,
         'mainImageUrl': product.mainImageUrl,
       });
-    } catch (e) {
-      print('Error updating product: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error updating product', e, stackTrace);
       rethrow;
     }
   }

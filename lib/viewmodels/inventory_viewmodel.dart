@@ -1,24 +1,28 @@
-import 'package:flutter/material.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/inventory_product_model.dart';
-import 'package:unshelf_seller/services/product_service.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
 
-class InventoryViewModel extends ChangeNotifier {
+class InventoryViewModel extends BaseViewModel {
+  final IProductService _productService;
+  final IBatchService _batchService;
+
+  InventoryViewModel({
+    required IProductService productService,
+    required IBatchService batchService,
+  })  : _productService = productService,
+        _batchService = batchService;
+
   List<InventoryProductModel> _inventoryItems = [];
-  bool _isLoading = false;
-
   List<InventoryProductModel> get inventoryItems => _inventoryItems;
-  bool get isLoading => _isLoading;
 
   Future<void> fetchInventory() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      var products = await ProductService().getProducts();
+    await runBusyFuture(() async {
+      var products = await _productService.getProducts();
 
       for (var product in products) {
-        var batches = await BatchService().getBatchesByProductId(product.id);
+        var batches = await _batchService.getBatchesByProductId(product.id);
 
         _inventoryItems.add(InventoryProductModel(
           id: product.id,
@@ -28,13 +32,8 @@ class InventoryViewModel extends ChangeNotifier {
         ));
       }
 
-      print('Inventory fetched successfully');
-    } catch (e) {
-      print('Error fetching inventory: $e');
-    }
-
-    _isLoading = false;
-    notifyListeners();
+      AppLogger.debug('Inventory fetched successfully');
+    });
   }
 
   void clearData() {

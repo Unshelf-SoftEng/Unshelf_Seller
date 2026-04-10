@@ -5,18 +5,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/product_model.dart';
-import 'package:unshelf_seller/services/product_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:unshelf_seller/utils/colors.dart';
 
-class ProductViewModel extends ChangeNotifier {
+class ProductViewModel extends BaseViewModel {
   TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  final IProductService _productService;
+
+  ProductViewModel({required IProductService productService})
+      : _productService = productService;
 
   ImageState _mainImageState = ImageState();
   ImageState get mainImageState => _mainImageState;
@@ -44,17 +49,18 @@ class ProductViewModel extends ChangeNotifier {
   }
 
   Future<bool> addProductWithValidation(BuildContext context) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     if (mainImageState.data == null) {
       errorFound = true;
       _showSnackBar(context, 'Please add a main image!');
+      setLoading(false);
       return false;
     }
 
     if (!(formKey.currentState?.validate() ?? false)) {
       _showSnackBar(context, 'Please fill out all required fields!');
+      setLoading(false);
       return false;
     }
 
@@ -74,11 +80,8 @@ class ProductViewModel extends ChangeNotifier {
     );
   }
 
-  final ProductService _productService = ProductService();
-
   Future<void> loadProduct(ProductModel product) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     nameController.text = product.name;
     descriptionController.text = product.description;
     selectedCategory = product.category;
@@ -101,9 +104,8 @@ class ProductViewModel extends ChangeNotifier {
     }
     _selectedProduct = product;
 
-    print('Product loaded: $product');
-    _isLoading = false;
-    notifyListeners();
+    AppLogger.debug('Product loaded: $product');
+    setLoading(false);
   }
 
   // Pick and add image to the respective list
@@ -155,8 +157,7 @@ class ProductViewModel extends ChangeNotifier {
   // Add or update product with the uploaded images
   Future<void> addProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
-      _isLoading = true;
-      notifyListeners();
+      setLoading(true);
 
       try {
         User? user = FirebaseAuth.instance.currentUser;
@@ -174,10 +175,9 @@ class ProductViewModel extends ChangeNotifier {
           _selectedProductId = await _productService.addProduct(product);
         }
       } catch (e) {
-        print('Error adding product' + e.toString());
+        AppLogger.error('Error adding product', e);
       } finally {
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
       }
     }
   }
@@ -185,13 +185,11 @@ class ProductViewModel extends ChangeNotifier {
   // Update product with the uploaded images
   Future<bool> updateProduct(BuildContext context) async {
     if (formKey.currentState!.validate()) {
-      _isLoading = true;
-      notifyListeners();
+      setLoading(true);
 
       if (mainImageState.isNew && mainImageState.data == null) {
         errorFound = true;
-        _isLoading = false;
-        notifyListeners();
+        setLoading(false);
         return false;
       }
 
@@ -200,7 +198,7 @@ class ProductViewModel extends ChangeNotifier {
 
         if (user != null) {
           final productRef = FirebaseFirestore.instance
-              .collection('products')
+              .collection(FirestoreConstants.products)
               .doc(_selectedProduct?.id);
 
           await FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -246,8 +244,10 @@ class ProductViewModel extends ChangeNotifier {
           return true;
         }
       } catch (e) {
-        print('Error updating product: $e');
+        AppLogger.error('Error updating product: $e');
         return false;
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -284,10 +284,10 @@ class ImageState {
         if (response.statusCode == 200) {
           data = response.bodyBytes;
         } else {
-          print("Failed to load image from URL.");
+          AppLogger.warning("Failed to load image from URL.");
         }
       } catch (e) {
-        print("Error loading image: $e");
+        AppLogger.error("Error loading image: $e");
       }
     }
   }
