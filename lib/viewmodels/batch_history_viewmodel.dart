@@ -1,22 +1,32 @@
-import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:unshelf_seller/models/order_model.dart';
-import 'package:unshelf_seller/models/batch_model.dart';
-import 'package:unshelf_seller/services/order_service.dart';
 import 'package:nanoid/nanoid.dart';
-import 'package:unshelf_seller/services/product_service.dart';
-import 'package:unshelf_seller/services/batch_service.dart';
 
-class BatchHistoryViewModel extends ChangeNotifier {
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/app_constants.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/constants/status_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_order_service.dart';
+import 'package:unshelf_seller/models/batch_model.dart';
+import 'package:unshelf_seller/models/order_model.dart';
+
+class BatchHistoryViewModel extends BaseViewModel {
+  final IOrderService _orderService;
+  final IBatchService _batchService;
+
+  BatchHistoryViewModel({
+    required IOrderService orderService,
+    required IBatchService batchService,
+  })  : _orderService = orderService,
+        _batchService = batchService;
+
   List<OrderModel> _orders = [];
   String _currentStatus = 'All';
   OrderModel? _selectedOrder;
   OrderModel? get selectedOrder => _selectedOrder;
   List<OrderModel> get orders => _orders;
   String get currentStatus => _currentStatus;
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
 
   set currentStatus(String status) {
     _currentStatus = status;
@@ -33,9 +43,6 @@ class BatchHistoryViewModel extends ChangeNotifier {
 
   String _sortOrder = 'Descending';
 
-  final OrderService _orderService = OrderService();
-  final BatchService _batchService = BatchService();
-
   List<OrderModel> get filteredOrders {
     List<OrderModel> ordersToReturn;
 
@@ -49,19 +56,19 @@ class BatchHistoryViewModel extends ChangeNotifier {
 
     // Sort by createdAt in the specified order
     if (_sortOrder == 'Ascending') {
-      ordersToReturn.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+      ordersToReturn.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     } else if (_sortOrder == 'Descending') {
-      ordersToReturn.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      ordersToReturn.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
 
     return ordersToReturn;
   }
 
   Future<void> fetchBatchHistory(batchId) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
-    BatchModel batch = (await _batchService.getBatchById(batchId))!;
+    // ignore: unused_local_variable
+    BatchModel? batch = await _batchService.getBatchById(batchId);
     _orders = await _orderService.getOrdersWithBatchId();
 
     double totalSaleSize = 0;
@@ -71,7 +78,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
     for (var order in _orders) {
       for (var item in order.items) {
         if (item.batchId == batchId) {
-          totalSaleSize += (item.price ?? 0) * (item.quantity ?? 0);
+          totalSaleSize += (item.price ?? 0) * item.quantity;
           totalProductsSold += item.quantity;
         }
       }
@@ -84,24 +91,19 @@ class BatchHistoryViewModel extends ChangeNotifier {
       'orderHistory': _orders,
     };
 
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> fetchOrdersHistory() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     _orders = await _orderService.getOrders(false);
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   Future<void> selectOrder(String orderId) async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     _selectedOrder = await _orderService.getOrder(orderId);
-    _isLoading = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   void filterOrdersByStatus(String? status) {
@@ -110,8 +112,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
   }
 
   Future<void> approveOrder() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     try {
       if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
@@ -119,31 +120,29 @@ class BatchHistoryViewModel extends ChangeNotifier {
       }
 
       final orderRef = FirebaseFirestore.instance
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .doc(_selectedOrder?.id);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.update(orderRef, {
-          'status': 'Processing',
+          FirestoreConstants.status: StatusConstants.processing,
         });
       });
 
-      _selectedOrder!.status = 'Processing';
+      _selectedOrder!.status = StatusConstants.processing;
       _orders.firstWhere((order) => order.id == _selectedOrder?.id).status =
-          'Processing';
+          StatusConstants.processing;
 
       notifyListeners();
     } catch (e) {
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
   Future<void> cancelOrder() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     var now = Timestamp.now();
 
@@ -153,44 +152,42 @@ class BatchHistoryViewModel extends ChangeNotifier {
       }
 
       final orderRef = FirebaseFirestore.instance
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .doc(_selectedOrder?.id);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.update(orderRef, {
-          'status': 'Cancelled',
+          FirestoreConstants.status: StatusConstants.cancelled,
           'cancelledAt': now,
         });
       });
 
-      _selectedOrder!.status = 'Cancelled';
+      _selectedOrder!.status = StatusConstants.cancelled;
       _selectedOrder!.cancelledAt = now;
       var updateOrder =
           _orders.firstWhere((order) => order.id == _selectedOrder?.id);
 
-      updateOrder.status = 'Cancelled';
+      updateOrder.status = StatusConstants.cancelled;
       updateOrder.cancelledAt = now;
 
       notifyListeners();
     } catch (e) {
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
   Future<void> fulfillOrder() async {
-    _isLoading = true;
-    notifyListeners();
+    setLoading(true);
     try {
       if (_selectedOrder == null || _selectedOrder?.buyerId == null) {
-        print('Order or buyer information is missing.');
+        AppLogger.error('Order or buyer information is missing.');
         throw Exception("Order or buyer information is missing.");
       }
 
       final orderRef = FirebaseFirestore.instance
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .doc(_selectedOrder?.id);
 
       var pickupCode = generatePickUpCode();
@@ -200,17 +197,17 @@ class BatchHistoryViewModel extends ChangeNotifier {
       for (var item in _selectedOrder!.items) {
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           if (item.isBundle!) {
-            print('Processing item: ${item.batchId}');
+            AppLogger.debug('Processing item: ${item.batchId}');
             final bundleRef = FirebaseFirestore.instance
-                .collection('bundles')
+                .collection(FirestoreConstants.bundles)
                 .doc(item.batchId);
 
             DocumentSnapshot bundleSnapshot = await transaction.get(bundleRef);
 
-            print('Batch snapshot: ${bundleSnapshot.data()}');
+            AppLogger.debug('Batch snapshot: ${bundleSnapshot.data()}');
 
             if (!bundleSnapshot.exists) {
-              print('Bundle ${item.batchId} does not exist.');
+              AppLogger.error('Bundle ${item.batchId} does not exist.');
               throw Exception("Bundle ${item.batchId} does not exist.");
             }
 
@@ -219,7 +216,8 @@ class BatchHistoryViewModel extends ChangeNotifier {
             double newStockValue = currentStock - quantity;
 
             if (newStockValue < 0) {
-              print('Insufficient stock for batch ${item.batchId}.');
+              AppLogger.error(
+                  'Insufficient stock for batch ${item.batchId}.');
               throw Exception(
                   "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
             }
@@ -229,19 +227,19 @@ class BatchHistoryViewModel extends ChangeNotifier {
               'isListed': newStockValue > 0,
             });
 
-            print('Stock updated for bundle ${item.batchId}.');
+            AppLogger.debug('Stock updated for bundle ${item.batchId}.');
           } else {
-            print('Processing item: ${item.batchId}');
+            AppLogger.debug('Processing item: ${item.batchId}');
             final batchRef = FirebaseFirestore.instance
-                .collection('batches')
+                .collection(FirestoreConstants.batches)
                 .doc(item.batchId);
 
             DocumentSnapshot batchSnapshot = await transaction.get(batchRef);
 
-            print('Batch snapshot: ${batchSnapshot.data()}');
+            AppLogger.debug('Batch snapshot: ${batchSnapshot.data()}');
 
             if (!batchSnapshot.exists) {
-              print('Batch ${item.batchId} does not exist.');
+              AppLogger.error('Batch ${item.batchId} does not exist.');
               throw Exception("Batch ${item.batchId} does not exist.");
             }
 
@@ -250,7 +248,8 @@ class BatchHistoryViewModel extends ChangeNotifier {
             double newStockValue = currentStock - quantity;
 
             if (newStockValue < 0) {
-              print('Insufficient stock for batch ${item.batchId}.');
+              AppLogger.error(
+                  'Insufficient stock for batch ${item.batchId}.');
               throw Exception(
                   "Insufficient stock for batch ${item.batchId}. Cannot fulfill order.");
             }
@@ -260,7 +259,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
               'isListed': newStockValue > 0,
             });
 
-            print('Stock updated for batch ${item.batchId}.');
+            AppLogger.debug('Stock updated for batch ${item.batchId}.');
           }
         });
       }
@@ -268,29 +267,28 @@ class BatchHistoryViewModel extends ChangeNotifier {
       // After processing all items, update the order status
       final orderUpdate = {
         'pickupCode': pickupCode,
-        'status': 'Ready',
+        FirestoreConstants.status: StatusConstants.ready,
       };
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.update(orderRef, orderUpdate);
       });
 
-      _selectedOrder!.status = 'Ready';
+      _selectedOrder!.status = StatusConstants.ready;
       _selectedOrder!.pickupCode = pickupCode;
 
       var updateOrder =
           _orders.firstWhere((order) => order.id == _selectedOrder?.id);
 
-      updateOrder.status = 'Ready';
+      updateOrder.status = StatusConstants.ready;
       updateOrder.pickupCode = pickupCode;
 
       notifyListeners();
     } catch (e) {
-      print("Error during order fulfillment: $e");
+      AppLogger.error('Error during order fulfillment: $e');
       rethrow;
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -302,7 +300,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
     try {
       Timestamp now = Timestamp.now();
       DocumentReference orderRef = FirebaseFirestore.instance
-          .collection('orders')
+          .collection(FirestoreConstants.orders)
           .doc(_selectedOrder?.id);
 
       // Fetch the order data
@@ -310,7 +308,7 @@ class BatchHistoryViewModel extends ChangeNotifier {
 
       // Check if the order exists
       if (!orderDoc.exists) {
-        print('No order found with ID: ${_selectedOrder?.id}');
+        AppLogger.debug('No order found with ID: ${_selectedOrder?.id}');
         return;
       }
 
@@ -319,18 +317,20 @@ class BatchHistoryViewModel extends ChangeNotifier {
       double totalPrice = orderDoc['totalPrice']?.toDouble() ?? 0.0;
 
       // Reference to the user document
-      DocumentReference userRef =
-          FirebaseFirestore.instance.collection('users').doc(buyerId);
+      DocumentReference userRef = FirebaseFirestore.instance
+          .collection(FirestoreConstants.users)
+          .doc(buyerId);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         transaction.update(orderRef, {
-          'status': 'Completed',
+          FirestoreConstants.status: StatusConstants.completed,
           'completedAt': now,
           'isPaid': true,
         });
 
-        double transactionFee =
-            double.parse((totalPrice * 0.02).toStringAsFixed(2));
+        double transactionFee = double.parse(
+            (totalPrice * AppConstants.transactionFeePercent)
+                .toStringAsFixed(2));
         double sellerEarnings =
             double.parse((totalPrice - transactionFee).toStringAsFixed(2));
 
@@ -348,31 +348,33 @@ class BatchHistoryViewModel extends ChangeNotifier {
           'sellerEarnings': sellerEarnings,
           'sellerId': orderDoc['sellerId'],
           'transactionFee': transactionFee,
-          'type': 'Sale',
+          'type': StatusConstants.sale,
         };
 
         transaction.set(
-          FirebaseFirestore.instance.collection('transactions').doc(),
+          FirebaseFirestore.instance
+              .collection(FirestoreConstants.transactions)
+              .doc(),
           transactionData,
         );
 
-        print(
+        AppLogger.debug(
             'Order completed. Seller earnings: ₱$sellerEarnings. User earned $earnedPoints points.');
-        _selectedOrder!.status = 'Completed';
+        _selectedOrder!.status = StatusConstants.completed;
         _selectedOrder!.completedAt = now;
         _selectedOrder!.isPaid = true;
 
         var updateOrder =
             _orders.firstWhere((order) => order.id == _selectedOrder?.id);
 
-        updateOrder.status = 'Completed';
+        updateOrder.status = StatusConstants.completed;
         updateOrder.completedAt = now;
         updateOrder.isPaid = true;
       });
 
       notifyListeners();
     } catch (e) {
-      print('Error completing order: $e');
+      AppLogger.error('Error completing order: $e');
     }
   }
 

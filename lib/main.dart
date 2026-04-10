@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_order_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 import 'package:unshelf_seller/viewmodels/analytics_viewmodel.dart';
 import 'package:unshelf_seller/viewmodels/batch_history_viewmodel.dart';
@@ -40,11 +44,16 @@ void main() async {
       storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
     ),
   );
+  setupLocator();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DashboardViewModel()),
-        ChangeNotifierProvider(create: (_) => OrderViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => OrderViewModel(
+            orderService: locator<IOrderService>(),
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => ProductViewModel()),
         ChangeNotifierProvider(create: (_) => StoreViewModel()),
         ChangeNotifierProvider(create: (_) => StoreLocationViewModel()),
@@ -62,7 +71,12 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SelectProductsViewModel()),
         ChangeNotifierProvider(create: (_) => ProductAnalyticsViewModel()),
         ChangeNotifierProvider(create: (_) => InventoryViewModel()),
-        ChangeNotifierProvider(create: (_) => BatchHistoryViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => BatchHistoryViewModel(
+            orderService: locator<IOrderService>(),
+            batchService: locator<IBatchService>(),
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
       ],
       child: const MyApp(),
