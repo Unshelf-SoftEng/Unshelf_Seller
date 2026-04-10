@@ -240,7 +240,7 @@ class _ListingsViewState extends State<ListingsView> {
           },
         ),
         IconButton(
-          icon: const Icon(Icons.delete, color: AppColors.warningColor),
+          icon: const Icon(Icons.delete, color: AppColors.error),
           onPressed: () async {
             final confirmDelete = await showDialog(
               context: context,
@@ -257,7 +257,7 @@ class _ListingsViewState extends State<ListingsView> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       child: const Text("Delete",
-                          style: TextStyle(color: AppColors.warningColor)),
+                          style: TextStyle(color: AppColors.error)),
                     ),
                   ],
                 );

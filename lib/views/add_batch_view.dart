@@ -45,7 +45,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     controller: viewModel.batchNumberController,
@@ -62,7 +62,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     controller: TextEditingController(
@@ -101,7 +101,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     keyboardType: TextInputType.number,
@@ -129,7 +129,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     keyboardType: TextInputType.number,
@@ -158,7 +158,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     controller: viewModel.quantifierController,
@@ -182,7 +182,7 @@ class AddBatchView extends StatelessWidget {
                             BorderSide(color: AppColors.lightColor, width: 2),
                       ),
                       errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.warningColor),
+                        borderSide: BorderSide(color: AppColors.error),
                       ),
                     ),
                     keyboardType: TextInputType.number,

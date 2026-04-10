@@ -63,7 +63,7 @@ class AddProductView extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: viewModel.errorFound
-                                            ? AppColors.warningColor
+                                            ? AppColors.error
                                             : AppColors.lightColor,
                                       ),
                                       borderRadius: BorderRadius.circular(
@@ -106,7 +106,7 @@ class AddProductView extends StatelessWidget {
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              AppColors.warningColor,
+                                              AppColors.error,
                                           foregroundColor: Colors.white,
                                           alignment: Alignment.center,
                                           minimumSize: const Size(50, 30),
@@ -231,7 +231,7 @@ class AddProductView extends StatelessWidget {
                                 child: Text(
                                   'Main image is required',
                                   style:
-                                      TextStyle(color: AppColors.warningColor),
+                                      TextStyle(color: AppColors.error),
                                 ),
                               ),
                             const SizedBox(height: 15),
@@ -249,7 +249,7 @@ class AddProductView extends StatelessWidget {
                                         width: 2.0)),
                                 errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: AppColors.warningColor)),
+                                        color: AppColors.error)),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -275,7 +275,7 @@ class AddProductView extends StatelessWidget {
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderSide:
-                                      BorderSide(color: AppColors.warningColor),
+                                      BorderSide(color: AppColors.error),
                                 ),
                               ),
                               maxLines: 3,
@@ -310,7 +310,7 @@ class AddProductView extends StatelessWidget {
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderSide:
-                                      BorderSide(color: AppColors.warningColor),
+                                      BorderSide(color: AppColors.error),
                                 ),
                               ),
                               onChanged: (String? newValue) {

@@ -284,7 +284,7 @@ class _OrderHistoryDetailsViewState extends State<OrderHistoryDetailsView> {
                   value,
                   style: const TextStyle(
                       fontSize: 16,
-                      color: AppColors.warningColor,
+                      color: AppColors.error,
                       fontWeight: FontWeight.bold),
                 ),
               )

@@ -69,7 +69,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                             decoration: BoxDecoration(
                               border: Border.all(
                                 color: viewModel.errorFound
-                                    ? AppColors.warningColor
+                                    ? AppColors.error
                                     : AppColors.lightColor,
                               ),
                               borderRadius: BorderRadius.circular(
@@ -109,7 +109,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.warningColor,
+                                  backgroundColor: AppColors.error,
                                   foregroundColor: Colors.white,
                                   alignment: Alignment.center,
                                   minimumSize: const Size(50, 30),
@@ -142,7 +142,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                         child: Text(
                           'Main image is required',
                           style: TextStyle(
-                            color: AppColors.warningColor,
+                            color: AppColors.error,
                           ),
                         ),
                       ),
@@ -159,7 +159,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                                 color: AppColors.lightColor, width: 2.0)),
                         errorBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: AppColors.warningColor)),
+                                BorderSide(color: AppColors.error)),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -182,7 +182,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               color: AppColors.lightColor, width: 2.0),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.warningColor),
+                          borderSide: BorderSide(color: AppColors.error),
                         ),
                       ),
                       maxLines: 3,
@@ -215,7 +215,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               color: AppColors.lightColor, width: 2.0),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.warningColor),
+                          borderSide: BorderSide(color: AppColors.error),
                         ),
                       ),
                       onChanged: (String? newValue) {
@@ -242,7 +242,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               color: AppColors.lightColor, width: 2.0),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.warningColor),
+                          borderSide: BorderSide(color: AppColors.error),
                         ),
                       ),
                       keyboardType: TextInputType.number,
@@ -270,7 +270,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               BorderSide(color: AppColors.lightColor, width: 2),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.warningColor),
+                          borderSide: BorderSide(color: AppColors.error),
                         ),
                       ),
                       keyboardType: TextInputType.number,
@@ -299,7 +299,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                               BorderSide(color: AppColors.lightColor, width: 2),
                         ),
                         errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.warningColor),
+                          borderSide: BorderSide(color: AppColors.error),
                         ),
                       ),
                       controller: viewModel.bundleDiscountController,
