@@ -452,19 +452,6 @@ class _AddBundleViewState extends State<AddBundleView> {
           );
         },
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () async {
-      //     await Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => BundleSuggestionsView(),
-      //       ),
-      //     );
-      //   },
-      //   label: const Text('Want suggestions?',
-      //       style: TextStyle(color: Colors.white)),
-      //   backgroundColor: AppColors.primaryColor,
-      // ),
     );
   }
 }
