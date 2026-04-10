@@ -196,7 +196,7 @@ class _AddBundleViewState extends State<AddBundleView> {
                     ),
                     const SizedBox(height: 15.0),
                     DropdownButtonFormField<String>(
-                      value: viewModel.selectedCategory.isEmpty
+                      initialValue: viewModel.selectedCategory.isEmpty
                           ? null
                           : viewModel.selectedCategory,
                       items: viewModel.categories.map((String category) {

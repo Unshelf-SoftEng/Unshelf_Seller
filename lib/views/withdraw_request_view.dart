@@ -79,7 +79,7 @@ class _WithdrawRequestViewState extends State<WithdrawRequestView> {
                     borderSide: BorderSide(color: AppColors.middleGreenYellow),
                   ),
                 ),
-                value: _selectedBank,
+                initialValue: _selectedBank,
                 items: _phBanks
                     .map((bank) => DropdownMenuItem(
                           value: bank,
