@@ -344,7 +344,7 @@ class _StoreViewState extends State<StoreView> {
         onPressed: () async {
           await FirebaseAuth.instance.signOut();
           if (context.mounted) {
-            _navigateTo(LoginView(), clearStack: true);
+            _navigateTo(const LoginView(), clearStack: true);
           }
         },
         icon: const Icon(Icons.logout, size: 18, color: AppColors.error),

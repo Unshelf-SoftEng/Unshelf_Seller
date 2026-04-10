@@ -155,7 +155,7 @@ class MyApp extends StatelessWidget {
       title: 'Unshelf',
       theme: AppTheme.lightTheme,
       home:
-          FirebaseAuth.instance.currentUser != null ? const HomeView() : LoginView(),
+          FirebaseAuth.instance.currentUser != null ? const HomeView() : const LoginView(),
     );
   }
 }
