@@ -48,11 +48,15 @@ class OrderService implements IOrderService {
     for (var item in order.items) {
       if (item.isBundle!) {
         final bundleDoc = await _bundleService.getBundle(item.batchId!);
-        order.bundles!.add(bundleDoc!);
+        if (bundleDoc != null) {
+          order.bundles!.add(bundleDoc);
+        }
         continue;
       } else {
         final batchDoc = await _batchService.getBatchById(item.batchId!);
-        order.products!.add(batchDoc!);
+        if (batchDoc != null) {
+          order.products!.add(batchDoc);
+        }
       }
     }
 
@@ -77,8 +81,7 @@ class OrderService implements IOrderService {
 
     List<OrderModel> orders = orderDoc.docs
         .map((doc) => OrderModel.fromFirestore(doc))
-        .toList()
-        .cast<OrderModel>();
+        .toList();
 
     return orders;
   }
@@ -98,8 +101,7 @@ class OrderService implements IOrderService {
 
     List<OrderModel> orders = orderDoc.docs
         .map((doc) => OrderModel.fromFirestore(doc))
-        .toList()
-        .cast<OrderModel>();
+        .toList();
 
     return orders;
   }

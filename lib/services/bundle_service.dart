@@ -18,13 +18,13 @@ class BundleService implements IBundleService {
 
   @override
   Future<BundleModel?> getBundle(String bundleId) async {
-    final productDoc = await _firestore
+    final bundleDoc = await _firestore
         .collection(FirestoreConstants.bundles)
         .doc(bundleId)
         .get();
 
-    if (productDoc.exists) {
-      return BundleModel.fromSnapshot(productDoc);
+    if (bundleDoc.exists) {
+      return BundleModel.fromSnapshot(bundleDoc);
     }
 
     return null;
