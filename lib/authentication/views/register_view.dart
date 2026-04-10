@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/authentication/views/login_view.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
+import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
@@ -28,41 +29,35 @@ class _RegisterViewState extends State<RegisterView> {
   // Function to save user data
   Future<void> saveUserData(
       User user, String name, String phoneNumber, String storeName) async {
-    try {
-      await FirebaseFirestore.instance.collection(FirestoreConstants.users).doc(user.uid).set({
-        'name': name,
-        'email': user.email,
-        'phoneNumber': phoneNumber,
-        'type': 'seller',
-        'isBanned': false,
-      });
+    await locator<IUserProfileService>().createUserDocument(user.uid, {
+      'name': name,
+      'email': user.email,
+      'phoneNumber': phoneNumber,
+      'type': 'seller',
+      'isBanned': false,
+    });
 
-      await FirebaseFirestore.instance.collection(FirestoreConstants.stores).doc(user.uid).set({
-        'storeSchedule': {
-          'Monday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Tuesday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Wednesday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Thursday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Friday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Saturday': {'open': '', 'close': '', 'isOpen': 'false'},
-          'Sunday': {'open': '', 'close': '', 'isOpen': 'false'},
-        },
-        'storeName': "",
-        'storeImageUrl': "",
-        'isApproved': false,
-        'isNew': true,
-        'latitude': 10.3157,
-        'longitude': 123.8854,
-        'storeAddress': "",
-        'storePhoneNumber': "",
-        'storeFollowers': 0,
-        'storeRating': 0,
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create user data')),
-      );
-    }
+    await locator<IStoreService>().createStore(user.uid, {
+      'storeSchedule': {
+        'Monday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Tuesday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Wednesday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Thursday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Friday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Saturday': {'open': '', 'close': '', 'isOpen': 'false'},
+        'Sunday': {'open': '', 'close': '', 'isOpen': 'false'},
+      },
+      'storeName': "",
+      'storeImageUrl': "",
+      'isApproved': false,
+      'isNew': true,
+      'latitude': 10.3157,
+      'longitude': 123.8854,
+      'storeAddress': "",
+      'storePhoneNumber': "",
+      'storeFollowers': 0,
+      'storeRating': 0,
+    });
   }
 
   void _register() async {

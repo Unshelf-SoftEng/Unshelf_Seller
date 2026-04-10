@@ -10,4 +10,5 @@ abstract class IStoreService {
   Future<void> saveStoreLocation(double latitude, double longitude);
   Future<void> saveStoreSchedule(
       String userId, Map<String, Map<String, dynamic>> schedule);
+  Future<void> createStore(String uid, Map<String, dynamic> data);
 }

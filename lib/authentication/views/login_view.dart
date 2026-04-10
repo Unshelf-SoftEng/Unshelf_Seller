@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/authentication/views/register_view.dart';
 import 'package:unshelf_seller/authentication/views/forgot_password_view.dart';
@@ -69,15 +69,13 @@ class _LoginViewState extends State<LoginView> {
           password: _passwordController.text,
         );
 
-        // Fetch user role from Firestore
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection(FirestoreConstants.users)
-            .doc(userCredential.user!.uid)
-            .get();
+        // Fetch user document via service
+        final userDoc = await locator<IUserProfileService>()
+            .getUserDocument(userCredential.user!.uid);
 
-        if (userDoc.exists) {
+        if (userDoc != null) {
           // Check if the user is banned
-          bool banned = userDoc['isBanned'];
+          bool banned = userDoc['isBanned'] as bool;
           if (banned == true) {
             await FirebaseAuth.instance.signOut(); // Sign out the banned user
             ScaffoldMessenger.of(context).showSnackBar(
@@ -88,7 +86,7 @@ class _LoginViewState extends State<LoginView> {
             return;
           }
 
-          bool isApproved = userDoc['isApproved'];
+          bool isApproved = userDoc['isApproved'] as bool;
           if (isApproved == false) {
             await FirebaseAuth.instance.signOut();
             ScaffoldMessenger.of(context).showSnackBar(
@@ -99,7 +97,7 @@ class _LoginViewState extends State<LoginView> {
             return;
           }
 
-          String role = userDoc['type'];
+          String role = userDoc['type'] as String;
           if (role == 'seller') {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Sign in successful')),

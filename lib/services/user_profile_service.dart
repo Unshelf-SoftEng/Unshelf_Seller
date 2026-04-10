@@ -5,6 +5,7 @@ import 'package:unshelf_seller/core/current_user_provider.dart';
 import 'package:unshelf_seller/core/errors/app_exceptions.dart';
 import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
 import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/models/report_model.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 
 class UserProfileService implements IUserProfileService {
@@ -97,6 +98,20 @@ class UserProfileService implements IUserProfileService {
       AppLogger.error('Failed to create user document', e, stackTrace);
       throw FirestoreException('Failed to create user document',
           originalError: e);
+    }
+  }
+
+  @override
+  Future<void> submitReport(ReportModel report) async {
+    try {
+      await _firestore
+          .collection(FirestoreConstants.reports)
+          .add(report.toJson());
+
+      AppLogger.debug('Report submitted by uid: ${report.userId}');
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to submit report', e, stackTrace);
+      throw FirestoreException('Failed to submit report', originalError: e);
     }
   }
 }

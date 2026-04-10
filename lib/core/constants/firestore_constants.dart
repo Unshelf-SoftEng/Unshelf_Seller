@@ -9,6 +9,7 @@ class FirestoreConstants {
   static const String withdrawalRequests = 'withdrawal_requests';
   static const String notifications = 'notifications';
   static const String stores = 'stores';
+  static const String reports = 'reports';
 
   // Document field names (used in queries and writes)
   static const String sellerId = 'sellerId';

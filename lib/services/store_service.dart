@@ -167,4 +167,20 @@ class StoreService implements IStoreService {
       throw FirestoreException('Failed to save store schedule', originalError: e);
     }
   }
+
+  @override
+  Future<void> createStore(String uid, Map<String, dynamic> data) async {
+    try {
+      await _firestore
+          .collection(FirestoreConstants.stores)
+          .doc(uid)
+          .set(data);
+
+      AppLogger.debug('Store document created for uid: $uid');
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to create store document', e, stackTrace);
+      throw FirestoreException('Failed to create store document',
+          originalError: e);
+    }
+  }
 }
