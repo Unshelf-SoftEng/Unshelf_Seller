@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
-import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
+
+import 'package:unshelf_seller/core/interfaces/i_product_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/utils/colors.dart';
+import 'package:unshelf_seller/viewmodels/product_viewmodel.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
 import 'package:unshelf_seller/views/product_details_view.dart';
@@ -14,7 +18,9 @@ class AddProductView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProductViewModel(),
+      create: (_) => ProductViewModel(
+        productService: locator<IProductService>(),
+      ),
       child: Consumer<ProductViewModel>(builder: (context, viewModel, child) {
         return Scaffold(
           appBar: CustomAppBar(
