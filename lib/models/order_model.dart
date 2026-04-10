@@ -64,6 +64,7 @@ class OrderModel {
       pointsDiscount: (data['pointsDiscount'] as num?)?.toDouble() ?? 0.0,
       subtotal: (data['subTotal'] as num?)?.toDouble() ?? 0.0,
       isPaid: data['isPaid'] ?? false,
+      buyerName: data['buyerName'] ?? '',
       products: [],
     );
   }
