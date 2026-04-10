@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/views/chats_view.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ChatScreenState extends State<ChatScreen>
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('users')
+            .collection(FirestoreConstants.users)
             .where('type', isEqualTo: 'buyer')
             .orderBy('name')
             .snapshots(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unshelf_seller/components/custom_app_bar.dart';
 import 'package:unshelf_seller/components/custom_button.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/user_model.dart';
 import 'package:unshelf_seller/viewmodels/user_profile_viewmodel.dart';
 import 'package:unshelf_seller/utils/colors.dart';
@@ -162,7 +163,7 @@ class EditUserProfileView extends StatelessWidget {
                               );
                             }
 
-                            print('Passing ${viewModel.userProfile}');
+                            AppLogger.debug('Passing ${viewModel.userProfile}');
 
                             Navigator.pop(context, viewModel.userProfile);
                           },

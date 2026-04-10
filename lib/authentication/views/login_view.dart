@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/authentication/views/register_view.dart';
 import 'package:unshelf_seller/authentication/views/forgot_password_view.dart';
@@ -70,7 +71,7 @@ class _LoginViewState extends State<LoginView> {
 
         // Fetch user role from Firestore
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
+            .collection(FirestoreConstants.users)
             .doc(userCredential.user!.uid)
             .get();
 
