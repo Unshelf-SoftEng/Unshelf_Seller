@@ -3,13 +3,13 @@ import 'package:unshelf_seller/models/product_model.dart';
 import 'package:unshelf_seller/models/item_model.dart';
 
 class BundleModel extends ItemModel {
-  String description;
-  double? price;
-  int? stock;
-  int? discount;
-  List<String>? additionalImageUrls;
-  List<Map<String, dynamic>> items;
-  List<ProductModel>? products;
+  final String description;
+  final double? price;
+  final int? stock;
+  final int? discount;
+  final List<String>? additionalImageUrls;
+  final List<Map<String, dynamic>> items;
+  final List<ProductModel>? products;
 
   BundleModel({
     required super.id,
@@ -24,6 +24,19 @@ class BundleModel extends ItemModel {
     this.additionalImageUrls,
     this.products,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'category': category,
+      'description': description,
+      'items': items,
+      'price': price,
+      'stock': stock,
+      'discount': discount,
+      'mainImageUrl': mainImageUrl,
+    };
+  }
 
   // Factory method to create StoreModel from Firebase document snapshot
   factory BundleModel.fromSnapshot(DocumentSnapshot doc) {
@@ -57,7 +70,7 @@ class BundleItem {
   final int quantity;
   final String productId;
   final String batchNumber;
-  String? productName;
+  final String? productName;
 
   BundleItem({
     required this.productId,
@@ -65,6 +78,14 @@ class BundleItem {
     required this.quantity,
     this.productName,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'batchNumber': batchNumber,
+      'quantity': quantity,
+    };
+  }
 
   factory BundleItem.fromMap(Map<String, dynamic> map) {
     return BundleItem(

@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/product_model.dart';
 
 class BatchModel {
-  String batchNumber;
-  String productId;
+  final String batchNumber;
+  final String productId;
   ProductModel? product;
-  double price;
+  final double price;
   int stock;
-  String quantifier;
+  final String quantifier;
   DateTime expiryDate;
-  int discount;
+  final int discount;
 
   BatchModel({
     required this.batchNumber,
@@ -21,6 +21,18 @@ class BatchModel {
     required this.expiryDate,
     required this.discount,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'batchNumber': batchNumber,
+      'productId': productId,
+      'price': price,
+      'stock': stock,
+      'quantifier': quantifier,
+      'expiryDate': Timestamp.fromDate(expiryDate),
+      'discount': discount,
+    };
+  }
 
   factory BatchModel.fromSnapshot(DocumentSnapshot doc, ProductModel? product) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
