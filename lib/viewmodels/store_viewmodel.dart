@@ -1,88 +1,81 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 import 'package:unshelf_seller/models/user_model.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class StoreViewModel extends ChangeNotifier {
+class StoreViewModel extends BaseViewModel {
   StoreModel? storeDetails;
   UserProfileModel? userProfile;
 
-  bool isLoading = true;
-  String? errorMessage;
-
   Future<void> fetchUserProfile() async {
-    isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      errorMessage = "User is not logged in";
-      isLoading = false;
-      notifyListeners();
+      setError("User is not logged in");
+      setLoading(false);
       return;
     }
 
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection(FirestoreConstants.users)
           .doc(user.uid)
           .get();
 
       if (!userDoc.exists) {
-        errorMessage = "User profile not found";
+        setError("User profile not found");
         userProfile = null;
       } else {
         userProfile = UserProfileModel.fromSnapshot(userDoc);
       }
     } catch (e) {
-      errorMessage = "Error fetching user profile: ${e.toString()}";
+      setError("Error fetching user profile: ${e.toString()}");
       userProfile = null;
     } finally {
-      isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
   Future<void> fetchStoreDetails() async {
-    isLoading = true;
-    notifyListeners();
+    setLoading(true);
 
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      errorMessage = "User is not logged in";
-      isLoading = false;
-      notifyListeners();
+      setError("User is not logged in");
+      setLoading(false);
       return;
     }
 
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection(FirestoreConstants.users)
           .doc(user.uid)
           .get();
 
       DocumentSnapshot storeDoc = await FirebaseFirestore.instance
-          .collection('stores')
+          .collection(FirestoreConstants.stores)
           .doc(user.uid)
           .get();
 
       if (!userDoc.exists || !storeDoc.exists) {
         storeDetails = null;
-        errorMessage = "User profile or store not found";
-        print(errorMessage);
+        setError("User profile or store not found");
+        AppLogger.warning(errorMessage ?? '');
       } else {
-        print('Getting Store Details Here');
+        AppLogger.debug('Getting Store Details Here');
         storeDetails = StoreModel.fromSnapshot(userDoc, storeDoc);
       }
     } catch (e) {
-      errorMessage = "Error fetching store details: ${e.toString()}";
-      print(errorMessage);
+      setError("Error fetching store details: ${e.toString()}");
+      AppLogger.error(errorMessage ?? '');
     } finally {
-      isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -90,27 +83,25 @@ class StoreViewModel extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      errorMessage = "User is not logged in";
-      isLoading = false;
-      notifyListeners();
+      setError("User is not logged in");
+      setLoading(false);
       return 0;
     }
 
     try {
       // Example path to fetch followers from the Firestore database
       QuerySnapshot followersSnapshot = await FirebaseFirestore.instance
-          .collection('stores')
+          .collection(FirestoreConstants.stores)
           .doc(user.uid)
           .collection('followers')
           .get();
 
       return followersSnapshot.size;
     } catch (e) {
-      errorMessage = "Error fetching store followers";
+      setError("Error fetching store followers");
       return 0; // or throw an exception if needed
     } finally {
-      isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -118,16 +109,15 @@ class StoreViewModel extends ChangeNotifier {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      errorMessage = "User is not logged in";
-      isLoading = false;
-      notifyListeners();
+      setError("User is not logged in");
+      setLoading(false);
       return 0.0;
     }
 
     try {
       // Example path to fetch ratings from the Firestore database
       DocumentSnapshot ratingsSnapshot = await FirebaseFirestore.instance
-          .collection('stores')
+          .collection(FirestoreConstants.stores)
           .doc(user.uid)
           .collection('ratings')
           .doc('average')
@@ -139,11 +129,10 @@ class StoreViewModel extends ChangeNotifier {
 
       return data?['average'] ?? 0.0;
     } catch (e) {
-      errorMessage = "Error fetching store ratings";
+      setError("Error fetching store ratings");
       return 0.0; // or throw an exception if needed
     } finally {
-      isLoading = false;
-      notifyListeners();
+      setLoading(false);
     }
   }
 
@@ -171,7 +160,7 @@ class StoreViewModel extends ChangeNotifier {
 
   void clear() {
     storeDetails = null;
-    errorMessage = null;
+    clearError();
     notifyListeners();
   }
 }

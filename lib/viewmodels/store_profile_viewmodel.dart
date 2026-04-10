@@ -5,8 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class StoreProfileViewModel extends ChangeNotifier {
+class StoreProfileViewModel extends BaseViewModel {
   final String storeId; // The ID of the store to update
   late TextEditingController _nameController;
   late TextEditingController _addressController;
@@ -25,9 +28,6 @@ class StoreProfileViewModel extends ChangeNotifier {
   TextEditingController get nameController => _nameController;
   Uint8List? get profileImage => _profileImage;
 
-  get isLoading => _loading;
-  bool _loading = false;
-
   Future<void> pickImage() async {
     XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -38,12 +38,12 @@ class StoreProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> updateStoreProfile() async {
-    _loading = true;
+    setLoading(true);
     if (_nameController.text.isNotEmpty) {
       try {
         // Update store details in Firestore
         final storeRef =
-            FirebaseFirestore.instance.collection('stores').doc(storeId);
+            FirebaseFirestore.instance.collection(FirestoreConstants.stores).doc(storeId);
         final updateData = {
           'storeName': _nameController.text,
         };
@@ -63,11 +63,12 @@ class StoreProfileViewModel extends ChangeNotifier {
         }
 
         await storeRef.update(updateData);
-        _loading = false;
+        setLoading(false);
         notifyListeners(); // Notify listeners if necessary
       } catch (e) {
         // Handle errors
-        print('Error updating store profile: $e');
+        AppLogger.error('Error updating store profile: $e');
+        setLoading(false);
       }
     }
   }

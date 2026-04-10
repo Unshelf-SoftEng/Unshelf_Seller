@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:unshelf_seller/models/store_model.dart';
+import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/logger.dart';
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 
-class StoreScheduleViewModel extends ChangeNotifier {
+class StoreScheduleViewModel extends BaseViewModel {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DateFormat _timeFormatter = DateFormat('hh:mm a');
   late Map<String, Map<String, dynamic>> _storeSchedule;
 
   StoreScheduleViewModel(StoreModel storeDetails) {
-    print(storeDetails.storeSchedule);
+    AppLogger.debug('Store schedule: ${storeDetails.storeSchedule}');
 
     for (var entry in storeDetails.storeSchedule!.entries) {
-      print(entry.key);
-      print(entry.value);
+      AppLogger.debug('Day: ${entry.key}, Value: ${entry.value}');
     }
 
     storeDetails.storeSchedule?.forEach((key, value) {
@@ -87,14 +89,17 @@ class StoreScheduleViewModel extends ChangeNotifier {
       return false;
     }
 
-    print('Passed validation');
+    AppLogger.debug('Passed validation');
 
     try {
-      await _firestore.collection('stores').doc(userId).update({
+      await _firestore
+          .collection(FirestoreConstants.stores)
+          .doc(userId)
+          .update({
         'storeSchedule': _storeSchedule,
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profile saved successfully')),
+        const SnackBar(content: Text('Profile saved successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
