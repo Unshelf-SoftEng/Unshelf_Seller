@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:unshelf_seller/models/notification_model.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
-import 'package:unshelf_seller/core/logger.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_analytics_service.dart';
 import 'package:unshelf_seller/core/constants/status_constants.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 
 class DashboardViewModel extends BaseViewModel {
+  final IAnalyticsService _analyticsService;
+
   DateTime today;
   int pendingOrders;
   int processedOrders;
@@ -17,11 +18,13 @@ class DashboardViewModel extends BaseViewModel {
   late String monthYear;
   List<NotificationModel>? _notifications;
   List<NotificationModel>? get notifications => _notifications;
-  int? _unseenCount;
+  final int? _unseenCount;
   int? get unseenCount => _unseenCount;
 
-  DashboardViewModel()
-      : today = DateTime.now(),
+  DashboardViewModel({IAnalyticsService? analyticsService})
+      : _analyticsService =
+            analyticsService ?? locator<IAnalyticsService>(),
+        today = DateTime.now(),
         pendingOrders = 0,
         processedOrders = 0,
         completedOrders = 0,
@@ -33,57 +36,49 @@ class DashboardViewModel extends BaseViewModel {
   }
 
   Future<void> fetchDashboardData() async {
-    setLoading(true);
-
-    User? user = FirebaseAuth.instance.currentUser;
-    try {
+    await runBusyFuture(() async {
       final now = DateTime.now();
-      final startOfDay = DateTime(now.year, now.month, now.day);
-      final endOfDay = startOfDay.add(const Duration(days: 1));
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final endOfDay = todayStart.add(const Duration(days: 1));
 
-      final ordersSnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.orders)
-          .where('createdAt', isGreaterThanOrEqualTo: startOfDay)
-          .where('createdAt', isLessThan: endOfDay)
-          .where('sellerId', isEqualTo: user?.uid)
-          .get();
+      final orderDocs =
+          await _analyticsService.fetchOrders(since: todayStart);
 
-      pendingOrders = ordersSnapshot.docs
+      // Filter to today only (service returns >= todayStart, trim >= endOfDay)
+      final todayOrders = orderDocs.where((doc) {
+        final createdAt = doc['createdAt'];
+        if (createdAt == null) return true;
+        final date = (createdAt as Timestamp).toDate();
+        return date.isBefore(endOfDay);
+      }).toList();
+
+      pendingOrders = todayOrders
           .where((doc) => doc['status'] == StatusConstants.pending)
           .length;
-      processedOrders = ordersSnapshot.docs
+      processedOrders = todayOrders
           .where((doc) => doc['status'] == StatusConstants.ready)
           .length;
-      completedOrders = ordersSnapshot.docs
+      completedOrders = todayOrders
           .where((doc) => doc['status'] == StatusConstants.completed)
           .length;
 
-      // Assuming 'total' field exists in each order document for total price
+      totalOrders = todayOrders.length;
+
       final startOfMonth = DateTime(now.year, now.month);
 
-      totalSales = 0;
-
-      QuerySnapshot transactionMonthly = await FirebaseFirestore.instance
-          .collection(FirestoreConstants.transactions)
-          .where('date', isGreaterThanOrEqualTo: startOfMonth)
-          .where('sellerId', isEqualTo: user?.uid)
-          .get();
+      final transDocs =
+          await _analyticsService.fetchTransactions(since: startOfMonth);
 
       double totalEarnings = 0.0;
-
-      for (var trans in transactionMonthly.docs) {
+      for (var trans in transDocs) {
         if (trans['type'] == StatusConstants.sale) {
-          double amount = trans['sellerEarnings'];
+          double amount = (trans['sellerEarnings'] as num).toDouble();
           totalEarnings += amount;
         }
       }
 
       totalSales = totalEarnings;
-    } catch (e) {
-      AppLogger.error('Error fetching dashboard data: $e');
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   String getCurrentMonth() {
@@ -92,6 +87,6 @@ class DashboardViewModel extends BaseViewModel {
     return dateFormat.format(now);
   }
 
-  int _totalStockRemaining = 40;
+  final int _totalStockRemaining = 40;
   int get totalStockRemaining => _totalStockRemaining;
 }
