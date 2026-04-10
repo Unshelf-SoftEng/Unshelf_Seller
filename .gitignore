@@ -45,3 +45,6 @@ app.*.map.json
 
 # Miscellaneous
 TODO.md
+
+# Design docs (generated specs/plans)
+/docs/
