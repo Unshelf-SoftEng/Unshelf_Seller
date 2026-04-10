@@ -51,29 +51,6 @@ class BundleModel extends ItemModel {
     );
   }
 
-  // factory BundleModel.fromJson(Map<String, dynamic> json) {
-  //   List<BundleItem> bundleItems = json['products'] != null
-  //       ? (json['products'] as List)
-  //           .map((item) => BundleItem.fromMap(item))
-  //           .toList()
-  //       : [];
-
-  //   List<String> productIdList =
-  //       bundleItems.map((product) => product.productId).toList();
-
-  //   return BundleModel(
-  //     id: '',
-  //     name: json['bundle_name'] ?? '',
-  //     description: json['description'] ?? '',
-  //     products: bundleItems,
-  //     productIds: productIdList,
-  //     category: '',
-  //     price: 0.0,
-  //     stock: 0,
-  //     discount: 0,
-  //     mainImageUrl: '',
-  //   );
-  // }
 }
 
 class BundleItem {

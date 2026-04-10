@@ -58,14 +58,6 @@ class _ProductAnalyticsViewState extends State<ProductAnalyticsView> {
       });
     }
 
-    int generateDailyOrders(int baseOrders) {
-      return (baseOrders +
-              (baseOrders *
-                  0.2 *
-                  (2 * (0.5 - DateTime.now().millisecondsSinceEpoch % 1000))))
-          .toInt();
-    }
-
     data = {
       'Apples': {
         'totalOrders': 200,

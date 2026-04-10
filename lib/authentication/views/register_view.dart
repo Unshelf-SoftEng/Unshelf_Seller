@@ -3,9 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/authentication/views/login_view.dart';
 import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
-import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/core/service_locator.dart';
-import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/utils/colors.dart';
 
 class RegisterView extends StatefulWidget {
@@ -24,8 +22,6 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _sellerNameController = TextEditingController();
   final TextEditingController _storeNameController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   // Function to save user data
   Future<void> saveUserData(
       User user, String name, String phoneNumber, String storeName) async {
@@ -98,62 +94,6 @@ class _RegisterViewState extends State<RegisterView> {
           SnackBar(content: Text('An error occurred: $e. Please try again.')),
         );
       }
-    }
-  }
-
-  Future<void> _registerWithGoogle() async {
-    try {
-      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
-
-      _auth.signInWithProvider(_googleAuthProvider);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration successful')),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeView()),
-      );
-    } catch (e) {
-      String errorMessage;
-
-      // Check if the error is a FirebaseAuthException
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'account-exists-with-different-credential':
-            errorMessage =
-                'An account already exists with a different credential.';
-            break;
-          case 'invalid-credential':
-            errorMessage = 'The credential provided is not valid.';
-            break;
-          case 'operation-not-allowed':
-            errorMessage =
-                'Operation not allowed. Please check your configuration.';
-            break;
-          case 'user-disabled':
-            errorMessage = 'The user has been disabled.';
-            break;
-          case 'user-not-found':
-            errorMessage = 'No user found for this email.';
-            break;
-          case 'wrong-password':
-            errorMessage = 'Wrong password provided.';
-            break;
-          default:
-            errorMessage = 'An unexpected error occurred. Please try again.';
-            break;
-        }
-      } else {
-        // Handle other types of errors, such as network errors
-        errorMessage = '${e} Google sign-in failed. Please try again.';
-        AppLogger.error('Google sign-in error', e);
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
     }
   }
 
@@ -299,34 +239,6 @@ class _RegisterViewState extends State<RegisterView> {
                   fontSize: 11,
                 ),
               ),
-              // const SizedBox(height: 15),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: [
-              //     Expanded(child: Divider(color: Colors.grey[400])),
-              //     const Padding(
-              //       padding: EdgeInsets.symmetric(horizontal: 10.0),
-              //       child: Text('or', style: TextStyle(color: Colors.grey)),
-              //     ),
-              //     Expanded(child: Divider(color: Colors.grey[400])),
-              //   ],
-              // ),
-              // const SizedBox(height: 15),
-              // ElevatedButton.icon(
-              //   onPressed: _registerWithGoogle,
-              //   label: const Text('Log in with Google'),
-              //   icon: Image.asset('assets/images/google_logo.png',
-              //       width: 24, height: 24, fit: BoxFit.contain),
-              //   style: ElevatedButton.styleFrom(
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //     backgroundColor: AppColors.lightColor,
-              //     foregroundColor: AppColors.deepMossGreen,
-              //     padding:
-              //         const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              //   ),
-              // ),
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
