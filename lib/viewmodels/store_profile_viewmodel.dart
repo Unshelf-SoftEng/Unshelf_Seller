@@ -2,13 +2,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
+import 'package:unshelf_seller/core/current_user_provider.dart';
 import 'package:unshelf_seller/core/interfaces/i_store_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/models/store_model.dart';
 
 class StoreProfileViewModel extends BaseViewModel {
   final IStoreService _storeService;
+  final CurrentUserProvider _currentUser;
   late TextEditingController _nameController;
   late TextEditingController _addressController;
   late TextEditingController _phoneNumberController;
@@ -16,8 +18,10 @@ class StoreProfileViewModel extends BaseViewModel {
   final ImagePicker picker = ImagePicker();
 
   StoreProfileViewModel(StoreModel storeDetails,
-      {required IStoreService storeService})
-      : _storeService = storeService {
+      {required IStoreService storeService,
+      CurrentUserProvider? currentUser})
+      : _storeService = storeService,
+        _currentUser = currentUser ?? locator<CurrentUserProvider>() {
     _nameController = TextEditingController(text: storeDetails.storeName);
     _addressController = TextEditingController(text: storeDetails.storeAddress);
     _phoneNumberController =
@@ -63,7 +67,7 @@ class StoreProfileViewModel extends BaseViewModel {
   }
 
   Future<String> uploadImage(Uint8List? image) async {
-    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final userId = _currentUser.uid;
     final mainImageRef =
         FirebaseStorage.instance.ref().child('user_avatars/$userId.jpg');
     await mainImageRef.putData(image!);

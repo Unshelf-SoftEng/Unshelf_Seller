@@ -58,4 +58,13 @@ class ChatService implements IChatService {
         .orderBy(FirestoreConstants.timestamp, descending: false)
         .snapshots();
   }
+
+  @override
+  Stream<QuerySnapshot> getBuyers() {
+    return _firestore
+        .collection(FirestoreConstants.users)
+        .where('type', isEqualTo: 'buyer')
+        .orderBy('name')
+        .snapshots();
+  }
 }

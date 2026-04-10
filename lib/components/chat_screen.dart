@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_chat_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
 import 'package:unshelf_seller/views/chats_view.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -10,11 +11,14 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen>
     with AutomaticKeepAliveClientMixin {
+  final IChatService _chatService = locator<IChatService>();
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Chat"),
@@ -42,11 +46,7 @@ class _ChatScreenState extends State<ChatScreen>
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(FirestoreConstants.users)
-            .where('type', isEqualTo: 'buyer')
-            .orderBy('name')
-            .snapshots(),
+        stream: _chatService.getBuyers(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something went wrong'));

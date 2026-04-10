@@ -7,6 +7,9 @@ import 'package:unshelf_seller/models/user_model.dart';
 
 class UserProfileViewModel extends BaseViewModel {
   final IUserProfileService _userProfileService;
+  // FirebaseAuth is injected for reauthentication and password-change operations
+  // which are not exposed by the service layer.
+  final FirebaseAuth _auth;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -18,8 +21,10 @@ class UserProfileViewModel extends BaseViewModel {
   UserProfileViewModel({
     required this.userProfile,
     IUserProfileService? userProfileService,
-  }) : _userProfileService =
-            userProfileService ?? locator<IUserProfileService>();
+    FirebaseAuth? auth,
+  })  : _userProfileService =
+            userProfileService ?? locator<IUserProfileService>(),
+        _auth = auth ?? FirebaseAuth.instance;
 
   void initializeControllers(UserProfileModel userProfile) {
     nameController.text = userProfile.name;
@@ -29,7 +34,7 @@ class UserProfileViewModel extends BaseViewModel {
 
   Future<void> updateUserProfile() async {
     await runBusyFuture(() async {
-      final user = FirebaseAuth.instance.currentUser!;
+      final user = _auth.currentUser!;
 
       if (passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isEmpty) {
@@ -53,8 +58,7 @@ class UserProfileViewModel extends BaseViewModel {
 
       if (passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isNotEmpty) {
-        await FirebaseAuth.instance.currentUser!
-            .updatePassword(passwordController.text);
+        await _auth.currentUser!.updatePassword(passwordController.text);
       }
 
       await _userProfileService.updateUserProfile({
