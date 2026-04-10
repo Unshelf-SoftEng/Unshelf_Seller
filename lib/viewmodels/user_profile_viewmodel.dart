@@ -1,11 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:unshelf_seller/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:unshelf_seller/core/base_viewmodel.dart';
-import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/interfaces/i_user_profile_service.dart';
+import 'package:unshelf_seller/core/service_locator.dart';
+import 'package:unshelf_seller/models/user_model.dart';
 
 class UserProfileViewModel extends BaseViewModel {
+  final IUserProfileService _userProfileService;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -13,10 +15,11 @@ class UserProfileViewModel extends BaseViewModel {
   TextEditingController confirmPasswordController = TextEditingController();
   UserProfileModel? userProfile;
 
-  UserProfileViewModel({required this.userProfile});
-
-  String? _errorMessage;
-  String? get errorMessageLocal => _errorMessage;
+  UserProfileViewModel({
+    required this.userProfile,
+    IUserProfileService? userProfileService,
+  }) : _userProfileService =
+            userProfileService ?? locator<IUserProfileService>();
 
   void initializeControllers(UserProfileModel userProfile) {
     nameController.text = userProfile.name;
@@ -24,22 +27,18 @@ class UserProfileViewModel extends BaseViewModel {
     phoneController.text = userProfile.phoneNumber;
   }
 
-  void updateUserProfile() async {
-    setLoading(true);
-
-    try {
-      User user = FirebaseAuth.instance.currentUser!;
+  Future<void> updateUserProfile() async {
+    await runBusyFuture(() async {
+      final user = FirebaseAuth.instance.currentUser!;
 
       if (passwordController.text.isNotEmpty &&
           confirmPasswordController.text.isEmpty) {
-        _errorMessage = 'Please confirm your password';
-        setLoading(false);
+        setError('Please confirm your password');
         return;
       }
 
       if (passwordController.text != confirmPasswordController.text) {
-        _errorMessage = 'Passwords do not match';
-        setLoading(false);
+        setError('Passwords do not match');
         return;
       }
 
@@ -58,21 +57,11 @@ class UserProfileViewModel extends BaseViewModel {
             .updatePassword(passwordController.text);
       }
 
-      await FirebaseFirestore.instance
-          .collection(FirestoreConstants.users)
-          .doc(user.uid)
-          .update({
+      await _userProfileService.updateUserProfile({
         'name': nameController.text,
         'email': emailController.text,
         'phoneNumber': phoneController.text,
       });
-
-      setLoading(false);
-    } catch (error) {
-      _errorMessage = 'Failed to update user profile: $error';
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 }
