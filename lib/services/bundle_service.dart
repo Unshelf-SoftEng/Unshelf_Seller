@@ -1,12 +1,25 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+
+import 'package:unshelf_seller/core/constants/firestore_constants.dart';
+import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
+import 'package:unshelf_seller/core/logger.dart';
 import 'package:unshelf_seller/models/bundle_model.dart';
 
-class BundleService extends ChangeNotifier {
+class BundleService implements IBundleService {
+  final FirebaseFirestore _firestore;
+  final CurrentUserProvider _currentUser;
+
+  BundleService({
+    FirebaseFirestore? firestore,
+    CurrentUserProvider? currentUser,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _currentUser = currentUser ?? CurrentUserProvider();
+
+  @override
   Future<BundleModel?> getBundle(String bundleId) async {
-    final productDoc = await FirebaseFirestore.instance
-        .collection('bundles')
+    final productDoc = await _firestore
+        .collection(FirestoreConstants.bundles)
         .doc(bundleId)
         .get();
 
@@ -17,30 +30,30 @@ class BundleService extends ChangeNotifier {
     return null;
   }
 
+  @override
   Future<void> createBundle(BundleModel bundle) async {
-    User user = FirebaseAuth.instance.currentUser!;
-
     try {
       final bundleData = {
         'name': bundle.name,
         'category': bundle.category,
         'description': bundle.description,
         'items': bundle.items,
-        'price': bundle.price,
-        'stock': bundle.stock,
-        'discount': bundle.discount,
+        FirestoreConstants.price: bundle.price,
+        FirestoreConstants.stock: bundle.stock,
+        FirestoreConstants.discount: bundle.discount,
         'mainImageUrl': bundle.mainImageUrl,
-        'sellerId': user.uid,
+        FirestoreConstants.sellerId: _currentUser.uid,
         'isListed': true,
       };
 
-      await FirebaseFirestore.instance.collection('bundles').add(bundleData);
-    } catch (e) {
-      print('Error adding product to Firestore: $e');
+      await _firestore.collection(FirestoreConstants.bundles).add(bundleData);
+    } catch (e, stackTrace) {
+      AppLogger.error('Error adding bundle to Firestore', e, stackTrace);
       rethrow;
     }
   }
 
+  @override
   Future<void> updateBundle(BundleModel bundle) async {
     try {
       final bundleData = {
@@ -48,18 +61,18 @@ class BundleService extends ChangeNotifier {
         'category': bundle.category,
         'description': bundle.description,
         'items': bundle.items,
-        'price': bundle.price,
-        'stock': bundle.stock,
-        'discount': bundle.discount,
+        FirestoreConstants.price: bundle.price,
+        FirestoreConstants.stock: bundle.stock,
+        FirestoreConstants.discount: bundle.discount,
         'mainImageUrl': bundle.mainImageUrl,
       };
 
-      await FirebaseFirestore.instance
-          .collection('bundles')
+      await _firestore
+          .collection(FirestoreConstants.bundles)
           .doc(bundle.id)
           .update(bundleData);
-    } catch (e) {
-      print('Error updating product in Firestore: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error updating bundle in Firestore', e, stackTrace);
       rethrow;
     }
   }
