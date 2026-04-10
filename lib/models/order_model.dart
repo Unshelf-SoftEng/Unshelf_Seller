@@ -60,10 +60,11 @@ class OrderModel {
       items: List<OrderItem>.from(
         data['orderItems'].map((item) => OrderItem.fromMap(item)),
       ),
-      totalPrice: (data['totalPrice'] ?? 0 as num).toDouble(),
-      pointsDiscount: (data['pointsDiscount'] ?? 0 as num).toDouble(),
-      subtotal: (data['subTotal'] ?? 0 as num).toDouble(),
+      totalPrice: (data['totalPrice'] as num?)?.toDouble() ?? 0.0,
+      pointsDiscount: (data['pointsDiscount'] as num?)?.toDouble() ?? 0.0,
+      subtotal: (data['subTotal'] as num?)?.toDouble() ?? 0.0,
       isPaid: data['isPaid'] ?? false,
+      buyerName: data['buyerName'] ?? '',
       products: [],
     );
   }

@@ -43,8 +43,8 @@ class WalletViewModel extends ChangeNotifier {
         'sellerId': user.uid,
         'amount': amount,
         'date': FieldValue.serverTimestamp(),
-        'bankName'
-            'accountName': accountName,
+        'bankName': bankName,
+        'accountName': accountName,
         'bankAccount': bankAccount,
         'isApproved': false,
       });

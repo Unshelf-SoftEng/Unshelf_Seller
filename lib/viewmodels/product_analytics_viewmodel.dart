@@ -64,18 +64,18 @@ class ProductAnalyticsViewModel extends ChangeNotifier {
 
     Map<String, int> productEntries = {};
 
-    batchCountMap.forEach((key, value) async {
+    for (final entry in batchCountMap.entries) {
       // Fetch batch details using the key
       DocumentSnapshot batchDoc = await FirebaseFirestore.instance
           .collection('batches')
-          .doc(key) // Use 'key' to fetch the document
+          .doc(entry.key) // Use 'key' to fetch the document
           .get();
 
       if (batchDoc.exists) {
         String productId = batchDoc['productId'];
-        productEntries[productId] = (productEntries[productId] ?? 0) + value;
+        productEntries[productId] = (productEntries[productId] ?? 0) + entry.value;
       }
-    });
+    }
 
     var sortedEntries = productEntries.entries.toList()
       ..sort((a, b) =>

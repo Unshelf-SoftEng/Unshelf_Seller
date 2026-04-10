@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:unshelf_seller/views/bundle_suggestions_view.dart';
 import 'package:unshelf_seller/viewmodels/bundle_viewmodel.dart';
 import 'package:unshelf_seller/models/batch_model.dart';
 import 'package:unshelf_seller/utils/colors.dart';
@@ -453,19 +452,6 @@ class _AddBundleViewState extends State<AddBundleView> {
           );
         },
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () async {
-      //     await Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => BundleSuggestionsView(),
-      //       ),
-      //     );
-      //   },
-      //   label: const Text('Want suggestions?',
-      //       style: TextStyle(color: Colors.white)),
-      //   backgroundColor: AppColors.primaryColor,
-      // ),
     );
   }
 }

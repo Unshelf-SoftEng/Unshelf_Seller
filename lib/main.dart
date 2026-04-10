@@ -63,7 +63,6 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProductAnalyticsViewModel()),
         ChangeNotifierProvider(create: (_) => InventoryViewModel()),
         ChangeNotifierProvider(create: (_) => BatchHistoryViewModel()),
-        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
       ],
       child: const MyApp(),
