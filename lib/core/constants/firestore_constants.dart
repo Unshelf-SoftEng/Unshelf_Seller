@@ -10,6 +10,7 @@ class FirestoreConstants {
   static const String notifications = 'notifications';
   static const String stores = 'stores';
 
+  // Document field names (used in queries and writes)
   static const String sellerId = 'sellerId';
   static const String productId = 'productId';
   static const String batchId = 'batchId';
@@ -19,4 +20,14 @@ class FirestoreConstants {
   static const String expiryDate = 'expiryDate';
   static const String discount = 'discount';
   static const String status = 'status';
+  static const String batchNumber = 'batchNumber';
+  static const String isListed = 'isListed';
+  static const String quantifier = 'quantifier';
+  static const String dateCreated = 'dateCreated';
+
+  // Subcollection names
+  static const String messages = 'messages';
+
+  // Common field names
+  static const String timestamp = 'timestamp';
 }

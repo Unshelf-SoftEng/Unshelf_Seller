@@ -34,7 +34,7 @@ class ChatService implements IChatService {
     await _firestore
         .collection(FirestoreConstants.chatRooms)
         .doc(chatRoomId)
-        .collection('messages')
+        .collection(FirestoreConstants.messages)
         .add(newMessage.toMap());
   }
 
@@ -47,8 +47,8 @@ class ChatService implements IChatService {
     return _firestore
         .collection(FirestoreConstants.chatRooms)
         .doc(chatRoomId)
-        .collection('messages')
-        .orderBy('timestamp', descending: false)
+        .collection(FirestoreConstants.messages)
+        .orderBy(FirestoreConstants.timestamp, descending: false)
         .snapshots();
   }
 }

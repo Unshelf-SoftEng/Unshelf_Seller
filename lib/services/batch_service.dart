@@ -91,16 +91,16 @@ class BatchService implements IBatchService {
       final snapshot = await _firestore
           .collection(FirestoreConstants.batches)
           .where(FirestoreConstants.productId, isEqualTo: productId)
-          .where('batchNumber', isGreaterThanOrEqualTo: datePart)
-          .where('batchNumber', isLessThan: '$datePart\uf7ff')
-          .orderBy('batchNumber', descending: true)
+          .where(FirestoreConstants.batchNumber, isGreaterThanOrEqualTo: datePart)
+          .where(FirestoreConstants.batchNumber, isLessThan: '$datePart\uf7ff')
+          .orderBy(FirestoreConstants.batchNumber, descending: true)
           .limit(1)
           .get();
 
       int batchCount = 0;
 
       if (snapshot.docs.isNotEmpty) {
-        final latestBatchNumber = snapshot.docs.first['batchNumber'] as String;
+        final latestBatchNumber = snapshot.docs.first[FirestoreConstants.batchNumber] as String;
         AppLogger.debug('Latest batch number: $latestBatchNumber');
 
         final regex = RegExp(r'(\d+)$');
@@ -125,15 +125,15 @@ class BatchService implements IBatchService {
         .collection(FirestoreConstants.batches)
         .doc(generatedBatchNumber)
         .set({
-      'batchNumber': generatedBatchNumber,
+      FirestoreConstants.batchNumber: generatedBatchNumber,
       FirestoreConstants.productId: productId,
       FirestoreConstants.price: price,
       FirestoreConstants.stock: stock,
-      'quantifier': quantifier,
+      FirestoreConstants.quantifier: quantifier,
       FirestoreConstants.expiryDate: Timestamp.fromDate(expiryDate),
       FirestoreConstants.discount: discount,
-      'isListed': true,
-      'dateCreated': Timestamp.now(),
+      FirestoreConstants.isListed: true,
+      FirestoreConstants.dateCreated: Timestamp.now(),
       FirestoreConstants.sellerId: _currentUser.uid,
     });
   }
@@ -149,7 +149,7 @@ class BatchService implements IBatchService {
         .update({
       FirestoreConstants.price: price,
       FirestoreConstants.stock: stock,
-      'quantifier': quantifier,
+      FirestoreConstants.quantifier: quantifier,
       FirestoreConstants.expiryDate: Timestamp.fromDate(expiryDate),
       FirestoreConstants.discount: discount,
     });
