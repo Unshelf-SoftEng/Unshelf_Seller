@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:unshelf_seller/core/constants/app_constants.dart';
 import 'package:unshelf_seller/core/constants/firestore_constants.dart';
 import 'package:unshelf_seller/core/current_user_provider.dart';
+import 'package:unshelf_seller/core/errors/app_exceptions.dart';
 import 'package:unshelf_seller/core/interfaces/i_batch_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_bundle_service.dart';
 import 'package:unshelf_seller/core/interfaces/i_order_service.dart';
@@ -27,82 +28,98 @@ class OrderService implements IOrderService {
 
   @override
   Future<OrderModel?> getOrder(String orderId) async {
-    final orderDoc = await _firestore
-        .collection(FirestoreConstants.orders)
-        .doc(orderId)
-        .get();
+    try {
+      final orderDoc = await _firestore
+          .collection(FirestoreConstants.orders)
+          .doc(orderId)
+          .get();
 
-    if (!orderDoc.exists) {
-      return null;
-    }
+      if (!orderDoc.exists) {
+        return null;
+      }
 
-    var order = OrderModel.fromFirestore(orderDoc);
+      var order = OrderModel.fromFirestore(orderDoc);
 
-    var buyerDoc = await _firestore
-        .collection(FirestoreConstants.users)
-        .doc(order.buyerId)
-        .get();
+      var buyerDoc = await _firestore
+          .collection(FirestoreConstants.users)
+          .doc(order.buyerId)
+          .get();
 
-    order.buyerName = buyerDoc['name'];
+      order.buyerName = buyerDoc['name'];
 
-    for (var item in order.items) {
-      if (item.isBundle!) {
-        final bundleDoc = await _bundleService.getBundle(item.batchId!);
-        if (bundleDoc != null) {
-          order.bundles!.add(bundleDoc);
-        }
-        continue;
-      } else {
-        final batchDoc = await _batchService.getBatchById(item.batchId!);
-        if (batchDoc != null) {
-          order.products!.add(batchDoc);
+      for (var item in order.items) {
+        if (item.isBundle!) {
+          final bundleDoc = await _bundleService.getBundle(item.batchId!);
+          if (bundleDoc != null) {
+            order.bundles!.add(bundleDoc);
+          }
+          continue;
+        } else {
+          final batchDoc = await _batchService.getBatchById(item.batchId!);
+          if (batchDoc != null) {
+            order.products!.add(batchDoc);
+          }
         }
       }
-    }
 
-    return order;
+      return order;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch order', e, stackTrace);
+      throw FirestoreException('Failed to fetch order', originalError: e);
+    }
   }
 
   @override
   Future<List<OrderModel>> getOrders(bool forToday) async {
-    final duration = forToday
-        ? AppConstants.orderExpiryDuration
-        : AppConstants.orderHistoryDuration;
+    try {
+      final duration = forToday
+          ? AppConstants.orderExpiryDuration
+          : AppConstants.orderHistoryDuration;
 
-    var orderDoc = await _firestore
-        .collection(FirestoreConstants.orders)
-        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
-        .where(FirestoreConstants.createdAt,
-            isGreaterThan: DateTime.now().subtract(duration))
-        .orderBy(FirestoreConstants.createdAt, descending: false)
-        .get();
+      var orderDoc = await _firestore
+          .collection(FirestoreConstants.orders)
+          .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+          .where(FirestoreConstants.createdAt,
+              isGreaterThan: DateTime.now().subtract(duration))
+          .orderBy(FirestoreConstants.createdAt, descending: false)
+          .get();
 
-    AppLogger.debug('Orders fetched: ${orderDoc.docs.length}');
+      AppLogger.debug('Orders fetched: ${orderDoc.docs.length}');
 
-    List<OrderModel> orders = orderDoc.docs
-        .map((doc) => OrderModel.fromFirestore(doc))
-        .toList();
+      List<OrderModel> orders = orderDoc.docs
+          .map((doc) => OrderModel.fromFirestore(doc))
+          .toList();
 
-    return orders;
+      return orders;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch orders', e, stackTrace);
+      throw FirestoreException('Failed to fetch orders', originalError: e);
+    }
   }
 
   @override
   Future<List<OrderModel>> getOrdersWithBatchId() async {
-    var orderDoc = await _firestore
-        .collection(FirestoreConstants.orders)
-        .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
-        .where(FirestoreConstants.createdAt,
-            isGreaterThan:
-                DateTime.now().subtract(AppConstants.orderExpiryDuration))
-        .orderBy(FirestoreConstants.createdAt, descending: false)
-        .get();
+    try {
+      var orderDoc = await _firestore
+          .collection(FirestoreConstants.orders)
+          .where(FirestoreConstants.sellerId, isEqualTo: _currentUser.uid)
+          .where(FirestoreConstants.createdAt,
+              isGreaterThan:
+                  DateTime.now().subtract(AppConstants.orderExpiryDuration))
+          .orderBy(FirestoreConstants.createdAt, descending: false)
+          .get();
 
-    AppLogger.debug('Orders containing batchId: ${orderDoc.docs.length}');
+      AppLogger.debug('Orders containing batchId: ${orderDoc.docs.length}');
 
-    List<OrderModel> orders = orderDoc.docs
-        .map((doc) => OrderModel.fromFirestore(doc))
-        .toList();
+      List<OrderModel> orders = orderDoc.docs
+          .map((doc) => OrderModel.fromFirestore(doc))
+          .toList();
 
-    return orders;
+      return orders;
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to fetch orders with batch ID', e, stackTrace);
+      throw FirestoreException('Failed to fetch orders with batch ID',
+          originalError: e);
+    }
   }
 }
