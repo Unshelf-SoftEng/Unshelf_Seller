@@ -82,4 +82,17 @@ class BundleService implements IBundleService {
       throw FirestoreException('Failed to update bundle', originalError: e);
     }
   }
+
+  @override
+  Future<void> deleteBundle(String bundleId) async {
+    try {
+      await _firestore
+          .collection(FirestoreConstants.bundles)
+          .doc(bundleId)
+          .delete();
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to delete bundle', e, stackTrace);
+      throw FirestoreException('Failed to delete bundle', originalError: e);
+    }
+  }
 }

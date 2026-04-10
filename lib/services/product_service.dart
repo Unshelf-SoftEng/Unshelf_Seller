@@ -117,4 +117,17 @@ class ProductService implements IProductService {
       throw FirestoreException('Failed to update product', originalError: e);
     }
   }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    try {
+      await _firestore
+          .collection(FirestoreConstants.products)
+          .doc(productId)
+          .delete();
+    } on FirebaseException catch (e, stackTrace) {
+      AppLogger.error('Failed to delete product', e, stackTrace);
+      throw FirestoreException('Failed to delete product', originalError: e);
+    }
+  }
 }

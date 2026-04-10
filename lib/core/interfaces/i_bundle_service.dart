@@ -4,4 +4,5 @@ abstract class IBundleService {
   Future<BundleModel?> getBundle(String bundleId);
   Future<void> createBundle(BundleModel bundle);
   Future<void> updateBundle(BundleModel bundle);
+  Future<void> deleteBundle(String bundleId);
 }
