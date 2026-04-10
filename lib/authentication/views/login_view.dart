@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:unshelf_seller/views/home_view.dart';
 import 'package:unshelf_seller/authentication/views/register_view.dart';
 import 'package:unshelf_seller/authentication/views/forgot_password_view.dart';
@@ -18,8 +19,7 @@ class _LoginViewState extends State<LoginView> {
   final _passwordController = TextEditingController();
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId:
-        '159115550949-hp96uuifjrgksbrc23tnbfhb49b99coo.apps.googleusercontent.com',
+    clientId: dotenv.env['GOOGLE_CLIENT_ID']!,
     scopes: <String>[
       'email',
       'profile',
